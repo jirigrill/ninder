@@ -10,11 +10,11 @@
 
 <div class="card-navigation flex flex-row items-center justify-center">
 	<div class="mr-auto">
-		{@render actionButton('fa-rotate-right', 'Revert', 'sky-600', 'sky-300', onRevert)}
+		{@render actionButton('fa-rotate-right', 'Revert', 'from-sky-600', 'to-sky-300', onRevert)}
 	</div>
-	{@render actionButton('fa-circle-xmark', 'Dislike', 'red-600', 'red-400', onDislike)}
-	{@render actionButton('fa-star', 'Super Like', 'amber-500', 'yellow-300', onSuperLike)}
-	{@render actionButton('fa-heart', 'Like', 'green-600', 'emerald-400', onLike)}
+	{@render actionButton('fa-circle-xmark', 'Dislike', 'from-red-600', 'to-red-400', onDislike)}
+	{@render actionButton('fa-star', 'Super Like', 'from-amber-500', 'to-yellow-300', onSuperLike)}
+	{@render actionButton('fa-heart', 'Like', 'from-green-600', 'to-emerald-400', onLike)}
 
 	<div class="invisible ml-auto">
 		{@render actionButton('fa-rotate-right', 'Hidden', 'sky-600', 'sky-300', onRevert)}
@@ -32,8 +32,8 @@
 			aria-label={ariaLabel}
 			onclick={clickHandler}
 		>
-			<i
-				class="fa-solid {iconClass} inline-block bg-gradient-to-tr from-{gradientStartColor} to-{gradientEndColor} bg-clip-text text-4xl text-transparent"
+			<i 
+				class="fa-solid {iconClass} bg-gradient-to-tr text-4xl {gradientStartColor} {gradientEndColor} inline-block bg-clip-text text-transparent"
 			></i>
 		</button>
 	{/snippet}
