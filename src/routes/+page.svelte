@@ -1,5 +1,5 @@
 <script>
-    import CardActionBar from "./CardActionBar.svelte";
+    import CardActionBar from "./components/CardActionBar.svelte";
 </script>
 
 <h1>Welcome to SvelteKit</h1>
