@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+	import { pan, type PanEvent } from './actions/pan';
 
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
@@ -7,52 +7,84 @@
 	};
 
 	const { onSwipeFeedback, onSwipe }: Props = $props();
+	let cards = $state([
+		1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
+		3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
+		5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+		2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3,
+		4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5,
+		1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2,
+		3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4,
+		5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1,
+		2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5
+	]);
 
-	let cardElement: HTMLElement;
 	let translateX = $state(0);
 	let rotation = $derived(translateX / 10);
 	let transitionAnimation = $state(false);
 
-	if (browser) {
-		import('hammerjs').then((obj) => {
-			let hammertime = new Hammer(cardElement);
+	function onpan(event: CustomEvent<PanEvent>) {
+		transitionAnimation = false;
+		translateX = event.detail.deltaX;
 
-			hammertime.on('pan', (event) => {
-				transitionAnimation = false;
-				translateX = event.deltaX;
+		if (event.detail.deltaX > 100) {
+			onSwipeFeedback('right');
+		} else if (event.detail.deltaX < -100) {
+			onSwipeFeedback('left');
+		} else {
+			onSwipeFeedback('none');
+		}
+	}
 
-				if (event.deltaX > 100) {
-					onSwipeFeedback('right');
-				} else if (event.deltaX < -100) {
-					onSwipeFeedback('left');
-				} else {
-					onSwipeFeedback('none');
-				}
-			});
+	function onpanend(event: CustomEvent<PanEvent>) {
+		transitionAnimation = true;
 
-			hammertime.on('panend', (event) => {
-				transitionAnimation = true;
+		if (event.detail.deltaX > 100) {
+			translateX = 800;
+			onSwipe('right');
 
-				if (event.deltaX > 100) {
-					translateX = 800;
-					onSwipe('right');
-				} else if (event.deltaX < -100) {
-					translateX = -800;
-					onSwipe('left');
-				} else {
-					translateX = 0;
-				}
-			});
-		});
+			cards.pop();
+			translateX = 0;
+			onSwipeFeedback('none');
+		} else if (event.detail.deltaX < -100) {
+			translateX = -800;
+			onSwipe('left');
+
+			cards.pop();
+			translateX = 0;
+			onSwipeFeedback('none');
+		} else {
+			translateX = 0;
+		}
 	}
 </script>
 
-<div
-	bind:this={cardElement}
-	class="h-full w-full rounded-lg bg-white shadow-xl"
-	class:duration-150={transitionAnimation}
-	class:transition-all={transitionAnimation}
-	style="-webkit-transform: translateX({translateX}px) rotate({rotation}deg);"
->
-	<p>test</p>
+<div class="relative h-full w-full">
+	{#if cards.length == 1}
+		<div class="absolute h-full w-full rounded-lg bg-slate-300 shadow-xl">
+			<p>Keine Karten mehr vorhanden!</p>
+		</div>
+	{:else}
+		{#key cards[cards.length - 2]}
+			<div class="absolute h-full w-full rounded-lg bg-white shadow-xl">
+				<p>{cards[cards.length - 2]}</p>
+			</div>
+		{/key}
+	{/if}
+
+	{#if cards.length >= 2}
+		{#key cards[cards.length - 1]}
+			<div
+				use:pan
+				{onpan}
+				{onpanend}
+				class="absolute h-full w-full rounded-lg bg-white shadow-xl"
+				class:duration-150={transitionAnimation}
+				class:transition-all={transitionAnimation}
+				style="-webkit-transform: translateX({translateX}px) rotate({rotation}deg);"
+			>
+				<p>{cards[cards.length - 1]}</p>
+			</div>
+		{/key}
+	{/if}
 </div>
