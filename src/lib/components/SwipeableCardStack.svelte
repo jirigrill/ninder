@@ -34,7 +34,11 @@
 		} else if (event.detail.deltaX < -100) {
 			swipe('left');
 		} else {
+			transitionAnimation = true;
 			resetTranslation();
+			setTimeout(() => {
+				resetAnimation();
+			}, 1000);
 		}
 	}
 
@@ -50,13 +54,17 @@
 
 		setTimeout(() => {
 			resetTranslation();
+			resetAnimation();
 			onSwipeFeedback('none');
 			onSwipe(direction);
-		}, 200);
+		}, 500);
 	}
 
 	function resetTranslation() {
 		translateX = 0;
+	}
+
+	function resetAnimation() {
 		transitionAnimation = false;
 	}
 
@@ -89,7 +97,7 @@
 				{onpan}
 				{onpanend}
 				class="absolute h-full w-full"
-				class:duration-200={transitionAnimation}
+				class:duration-500={transitionAnimation}
 				class:opacity-25={transitionAnimation}
 				class:transition-all={transitionAnimation}
 				style="transform: translateX({translateX}px) rotate({rotation}deg);"
