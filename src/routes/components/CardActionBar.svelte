@@ -1,23 +1,41 @@
 <script lang="ts">
 	type Props = {
-		onRevert: () => void;
-		onDislike: () => void;
-		onLike: () => void;
-		onSuperLike: () => void;
+		onRevertButton: () => void;
+		onDislikeButton: () => void;
+		onLikeButton: () => void;
+		onSuperLikeButton: () => void;
 	};
-	let { onRevert, onDislike, onLike, onSuperLike }: Props = $props();
+	let { onRevertButton, onDislikeButton, onLikeButton, onSuperLikeButton }: Props = $props();
 </script>
 
 <div class="card-navigation flex flex-row items-center justify-center">
 	<div class="mr-auto">
-		{@render actionButton('fa-rotate-right', 'Revert', 'from-sky-600', 'to-sky-300', onRevert)}
+		{@render actionButton(
+			'fa-rotate-right',
+			'Revert',
+			'from-sky-600',
+			'to-sky-300',
+			onRevertButton
+		)}
 	</div>
-	{@render actionButton('fa-circle-xmark', 'Dislike', 'from-red-600', 'to-red-400', onDislike)}
-	{@render actionButton('fa-star', 'Super Like', 'from-amber-500', 'to-yellow-300', onSuperLike)}
-	{@render actionButton('fa-heart', 'Like', 'from-green-600', 'to-emerald-400', onLike)}
+	{@render actionButton(
+		'fa-circle-xmark',
+		'Dislike',
+		'from-red-600',
+		'to-red-400',
+		onDislikeButton
+	)}
+	{@render actionButton(
+		'fa-star',
+		'Super Like',
+		'from-amber-500',
+		'to-yellow-300',
+		onSuperLikeButton
+	)}
+	{@render actionButton('fa-heart', 'Like', 'from-green-600', 'to-emerald-400', onLikeButton)}
 
 	<div class="invisible ml-auto">
-		{@render actionButton('fa-rotate-right', 'Hidden', 'sky-600', 'sky-300', onRevert)}
+		{@render actionButton('fa-rotate-right', 'Hidden', 'sky-600', 'sky-300', onRevertButton)}
 	</div>
 
 	{#snippet actionButton(

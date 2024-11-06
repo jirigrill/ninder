@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { pan, type PanEvent } from './actions/pan';
+	import { pan, type PanEvent } from '../actions/pan';
 
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
@@ -29,8 +29,6 @@
 	}
 
 	function onpanend(event: CustomEvent<PanEvent>) {
-		transitionAnimation = true;
-
 		if (event.detail.deltaX > 100) {
 			swipe('right');
 		} else if (event.detail.deltaX < -100) {
@@ -40,7 +38,10 @@
 		}
 	}
 
-	function swipe(direction: 'right' | 'left') {
+	export function swipe(direction: 'right' | 'left') {
+		transitionAnimation = true;
+		onSwipeFeedback(direction);
+
 		if (direction == 'right') {
 			translateRight();
 		} else {
