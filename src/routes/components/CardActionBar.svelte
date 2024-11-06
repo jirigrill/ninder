@@ -8,16 +8,7 @@
 	let { onRevertButton, onDislikeButton, onLikeButton, onSuperLikeButton }: Props = $props();
 </script>
 
-<div class="card-navigation flex flex-row items-center justify-center">
-	<div class="mr-auto">
-		{@render actionButton(
-			'fa-rotate-right',
-			'Revert',
-			'from-sky-600',
-			'to-sky-300',
-			onRevertButton
-		)}
-	</div>
+<div class="card-navigation space-be flex flex-row items-center justify-around">
 	{@render actionButton(
 		'fa-circle-xmark',
 		'Dislike',
@@ -25,6 +16,7 @@
 		'to-red-400',
 		onDislikeButton
 	)}
+	{@render actionButton('fa-rotate-right', 'Revert', 'from-sky-600', 'to-sky-300', onRevertButton)}
 	{@render actionButton(
 		'fa-star',
 		'Super Like',
@@ -34,10 +26,6 @@
 	)}
 	{@render actionButton('fa-heart', 'Like', 'from-green-600', 'to-emerald-400', onLikeButton)}
 
-	<div class="invisible ml-auto">
-		{@render actionButton('fa-rotate-right', 'Hidden', 'sky-600', 'sky-300', onRevertButton)}
-	</div>
-
 	{#snippet actionButton(
 		iconClass: string,
 		ariaLabel: string,
@@ -46,7 +34,7 @@
 		clickHandler: () => void
 	)}
 		<button
-			class="mx-2 flex h-[70px] w-[70px] items-center justify-center rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
+			class="flex h-[70px] w-[70px] items-center justify-center rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
 			aria-label={ariaLabel}
 			onclick={clickHandler}
 		>
