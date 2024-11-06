@@ -38,7 +38,7 @@
 			resetTranslation();
 			setTimeout(() => {
 				resetAnimation();
-			}, 1000);
+			}, 500);
 		}
 	}
 
@@ -69,11 +69,11 @@
 	}
 
 	function translateRight() {
-		translateX = 800;
+		translateX = window.innerWidth * 1.5;
 	}
 
 	function translateLeft() {
-		translateX = -800;
+		translateX = -(window.innerWidth * 1.5);
 	}
 </script>
 
@@ -98,7 +98,6 @@
 				{onpanend}
 				class="absolute h-full w-full"
 				class:duration-500={transitionAnimation}
-				class:opacity-25={transitionAnimation}
 				class:transition-all={transitionAnimation}
 				style="transform: translateX({translateX}px) rotate({rotation}deg);"
 			>
