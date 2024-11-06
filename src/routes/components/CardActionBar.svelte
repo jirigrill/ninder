@@ -28,11 +28,11 @@
 		clickHandler: () => void
 	)}
 		<button
-			class="mx-2 rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
+			class="mx-2 flex h-[50px] w-[50px] items-center justify-center rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
 			aria-label={ariaLabel}
 			onclick={clickHandler}
 		>
-			<i 
+			<i
 				class="fa-solid {iconClass} bg-gradient-to-tr text-4xl {gradientStartColor} {gradientEndColor} inline-block bg-clip-text text-transparent"
 			></i>
 		</button>
