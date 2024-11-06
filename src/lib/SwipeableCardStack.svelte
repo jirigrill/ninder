@@ -20,6 +20,7 @@
 	]);
 
 	let translateX = $state(0);
+
 	let rotation = $derived(translateX / 10);
 	let transitionAnimation = $state(false);
 
@@ -43,17 +44,24 @@
 			translateX = 800;
 			onSwipe('right');
 
-			cards.pop();
-			translateX = 0;
-			onSwipeFeedback('none');
+			setTimeout(() => {
+				cards.pop();
+				translateX = 0;
+				transitionAnimation = false;
+				onSwipeFeedback('none');
+			}, 200);
 		} else if (event.detail.deltaX < -100) {
 			translateX = -800;
 			onSwipe('left');
 
-			cards.pop();
-			translateX = 0;
-			onSwipeFeedback('none');
+			setTimeout(() => {
+				cards.pop();
+				translateX = 0;
+				transitionAnimation = false;
+				onSwipeFeedback('none');
+			}, 200);
 		} else {
+			transitionAnimation = false;
 			translateX = 0;
 		}
 	}
@@ -79,7 +87,8 @@
 				{onpan}
 				{onpanend}
 				class="absolute h-full w-full rounded-lg bg-white shadow-xl"
-				class:duration-150={transitionAnimation}
+				class:duration-200={transitionAnimation}
+				class:opacity-25={transitionAnimation}
 				class:transition-all={transitionAnimation}
 				style="-webkit-transform: translateX({translateX}px) rotate({rotation}deg);"
 			>
