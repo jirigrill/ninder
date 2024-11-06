@@ -6,6 +6,7 @@
 
 	let swipeFeedbackState = $state('none');
 	let backgroundColor = $state('bg-slate-100');
+	let cards = $state(['1', '2', '3', '4']);
 
 	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none') {
 		swipeFeedbackState = feedbackType;
@@ -19,7 +20,14 @@
 		}
 	}
 
-	function onSwipe(feedbackType: 'left' | 'right') {}
+	function onSwipe(feedbackType: 'left' | 'right') {
+		cards.shift();
+		if (cards.length == 2) {
+			cards.push('push 1');
+			cards.push('push 2');
+			cards.push('push 3');
+		}
+	}
 </script>
 
 {@render swipeFeedback(
@@ -37,10 +45,22 @@
 
 <div class="flex h-full w-full flex-col p-4 {backgroundColor} background-color-transition">
 	<div class="mb-4 flex grow flex-col">
-		<SwipeableCardStack {onSwipeFeedback} {onSwipe} />
+		<SwipeableCardStack {onSwipeFeedback} {onSwipe} {cardSnippet} {emptyCardSnippet} {cards} />
 	</div>
 	<CardActionBar />
 </div>
+
+{#snippet cardSnippet(text: string)}
+	<div class="h-full w-full rounded-lg bg-white shadow-xl">
+		<p>{text}</p>
+	</div>
+{/snippet}
+
+{#snippet emptyCardSnippet()}
+	<div class="h-full w-full rounded-lg bg-slate-300 shadow-xl">
+		<p>Keine Karten verfügbar</p>
+	</div>
+{/snippet}
 
 {#snippet swipeFeedback(
 	iconClass: string,

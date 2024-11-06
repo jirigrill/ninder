@@ -28,7 +28,7 @@
 		clickHandler: () => void
 	)}
 		<button
-			class="mx-2 flex h-[50px] w-[50px] items-center justify-center rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
+			class="mx-2 flex h-[70px] w-[70px] items-center justify-center rounded-full bg-white p-2 shadow-md active:bg-slate-100 active:shadow-inner"
 			aria-label={ariaLabel}
 			onclick={clickHandler}
 		>
