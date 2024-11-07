@@ -1,7 +1,7 @@
-import { names } from "./data";
+import * as db from "./data";
 
 export function load({ params }: { params: { category: string } }) {
-    const filteredNames = names.filter((name) => name.countries.includes(params.category));
+    const filteredNames = db.getCards(params.category);
     return {
         names: filteredNames
     }
