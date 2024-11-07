@@ -56,11 +56,26 @@
 
 </script>
 
-<a href="/swipe">Swipe</a>
+<div class="h-full w-full bg-slate-100 p-4 scroll-view">
+	{#each categories as category}
+		<a class="flex flex-col bg-white p-4 mb-4  shadow-lg rounded-xl" href="/swipe/{category.letterCode}">
+			<div class="flex items-center">
+				<span class="fi mr-1 fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
+				<h1 class="text-2xl ml-2 font-semibold">{category.name}</h1>
+			</div>
+			<progress class=""  value="35"></progress>
+		</a>
+	{/each}	
+</div>
 
-{#each categories as category}
-	<a class="flex" href="/swipe/{category.letterCode}">
-		<span class="fi ml-1 mr-1 fi-{category.letterCode.toLowerCase()}"></span>
-		<h1>{category.name}</h1>
-	</a>
-{/each}
+<style>
+	.scroll-view {
+		overflow-y: scroll;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.scroll-view::-webkit-scrollbar {
+		display: none;
+	}
+</style>
