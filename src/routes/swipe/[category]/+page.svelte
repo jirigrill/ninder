@@ -2,7 +2,7 @@
 	import type { Card } from '$lib/types';
 	import CardSwipeContainer from './CardSwipeContainer.svelte';
 
-	let { data} = $props();
+	let { data } = $props();
 
 	let cards = data.names;
 
@@ -14,5 +14,6 @@
 		cards.shift();
 	}
 </script>
+
 
 <CardSwipeContainer {cards} {onLike} {onDislike} />
