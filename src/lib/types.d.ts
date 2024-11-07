@@ -1,5 +1,5 @@
 export type Card = {
 	name: string;
-	land: string[];
-	bedeutung: string;
+	countries: string[];
+	meaning: string;
 };
