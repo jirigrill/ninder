@@ -3,11 +3,12 @@
 
 	import SwipeableCardStack from '$lib/components/SwipeableCardStack.svelte';
 	import CardActionBar from './CardActionBar.svelte';
+	import type { Card } from '$lib/types';
 
 	type Props = {
-		onLike: (card: string) => void;
-		onDislike: (card: string) => void;
-		cards: string[];
+		onLike: (card: Card) => void;
+		onDislike: (card: Card) => void;
+		cards: Card[];
 	};
 
 	let { onLike, onDislike, cards = [] }: Props = $props();
@@ -72,9 +73,24 @@
 	<CardActionBar {onDislikeButton} {onLikeButton} />
 </div>
 
-{#snippet cardSnippet(text: string)}
+<!-- {#snippet cardSnippet(text: string)}
 	<div class="h-full w-full rounded-lg bg-white shadow-xl">
 		<p>{text}</p>
+	</div>
+{/snippet} -->
+
+{#snippet cardSnippet(card: Card)}
+	<div
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gradient-to-br from-sky-200 to-sky-400 shadow-xl"
+	>
+		<h1 class="text-8xl font-bold text-white">{card.name}</h1>
+		<h2 class="mt-10 text-3xl font-bold text-white">- {card.bedeutung} -</h2>
+		<div class="mb-5 mt-5 flex text-2xl">
+			<p class="mr-5 font-bold text-white">Herkunft:</p>
+			{#each card.land as land}
+				<span class="fi ml-1 mr-1 fi-{land.toLowerCase()}"></span>
+			{/each}
+		</div>
 	</div>
 {/snippet}
 

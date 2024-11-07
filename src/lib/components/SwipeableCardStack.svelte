@@ -1,11 +1,12 @@
 <script lang="ts">
+	import type { Card } from '$lib/types';
 	import { pan, type PanEvent } from '../actions/pan';
 
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
 		onSwipe: (swipe: 'left' | 'right') => void;
-		cards: string[];
-		cardSnippet: (card: string) => any;
+		cards: Card[];
+		cardSnippet: (card: Card) => any;
 		emptyCardSnippet: () => any;
 	};
 
