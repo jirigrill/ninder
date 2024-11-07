@@ -60,10 +60,10 @@
 	{#each categories as category}
 		<a class="flex flex-col bg-white p-4 mb-4  shadow-lg rounded-xl" href="/swipe/{category.letterCode}">
 			<div class="flex items-center">
-				<span class="fi mr-1 fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
+				<span class="shadow-sm fi mr-1 fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
 				<h1 class="text-2xl ml-2 font-semibold">{category.name}</h1>
 			</div>
-			<progress class=""  value="35"></progress>
+			<progress class="mt-4"  value="35"></progress>
 		</a>
 	{/each}	
 </div>
