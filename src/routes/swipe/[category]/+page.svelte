@@ -1,14 +1,20 @@
 <script lang="ts">
 	import type { Card } from '$lib/types';
+	import { page } from '$app/stores';
+	const email = $page.url.searchParams.get('email');
 	import CardSwipeContainer from './CardSwipeContainer.svelte';
+	import { fade, fly, slide } from 'svelte/transition';
 
 	let { data } = $props();
-	let cards: Card[] = $state(data.cards);
-	let loadingAnimation = $state(false);
-
-	let skip = 2;
+	let cards: Card[] = $state([]);
+	let loadingAnimation = $state(true);
+	let skip = 0;
 	let take = 2;
-	let country = 'fi';
+	let country = $page.params.category;
+
+	$effect(() => {
+		tryLoadNextStack();
+	});
 
 	async function onLike(card: Card) {
 		cards.shift();
@@ -32,18 +38,21 @@
 			method: 'GET'
 		});
 		const newStack: Card[] = await response.json();
-		await new Promise(r => setTimeout(r, 2000)); 
 		cards.push(...newStack);
 		skip += take;
 		loadingAnimation = false;
 	}
 </script>
 
-{#if loadingAnimation}
-	<i class="fa-solid fa-spinner loading-spinner absolute text-9xl"></i>
+<div class="w-full h-full">
+	{#if loadingAnimation}
+	<div class="absolute z-10 flex justify-center items-center h-full w-full">
+		<i class="fa-solid fa-spinner loading-spinner text-9xl"></i>
+	</div>
 {/if}
 
 <CardSwipeContainer {cards} {onLike} {onDislike} />
+</div>
 
 <style>
 	.loading-spinner {

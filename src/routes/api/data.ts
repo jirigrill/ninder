@@ -1,5 +1,72 @@
-import type { Card } from "$lib/types";
+import type { Card, Category } from "$lib/types";
 
+const categories: Category[] = [
+    {
+        name: "Deutschland",
+        letterCode: "DE",
+        progress: 0
+    },
+    {
+        name: "Finnland",
+        letterCode: "FI",
+        progress: 0
+    },
+    {
+        name: "Frankreich",
+        letterCode: "FR",
+        progress: 0
+    },
+    {
+        name: "Griechenland",
+        letterCode: "GR",
+        progress: 0
+    },
+    {
+        name: "Italien",
+        letterCode: "IT",
+        progress: 0
+    },
+    {
+        name: "Kanada",
+        letterCode: "CA",
+        progress: 0
+    },
+    {
+        name: "Portugal",
+        letterCode: "PT",
+        progress: 0
+    },
+    {
+        name: "Russland",
+        letterCode: "RU",
+        progress: 0
+    },
+    {
+        name: "Schweden",
+        letterCode: "SE",
+        progress: 0
+    },
+    {
+        name: "Spanien",
+        letterCode: "ES",
+        progress: 0
+    },
+    {
+        name: "Ukraine",
+        letterCode: "UA",
+        progress: 0
+    },
+    {
+        name: "USA",
+        letterCode: "US",
+        progress: 0
+    },
+    {
+        name: "Vereinigtes Königreich",
+        letterCode: "GB",
+        progress: 0
+    }
+];
 const names: Card[] = [
     {
         id: crypto.randomUUID(),
@@ -154,27 +221,14 @@ const names: Card[] = [
         countries: ['FI'],
         meaning: 'Einzigartige',
         swipeStatus: "none"
-    },
-    {
-        id: crypto.randomUUID(),
-        name: 'test 1',
-        countries: ['FI'],
-        meaning: 'Wer ist wie Gott?',
-        swipeStatus: "none"
-    },
-    {
-        id: crypto.randomUUID(),
-        name: 'test 2',
-        countries: ['FI'],
-        meaning: 'Einzigartige',
-        swipeStatus: "none"
     }
 ];
-const db = new Array<Card>(...names);
+const cardDb = new Array<Card>(...names);
 const swiped = new Set<string>();
+const categoryDb = new Array<Category>(...categories);
 
 export function getCards(country: string | null | undefined, skip: number = 0, take: number = 10) {
-    let filter = db.filter((card) => !swiped.has(card.id));
+    let filter = cardDb.filter((card) => !swiped.has(card.id));
     if (country !== null && country !== undefined) {
         filter = filter.filter((name) => name.countries.includes(country.toLocaleUpperCase()));
     }
@@ -186,29 +240,51 @@ export function getCards(country: string | null | undefined, skip: number = 0, t
     return filter.slice(skip, skip + take);
 }
 
+export function getTotalCards(country: string | null | undefined): number {
+    let filter = cardDb;
+    if (country !== null && country !== undefined) {
+        filter = filter.filter((name) => name.countries.includes(country.toLocaleUpperCase()));
+    }
+
+    return filter.length;
+}
+
+export function getTotalSwipedCards(country: string | null | undefined): number {
+    let filter = cardDb;
+    if (country !== null && country !== undefined) {
+        filter = filter.filter((name) => name.countries.includes(country.toLocaleUpperCase()));
+    }
+
+    return filter.filter((card) => swiped.has(card.id)).length;
+}
+
 export function removeCard(id: string) {
-    const index = db.findIndex((card) => card.id === id);
+    const index = cardDb.findIndex((card) => card.id === id);
     if (index !== -1) {
-        db.splice(index, 1);
+        cardDb.splice(index, 1);
     }
 }
 
 export function updateSwipeStatus(id: string, swipeStatus: "none" | "liked" | "disliked") {
-    const index = db.findIndex((card) => card.id === id);
+    const index = cardDb.findIndex((card) => card.id === id);
 
     if(index === -1) {
         throw `A card with the id ${id} wasn't found!`;
     }
 
-    swiped.add(db[index].id);
+    swiped.add(cardDb[index].id);
 }
 
 export function addCard() {
-    db.push({
+    cardDb.push({
         id: crypto.randomUUID(),
         name: "test",
         countries: ["FI"],
         meaning: "test",
         swipeStatus: "none"
     });
+}
+
+export function getCategories() {
+    return categoryDb;
 }

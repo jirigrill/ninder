@@ -24,7 +24,6 @@ export function pan(node: HTMLElement): ActionReturn<Attributes> {
 		);
 
 		destroyHammertime = () => {
-			console.log('destroyed');
 			hammertime.off('pan');
 			hammertime.off('panend');
 		};

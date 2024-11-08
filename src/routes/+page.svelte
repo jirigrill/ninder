@@ -1,71 +1,58 @@
 <script lang="ts">
-	const categories = [
-    {
-        name: "Deutschland",
-        letterCode: "DE"
-    },
-    {
-        name: "Finnland",
-        letterCode: "FI"
-    },
-    {
-        name: "Frankreich",
-        letterCode: "FR"
-    },
-    {
-        name: "Griechenland",
-        letterCode: "GR"
-    },
-    {
-        name: "Italien",
-        letterCode: "IT"
-    },
-    {
-        name: "Kanada",
-        letterCode: "CA"
-    },
-    {
-        name: "Portugal",
-        letterCode: "PT"
-    },
-    {
-        name: "Russland",
-        letterCode: "RU"
-    },
-    {
-        name: "Schweden",
-        letterCode: "SE"
-    },
-    {
-        name: "Spanien",
-        letterCode: "ES"
-    },
-    {
-        name: "Ukraine",
-        letterCode: "UA"
-    },
-    {
-        name: "USA",
-        letterCode: "US"
-    },
-    {
-        name: "Vereinigtes Königreich",
-        letterCode: "GB"
-    }
-];
+	import type { CategoryProgress } from '$lib/types';
 
+	let categories: CategoryProgress[] = $state([]);
+
+	async function loadCategories() {
+		const response = await fetch(`/api/categories`, {
+			method: 'GET'
+		});
+		const loadedCategories: CategoryProgress[] = await response.json();
+		categories.push(...loadedCategories);
+	}
 </script>
 
-<div class="h-full w-full bg-slate-100 p-4 scroll-view">
-	{#each categories as category}
-		<a class="flex flex-col bg-white p-4 mb-4  shadow-lg rounded-xl" href="/swipe/{category.letterCode}">
+<div class="scroll-view h-full w-full bg-slate-100 p-4">
+	{#await loadCategories()}
+		{#each Array(10) as index}
+			{@render skeletonSnippet()}
+		{/each}
+	{:then}
+		{#each categories as category}
+			{@render categorySnippet(category)}
+		{/each}
+	{/await}
+
+	{#snippet skeletonSnippet()}
+		<div class="mb-4 flex flex-col rounded-xl bg-slate-200 p-4 shadow-lg">
 			<div class="flex items-center">
-				<span class="shadow-sm fi mr-1 fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
-				<h1 class="text-2xl ml-2 font-semibold">{category.name}</h1>
+				<div class=" h-[50px] w-[50px] bg-slate-300 shadow-sm"></div>
+				<h1 class="ml-2 bg-slate-300 text-2xl font-semibold text-slate-300">Deutschland</h1>
 			</div>
-			<progress class="mt-4"  value="35"></progress>
+			<div class="flex items-baseline">
+				<p class="mt-1 bg-slate-300 text-xl text-slate-300">o von o</p>
+				<div class="ml-4 h-5 grow bg-slate-300"></div>
+			</div>
+		</div>
+	{/snippet}
+
+	{#snippet categorySnippet(category: CategoryProgress)}
+		<a
+			class="mb-4 flex flex-col rounded-xl bg-white p-4 shadow-lg"
+			href="/swipe/{category.letterCode}"
+		>
+			<div class="flex items-center">
+				<span class="fi mr-1 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
+				></span>
+				<h1 class="ml-2 text-2xl font-semibold">{category.name}</h1>
+			</div>
+			<div class="flex items-baseline">
+				<p class="text-xl">{category.swipedCards} von {category.totalCards}</p>
+				<progress class="ml-4 grow" value={category.swipedCards} max={category.totalCards}
+				></progress>
+			</div>
 		</a>
-	{/each}	
+	{/snippet}
 </div>
 
 <style>
@@ -77,5 +64,15 @@
 
 	.scroll-view::-webkit-scrollbar {
 		display: none;
+	}
+
+	.skeleton {
+		background-color: #e2e5e7 !important;
+	}
+
+	@keyframes shine {
+		to {
+			background-position: right -40px top 0;
+		}
 	}
 </style>

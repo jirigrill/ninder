@@ -5,8 +5,12 @@ import * as db from '../../../data';
 export const POST: RequestHandler = async ({params}) => {
     const id: string | undefined = params.id;
 
+    if(id === undefined) {
+        return new Response(null, { status: 404});
+    }
+
     try{
-        db.updateSwipeStatus(id, "like");
+        db.updateSwipeStatus(id, "liked");
         return new Response(null, { status: 204 });
     } catch(exception) {
         if(exception === `A card with the id ${id} wasn't found!`) {
