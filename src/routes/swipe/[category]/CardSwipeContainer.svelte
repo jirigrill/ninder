@@ -95,8 +95,11 @@
 {/snippet}
 
 {#snippet emptyCardSnippet()}
-	<div class="h-full w-full rounded-lg bg-slate-300 shadow-xl">
-		<p>Keine Karten verfügbar</p>
+	<div
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-400 bg-slate-300 p-5 shadow-xl"
+	>
+		<h1 class="text-center text-6xl font-bold text-slate-50">Yeah, das waren alle Namen!</h1>
+		<i class="fa-solid fa-flag-checkered mt-10 text-9xl text-slate-50"></i>
 	</div>
 {/snippet}
 
@@ -127,5 +130,37 @@
 		-webkit-transition: background-color 200ms linear;
 		-ms-transition: background-color 200ms linear;
 		transition: background-color 200ms linear;
+	}
+
+	.skeleton-box {
+		display: inline-block;
+		height: 1em;
+		position: relative;
+		overflow: hidden;
+		background-color: #dddbdd;
+
+		&::after {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			transform: translateX(-100%);
+			background-image: linear-gradient(
+				90deg,
+				rgba(#fff, 0) 0,
+				rgba(#fff, 0.2) 20%,
+				rgba(#fff, 0.5) 60%,
+				rgba(#fff, 0)
+			);
+			animation: shimmer 5s infinite;
+			content: '';
+		}
+
+		@keyframes shimmer {
+			100% {
+				transform: translateX(100%);
+			}
+		}
 	}
 </style>
