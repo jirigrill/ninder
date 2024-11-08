@@ -227,17 +227,13 @@ const cardDb = new Array<Card>(...names);
 const swiped = new Set<string>();
 const categoryDb = new Array<Category>(...categories);
 
-export function getCards(country: string | null | undefined, skip: number = 0, take: number = 10) {
+export function getCards(country: string | null | undefined, take: number = 10) {
     let filter = cardDb.filter((card) => !swiped.has(card.id));
     if (country !== null && country !== undefined) {
         filter = filter.filter((name) => name.countries.includes(country.toLocaleUpperCase()));
     }
 
-    if(skip >= filter.length) {
-        skip = 0;
-    }
-
-    return filter.slice(skip, skip + take);
+    return filter.slice(0, take);
 }
 
 export function getTotalCards(country: string | null | undefined): number {
