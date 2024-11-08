@@ -5,3 +5,9 @@ export type Card = {
 	meaning: string;
 	swipeStatus: "none" | "liked" | "disliked";
 };
+
+export type Category = {
+	name: string;
+	letterCode: string;
+	progress: number;
+};
