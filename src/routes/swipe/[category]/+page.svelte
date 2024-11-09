@@ -4,7 +4,7 @@
 	import { browser } from '$app/environment';
 	import CardActionBar from './CardActionBar.svelte';
 	import SwipeableCardStack from '$lib/components/SwipeableCardStack.svelte';
-	import TitleHeader from '$lib/components/TitleHeader.svelte';
+	import TitleHeader from './TitleHeader.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import SwipeFeedback from './SwipeFeedback.svelte';
 
