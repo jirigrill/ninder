@@ -1,16 +1,15 @@
 <script lang="ts">
 	import type { Card } from '$lib/types';
+	import NameCard from '../../routes/swipe/[category]/NameCard.svelte';
 	import { pan, type PanEvent } from '../actions/pan';
 
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
 		onSwipe: (swipe: 'left' | 'right') => void;
 		cards: Card[];
-		cardSnippet: (card: Card) => any;
-		emptyCardSnippet: () => any;
 	};
 
-	const { onSwipeFeedback, onSwipe, cards, cardSnippet, emptyCardSnippet }: Props = $props();
+	const { onSwipeFeedback, onSwipe, cards }: Props = $props();
 
 	let translateX = $state(0);
 	let rotation = $derived(translateX / 10);
@@ -81,12 +80,12 @@
 <div class="relative h-full w-full">
 	{#if cards.length <= 1}
 		<div class="absolute h-full w-full">
-			{@render emptyCardSnippet()}
+			<NameCard card={undefined} />
 		</div>
 	{:else}
 		{#key cards[1]}
 			<div class="absolute h-full w-full">
-				{@render cardSnippet(cards[1])}
+				<NameCard card={cards[1]} />
 			</div>
 		{/key}
 	{/if}
@@ -102,7 +101,7 @@
 				class:transition-all={transitionAnimation}
 				style="transform: translateX({translateX}px) rotate({rotation}deg);"
 			>
-				{@render cardSnippet(cards[0])}
+				<NameCard card={cards[0]} />
 			</div>
 		{/key}
 	{/if}
