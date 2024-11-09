@@ -1,13 +1,16 @@
 <script lang="ts">
+	import { randombackgroundcolor } from '$lib/actions/randomBackgroundColor';
 	import type { Card } from '$lib/types';
 
-	const { card }: { card: Card | undefined } = $props();
+	const { card, shadow }: { card: Card | undefined, shadow: boolean } = $props();
 </script>
 
 {#if card}
 	<div
-		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gradient-to-br from-sky-200 to-sky-400 shadow-xl"
-	>
+		use:randombackgroundcolor
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg"
+		class:shadow-xl={shadow}
+	>	
 		<h1 class="text-8xl font-bold text-white">{card.name}</h1>
 		<h2 class="mt-10 text-3xl font-bold text-white">- {card.meaning} -</h2>
 		<div class="mb-5 mt-5 flex text-2xl">

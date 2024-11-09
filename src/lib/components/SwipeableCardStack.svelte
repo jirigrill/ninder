@@ -80,12 +80,12 @@
 <div class="relative h-full w-full">
 	{#if cards.length <= 1}
 		<div class="absolute h-full w-full">
-			<NameCard card={undefined} />
+			<NameCard card={undefined} shadow={true} />
 		</div>
 	{:else}
 		{#key cards[1]}
 			<div class="absolute h-full w-full">
-				<NameCard card={cards[1]} />
+				<NameCard card={cards[1]} shadow={false} />
 			</div>
 		{/key}
 	{/if}
@@ -101,7 +101,7 @@
 				class:transition-all={transitionAnimation}
 				style="transform: translateX({translateX}px) rotate({rotation}deg);"
 			>
-				<NameCard card={cards[0]} />
+				<NameCard card={cards[0]} shadow={true}/>
 			</div>
 		{/key}
 	{/if}
