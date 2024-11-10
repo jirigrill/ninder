@@ -3,7 +3,7 @@ export type Card = {
 	name: string;
 	countries: string[];
 	meaning: string;
-	swipeStatus: "none" | "liked" | "disliked";
+	swipeStatus: 'none' | 'liked' | 'disliked';
 };
 
 export type CategoryProgress = {
@@ -11,10 +11,15 @@ export type CategoryProgress = {
 	letterCode: string;
 	totalCards: number;
 	swipedCards: number;
-}
+};
 
 export type Category = {
 	name: string;
 	letterCode: string;
 	progress: number;
+};
+
+export type PartnerSession = {
+	ownSessionId: string;
+	partnerSessionId: string;
 };

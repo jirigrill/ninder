@@ -1,8 +1,9 @@
 <script lang="ts">
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	import '/node_modules/flag-icons/css/flag-icons.min.css';
-	import '../app.css';
+	import '../../app.css';
 	let { children } = $props();
+
 </script>
 
 <div class="flex h-full w-full flex-col bg-slate-100">

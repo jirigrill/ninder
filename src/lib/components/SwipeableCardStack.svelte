@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Card } from '$lib/types';
-	import NameCard from '../../routes/swipe/[category]/NameCard.svelte';
+	import NameCard from '../../routes/(withSession)/swipe/[category]/NameCard.svelte';
 	import { pan, type PanEvent } from '../actions/pan';
 
 	type Props = {

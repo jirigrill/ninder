@@ -1,4 +1,5 @@
 <script lang="ts">
+	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
 	import type { CategoryProgress } from '$lib/types';
 
 	let categories: CategoryProgress[] = $state([]);
@@ -11,10 +12,9 @@
 		categories.push(...loadedCategories);
 	}
 </script>
-<div class="flex justify-center w-full mb-4">
-	<h1 class="text-3xl font-semibold mt-4">Länder</h1>
-</div>
-<div class="scroll-view h-full w-full bg-slate-100 pl-4 pr-4 pb-4">
+
+<GenericTitleHeader title={'Länder'} />
+<div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
 	{#await loadCategories()}
 		{#each Array(10) as index}
 			{@render skeletonSnippet()}
