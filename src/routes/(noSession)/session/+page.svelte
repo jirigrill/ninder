@@ -28,27 +28,27 @@
 
 <GenericTitleHeader title={'Neue Session'} />
 
-<main class="flex w-full grow flex-col items-center">
+<div class="flex flex-col items-center">
 	<Tabs.Root value="create" class="w-4/5">
-		<Tabs.List class="mb-10 grid w-full grid-cols-2 bg-slate-200">
+		<Tabs.List class="grid grid-cols-2 bg-slate-200">
 			<Tabs.Trigger value="create">Erstellen</Tabs.Trigger>
 			<Tabs.Trigger value="join">Beitreten</Tabs.Trigger>
 		</Tabs.List>
-		<Tabs.Content value="create">
-			<Card.Root class="w-full">
+		<Tabs.Content value="create" class="mb-10 mt-10">
+			<Card.Root class="flex flex-col items-center">
 				<Card.Header>
 					<Card.Title>Du erstellst die Session</Card.Title>
 					<Card.Description
 						>Lass deinen Code von deinem Partner einscanner oder eintippen!</Card.Description
 					>
 				</Card.Header>
-				<Card.Content class="flex flex-col items-center">
+				<Card.Content>
 					{#if loaded}
 						<PinInput value={getPinCodeAsArray()} readonly={true} />
 						<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
 							<QrCode url={getPinCodeAsString()} />
 						</div>
-						<div class="mt-4 flex items-center">
+						<div class="item-end mt-4 flex items-center">
 							<i class="fa-solid fa-circle-notch fa-spin mr-2 text-3xl"></i>
 							<p class="text-base font-normal text-slate-900">Warte auf beitritt...</p>
 						</div>
@@ -68,15 +68,14 @@
 				</Card.Content>
 			</Card.Root>
 		</Tabs.Content>
-		<Tabs.Content value="join">
-			<Card.Root class="w-full">
+		<Tabs.Content value="join" class="mb-10 mt-10">
+			<Card.Root class="flex flex-col items-center">
 				<Card.Header>
 					<Card.Title>Du trittst einer Session bei</Card.Title>
 					<Card.Description>Tippe oder Scanne den Code deines Partners ein!</Card.Description>
 				</Card.Header>
-				<Card.Content class="flex flex-col items-center">
-					<!-- <PinInput readonly={false} onPinInput={(e) => console.log(e)} /> -->
-					<!-- <p>test: {pairingCode}</p> -->
+				<Card.Content>
+					<PinInput readonly={false} onPinInput={(e) => console.log(e)} />
 					<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
 						<QrCode url={'test'} />
 					</div>
@@ -84,4 +83,4 @@
 			</Card.Root>
 		</Tabs.Content>
 	</Tabs.Root>
-</main>
+</div>
