@@ -1,5 +1,4 @@
-import { browser } from '$app/environment';
-import { initialize, login } from '$lib/firebaseConfig';
+import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
 import { FirestoreRepository } from '$lib/FirestoreRepository';
 import type { PartnerSession } from '$lib/types';
 import type { PageLoad } from './$types';
@@ -8,18 +7,22 @@ function getRandomNumberArray(): string[] {
 	return Array.from({ length: 4 }, () => Math.floor(Math.random() * 10).toString());
 }
 
-async function loadSession(): Promise<PartnerSession> {
-	const store = initialize();
-	const credentials = await login();
-	const repo: FirestoreRepository<PartnerSession> = new FirestoreRepository(store);
+async function loadPartnerSession(): Promise<PartnerSession> {
+	const userStore = getUserStore();
 
-	let session = await repo.getCurrentSession(credentials.user.uid);
+	if (!userStore.user) {
+		throw 'user is not valid';
+	}
+
+	const repo: FirestoreRepository<PartnerSession> = new FirestoreRepository(getStore());
+
+	let session = await repo.getCurrentSession(userStore.user.uid);
 	if (session?.partnerUserId) {
-		await repo.resetAllSessions(credentials.user.uid);
+		await repo.resetAllSessions(userStore.user.uid);
 	}
 	if (!session) {
 		session = {
-			initiatorUserId: credentials.user.uid,
+			initiatorUserId: userStore.user.uid,
 			partnerUserId: null,
 			pairingCode: getRandomNumberArray().join('')
 		};
@@ -30,11 +33,7 @@ async function loadSession(): Promise<PartnerSession> {
 }
 
 export const load: PageLoad = async ({ params }) => {
-	if (browser) {
-		return {
-			partnerSession: loadSession()
-		};
-	}
-
-	return;
+	return {
+		partnerSession: loadPartnerSession
+	};
 };

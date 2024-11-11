@@ -4,27 +4,25 @@
 	import PinInput from '$lib/components/PinInput.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import { browser } from '$app/environment';
-	import { initialize, login } from '$lib/firebaseConfig';
-	import { FirestoreRepository } from '$lib/FirestoreRepository';
 	import type { PartnerSession } from '$lib/types';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { getSessionStore } from '$lib/FirebaseStore.svelte.js';
 
 	let { data } = $props();
+	const sessionStore = getSessionStore();
 	let loaded = $state(false);
-	let partnerSession: PartnerSession | null = null;
 
-	data.partnerSession?.then((dataPartnerSession) => {
+	data.partnerSession().then((partnerSession) => {
 		loaded = true;
-		partnerSession = dataPartnerSession;
+		sessionStore.session = partnerSession;
 	});
 
 	function getPinCodeAsArray(): string[] {
-		return Array.from(partnerSession?.pairingCode || '');
+		return Array.from(sessionStore.session?.pairingCode || '');
 	}
 
 	function getPinCodeAsString(): string {
-		return partnerSession?.pairingCode || '';
+		return sessionStore.session?.pairingCode || '';
 	}
 </script>
 
@@ -50,6 +48,10 @@
 						<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
 							<QrCode url={getPinCodeAsString()} />
 						</div>
+						<div class="mt-4 flex items-center">
+							<i class="fa-solid fa-circle-notch fa-spin mr-2 text-3xl"></i>
+							<p class="text-base font-normal text-slate-900">Warte auf beitritt...</p>
+						</div>
 					{:else}
 						<div class="flex w-full justify-center">
 							<Skeleton class="h-[51px] w-[40px]  rounded-2xl" />
@@ -58,6 +60,10 @@
 							<Skeleton class="ml-2 h-[51px] w-[40px] gap-2 rounded-2xl" />
 						</div>
 						<Skeleton class="mt-4 aspect-square h-auto w-full rounded-2xl shadow" />
+						<div class="mt-4 flex items-center">
+							<i class="fa-solid fa-circle-notch fa-spin mr-2 text-3xl"></i>
+							<p class="text-base font-normal text-slate-900">Erstelle Session...</p>
+						</div>
 					{/if}
 				</Card.Content>
 			</Card.Root>
