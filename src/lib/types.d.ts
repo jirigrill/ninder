@@ -20,6 +20,7 @@ export type Category = {
 };
 
 export type PartnerSession = {
-	ownSessionId: string;
-	partnerSessionId: string;
+	pairingCode: string | null;
+	initiatorUserId: string;
+	partnerUserId: string | null;
 };
