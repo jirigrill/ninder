@@ -12,8 +12,8 @@
 	const sessionStore = getSessionStore();
 
 	data.partnerSession().then((partnerSession) => {
-		loaded = true;
 		sessionStore.session = partnerSession;
+		loaded = true;
 	});
 
 	function onjoined() {

@@ -3,17 +3,18 @@
 	import QrCode from '$lib/components/QrCode.svelte';
 	import StatusButton from '$lib/components/StatusButton.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
+	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte';
 	import { SessionRepository } from '$lib/SessionRepository';
 
 	type Props = { onjoined: () => void };
 	const { onjoined }: Props = $props();
 
 	let sessionJoinState: 'none' | 'loading' | 'failed' | 'succeeded' = $state('none');
-	let pinState = $state('');
+	let pinState = '';
 
 	const repo = new SessionRepository(getStore());
 	const userStore = getUserStore();
+	const sessionStore = getSessionStore();
 
 	function onPinInput(pin: string) {
 		pinState = pin;
@@ -26,6 +27,8 @@
 		sessionJoinState = result ? 'succeeded' : 'failed';
 
 		if (sessionJoinState == 'succeeded') {
+			const session = await repo.getCurrentSessionByPairingCode(pinState, userStore.user?.uid);
+			sessionStore.session = session;
 			onjoined();
 		}
 	}

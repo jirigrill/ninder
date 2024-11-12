@@ -2,10 +2,10 @@
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	import '/node_modules/flag-icons/css/flag-icons.min.css';
 	import '../../app.css';
-	import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
+	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte';
 	import { browser } from '$app/environment';
-	import { SessionRepository } from '$lib/SessionRepository';
 	import { goto } from '$app/navigation';
+	import { SessionRepository } from '$lib/SessionRepository';
 	let { children, data } = $props();
 
 	let loading = $state(true);
@@ -21,9 +21,16 @@
 	});
 
 	async function gotoSessionPageIfNotPaired() {
-		const repo = new SessionRepository(getStore());
-		const session = await repo.getCurrentSession(userStore.user?.uid);
-		if (session?.partnerUserId == null) {
+		const store = getSessionStore();
+
+		if (store.session == null) {
+			const repo = new SessionRepository(getStore());
+			const session = await repo.getCurrentSessionByPairingCode('null', userStore.user?.uid);
+			store.session = session;
+		}
+
+		if (store.session == null || store.session.partnerUserId == null) {
+			console.log(store.session);
 			await goto('/session');
 		} else {
 			loading = false;
