@@ -39,7 +39,7 @@ async function loadPartnerSession(): Promise<PartnerSession> {
 
 	const repo: SessionRepository = new SessionRepository(getStore());
 
-	let session = await repo.getCurrentSession(userStore.user.uid);
+	let session = await repo.getInitiatorSession(userStore.user.uid);
 	if (isSessionUnpaired(session)) {
 		session = await resetSession(userStore, repo);
 	}

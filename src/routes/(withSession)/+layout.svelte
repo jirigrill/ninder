@@ -25,12 +25,11 @@
 
 		if (store.session == null) {
 			const repo = new SessionRepository(getStore());
-			const session = await repo.getCurrentSessionByPairingCode('null', userStore.user?.uid);
+			const session = await repo.getPairedSession(userStore.user?.uid);
 			store.session = session;
 		}
 
 		if (store.session == null || store.session.partnerUserId == null) {
-			console.log(store.session);
 			await goto('/session');
 		} else {
 			loading = false;

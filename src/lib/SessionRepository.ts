@@ -23,7 +23,36 @@ export class SessionRepository {
 		this.db = db;
 	}
 
-	async getCurrentSession(userId: string): Promise<PartnerSession | null> {
+	async getPairedSessionByUserIdField(
+		userId: string,
+		field: 'initiatorUserId' | 'partnerUserId'
+	): Promise<PartnerSession | null> {
+		const sessionsRef = collection(this.db, 'sessions');
+		const q = query(sessionsRef, where(field, '==', userId));
+
+		const querySnapshot = await getDocs(q);
+		if (!querySnapshot.empty) {
+			const doc = querySnapshot.docs[0];
+			return doc.data() as PartnerSession;
+		} else {
+			return null;
+		}
+	}
+
+	async getPairedSession(userId: string): Promise<PartnerSession | null> {
+		let session = await this.getPairedSessionByUserIdField(userId, 'initiatorUserId');
+		if (session == null || session.partnerUserId == null) {
+			session = await this.getPairedSessionByUserIdField(userId, 'partnerUserId');
+		}
+
+		if (session?.initiatorUserId == null) {
+			return null;
+		}
+
+		return session;
+	}
+
+	async getInitiatorSession(userId: string): Promise<PartnerSession | null> {
 		const sessionsRef = collection(this.db, 'sessions');
 		const q = query(sessionsRef, where('initiatorUserId', '==', userId));
 
@@ -41,7 +70,11 @@ export class SessionRepository {
 		userId: string
 	): Promise<PartnerSession | null> {
 		const sessionsRef = collection(this.db, 'sessions');
-		const q = query(sessionsRef, where('partnerUserId', '==', userId));
+		const q = query(
+			sessionsRef,
+			where('partnerUserId', '==', userId),
+			where('pairingCode', '==', pairingCode)
+		);
 
 		const querySnapshot = await getDocs(q);
 		if (!querySnapshot.empty) {
@@ -72,8 +105,6 @@ export class SessionRepository {
 		if (!document) {
 			return false;
 		}
-
-		console.log(document.id);
 
 		await updateDoc(doc(this.db, this.collectionName, document.id), {
 			partnerUserId: userId
