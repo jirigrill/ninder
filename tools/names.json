@@ -7,7 +7,8 @@
             "US",
             "FR"
         ],
-        "meaning": "Die Große"
+        "meaning": "Die Große",
+        "rootCountry": "DE"
     },
     {
         "id": "2",
@@ -16,7 +17,8 @@
             "US",
             "IE"
         ],
-        "meaning": "Entschlossener Beschützer"
+        "meaning": "Entschlossener Beschützer",
+        "rootCountry": "IE"
     },
     {
         "id": "3",
@@ -26,7 +28,8 @@
             "US",
             "SE"
         ],
-        "meaning": "Meine Geliebte"
+        "meaning": "Meine Geliebte",
+        "rootCountry": "SE"
     },
     {
         "id": "4",
@@ -35,7 +38,8 @@
             "US",
             "IL"
         ],
-        "meaning": "Ruhe Trost"
+        "meaning": "Ruhe Trost",
+        "rootCountry": "IL"
     },
     {
         "id": "5",
@@ -45,7 +49,8 @@
             "DE",
             "GB"
         ],
-        "meaning": "Weisheit"
+        "meaning": "Weisheit",
+        "rootCountry": "DE"
     },
     {
         "id": "6",
@@ -55,7 +60,8 @@
             "DE",
             "FR"
         ],
-        "meaning": "Sohn Der Rechten Hand"
+        "meaning": "Sohn Der Rechten Hand",
+        "rootCountry": "FR"
     },
     {
         "id": "7",
@@ -65,7 +71,8 @@
             "GB",
             "IT"
         ],
-        "meaning": "Olivenbaum"
+        "meaning": "Olivenbaum",
+        "rootCountry": "GB"
     },
     {
         "id": "8",
@@ -75,7 +82,8 @@
             "PT",
             "US"
         ],
-        "meaning": "Licht"
+        "meaning": "Licht",
+        "rootCountry": "ES"
     },
     {
         "id": "9",
@@ -85,7 +93,8 @@
             "US",
             "DE"
         ],
-        "meaning": "Die Freie"
+        "meaning": "Die Freie",
+        "rootCountry": "FR"
     },
     {
         "id": "10",
@@ -95,7 +104,8 @@
             "US",
             "SE"
         ],
-        "meaning": "Licht"
+        "meaning": "Licht",
+        "rootCountry": "SE"
     },
     {
         "id": "11",
@@ -105,7 +115,8 @@
             "DE",
             "GB"
         ],
-        "meaning": "Der Herrscher Des Hauses"
+        "meaning": "Der Herrscher Des Hauses",
+        "rootCountry": "GB"
     },
     {
         "id": "12",
@@ -115,7 +126,8 @@
             "DE",
             "FR"
         ],
-        "meaning": "Die Fleißige"
+        "meaning": "Die Fleißige",
+        "rootCountry": "FR"
     },
     {
         "id": "13",
@@ -125,7 +137,8 @@
             "RU",
             "US"
         ],
-        "meaning": "Der Beschützer Der Menschheit"
+        "meaning": "Der Beschützer Der Menschheit",
+        "rootCountry": "GR"
     },
     {
         "id": "14",
@@ -135,7 +148,8 @@
             "US",
             "RU"
         ],
-        "meaning": "Die Liebenswerte"
+        "meaning": "Die Liebenswerte",
+        "rootCountry": "RU"
     },
     {
         "id": "15",
@@ -144,7 +158,8 @@
             "US",
             "GB"
         ],
-        "meaning": "Der Übernehmer"
+        "meaning": "Der Übernehmer",
+        "rootCountry": "GB"
     },
     {
         "id": "16",
@@ -154,7 +169,8 @@
             "DE",
             "FR"
         ],
-        "meaning": "Der Vögelchen Freund"
+        "meaning": "Der Vögelchen Freund",
+        "rootCountry": "FR"
     },
     {
         "id": "17",
@@ -163,7 +179,8 @@
             "US",
             "IE"
         ],
-        "meaning": "Kleines Feuer"
+        "meaning": "Kleines Feuer",
+        "rootCountry": "IE"
     },
     {
         "id": "18",
@@ -173,7 +190,8 @@
             "IT",
             "ES"
         ],
-        "meaning": "Mond"
+        "meaning": "Mond",
+        "rootCountry": "IT"
     },
     {
         "id": "19",
@@ -182,7 +200,8 @@
             "US",
             "CA"
         ],
-        "meaning": "Die Harfenspielerin"
+        "meaning": "Die Harfenspielerin",
+        "rootCountry": "US"
     },
     {
         "id": "20",
@@ -192,7 +211,8 @@
             "US",
             "FR"
         ],
-        "meaning": "Löwe"
+        "meaning": "Löwe",
+        "rootCountry": "DE"
     },
     {
         "id": "21",
@@ -200,7 +220,8 @@
         "countries": [
             "FI"
         ],
-        "meaning": "Wer ist wie Gott?"
+        "meaning": "Wer ist wie Gott?",
+        "rootCountry": "FI"
     },
     {
         "id": "22",
@@ -208,6 +229,7 @@
         "countries": [
             "FI"
         ],
-        "meaning": "Einzigartige"
+        "meaning": "Einzigartige",
+        "rootCountry": "FI"
     }
 ]
