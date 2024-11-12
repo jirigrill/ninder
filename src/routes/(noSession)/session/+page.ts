@@ -1,5 +1,5 @@
 import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
-import { FirestoreRepository } from '$lib/FirestoreRepository';
+import { SessionRepository } from '$lib/SessionRepository';
 import type { PartnerSession } from '$lib/types';
 import type { PageLoad } from './$types';
 
@@ -14,7 +14,7 @@ async function loadPartnerSession(): Promise<PartnerSession> {
 		throw 'user is not valid';
 	}
 
-	const repo: FirestoreRepository<PartnerSession> = new FirestoreRepository(getStore());
+	const repo: SessionRepository = new SessionRepository(getStore());
 
 	let session = await repo.getCurrentSession(userStore.user.uid);
 	if (session?.partnerUserId) {

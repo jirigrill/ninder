@@ -4,12 +4,14 @@
 	import PinInput from '$lib/components/PinInput.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import type { PartnerSession } from '$lib/types';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import { getSessionStore } from '$lib/FirebaseStore.svelte.js';
+	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte.js';
+	import { SessionRepository } from '$lib/SessionRepository.js';
 
 	let { data } = $props();
 	const sessionStore = getSessionStore();
+	const userStore = getUserStore();
+
 	let loaded = $state(false);
 
 	data.partnerSession().then((partnerSession) => {
@@ -23,6 +25,11 @@
 
 	function getPinCodeAsString(): string {
 		return sessionStore.session?.pairingCode || '';
+	}
+
+	async function joinSession(pin: string) {
+		const repo = new SessionRepository(getStore());
+		await repo.join(pin, userStore.user?.uid);
 	}
 </script>
 
@@ -75,7 +82,7 @@
 					<Card.Description>Tippe oder Scanne den Code deines Partners ein!</Card.Description>
 				</Card.Header>
 				<Card.Content>
-					<PinInput readonly={false} onPinInput={(e) => console.log(e)} />
+					<PinInput readonly={false} onPinInput={joinSession} />
 					<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
 						<QrCode url={'test'} />
 					</div>
