@@ -24,7 +24,7 @@
 		}
 
 		if (!readonly && onPinInput) {
-			onPinInput(value.join());
+			onPinInput(value.join(''));
 		}
 	}
 </script>

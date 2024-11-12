@@ -7,12 +7,15 @@
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte.js';
 	import { SessionRepository } from '$lib/SessionRepository.js';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import StatusButton from '$lib/components/StatusButton.svelte';
 
 	let { data } = $props();
 	const sessionStore = getSessionStore();
 	const userStore = getUserStore();
 
 	let loaded = $state(false);
+	let sessionJoinState: 'none' | 'loading' | 'failed' | 'succeeded' = $state('none');
 
 	data.partnerSession().then((partnerSession) => {
 		loaded = true;
@@ -28,8 +31,10 @@
 	}
 
 	async function joinSession(pin: string) {
+		sessionJoinState = 'loading';
 		const repo = new SessionRepository(getStore());
-		await repo.join(pin, userStore.user?.uid);
+		const result = await repo.join(pin, userStore.user?.uid);
+		sessionJoinState = result ? 'succeeded' : 'failed';
 	}
 </script>
 
@@ -83,9 +88,10 @@
 				</Card.Header>
 				<Card.Content>
 					<PinInput readonly={false} onPinInput={joinSession} />
-					<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
+					<div class="mb-4 mt-4 w-full rounded-2xl bg-white p-4 shadow">
 						<QrCode url={'test'} />
 					</div>
+					<StatusButton status={sessionJoinState} text="Session beitreten" />
 				</Card.Content>
 			</Card.Root>
 		</Tabs.Content>

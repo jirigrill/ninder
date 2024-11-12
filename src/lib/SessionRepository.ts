@@ -3,12 +3,11 @@ import {
 	collection,
 	deleteDoc,
 	doc,
-	DocumentSnapshot,
 	Firestore,
 	getDocs,
 	query,
 	QueryDocumentSnapshot,
-	QuerySnapshot,
+	setDoc,
 	updateDoc,
 	where,
 	type DocumentData
@@ -47,8 +46,8 @@ export class SessionRepository {
 	}
 
 	async insert(data: PartnerSession): Promise<void> {
-		const collectionReference = collection(this.db, this.collectionName);
-		await addDoc(collectionReference, data);
+		const docRef = doc(this.db, this.collectionName, data.pairingCode || '');
+		await setDoc(docRef, data);
 	}
 
 	async join(pairingCode: string, userId: string): Promise<boolean> {
@@ -57,9 +56,11 @@ export class SessionRepository {
 			return false;
 		}
 
-		// await updateDoc(doc(this.db, this.collectionName, document.id), {
-		// 	partnerUserId: userId
-		// });
+		console.log(document.id);
+
+		await updateDoc(doc(this.db, this.collectionName, document.id), {
+			partnerUserId: userId
+		});
 
 		return true;
 	}
@@ -67,18 +68,15 @@ export class SessionRepository {
 	async getOpenPairingSessionDocument(
 		pairingCode: string
 	): Promise<QueryDocumentSnapshot<DocumentData, DocumentData> | null> {
-		const sessionsRef = collection(this.db, this.collectionName);
-		const q = query(
-			sessionsRef,
-			where('pairingCode', '==', pairingCode),
-			where('partnerUserId', '==', null)
-		);
+		const sessionsRef = collection(this.db, 'sessions');
+		const q = query(sessionsRef, where('pairingCode', '==', pairingCode));
 
-		const snapshot = await getDocs(q);
-		if (snapshot.empty) {
+		const querySnapshot = await getDocs(q);
+		if (!querySnapshot.empty) {
+			const doc = querySnapshot.docs[0];
+			return doc;
+		} else {
 			return null;
 		}
-
-		return snapshot.docs[0];
 	}
 }
