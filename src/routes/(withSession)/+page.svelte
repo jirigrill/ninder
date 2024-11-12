@@ -1,14 +1,22 @@
 <script lang="ts">
+	import { CategoryRepository } from '$lib/CategoryRepository';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
+	import { getStore } from '$lib/FirebaseStore.svelte';
 	import type { CategoryProgress } from '$lib/types';
 
 	let categories: CategoryProgress[] = $state([]);
 
 	async function loadCategories() {
-		const response = await fetch(`/api/categories`, {
-			method: 'GET'
+		const repo = new CategoryRepository(getStore());
+		const loadedCategories = (await repo.getCategories()).map((c) => {
+			return {
+				name: c.name,
+				letterCode: c.letterCode,
+				totalCards: c.totalCards,
+				swipedCards: 0
+			};
 		});
-		const loadedCategories: CategoryProgress[] = await response.json();
+
 		categories.push(...loadedCategories);
 	}
 </script>
@@ -32,7 +40,7 @@
 				<h1 class="ml-2 bg-slate-300 text-2xl font-semibold text-slate-300">Deutschland</h1>
 			</div>
 			<div class="flex items-baseline">
-				<p class="mt-1 bg-slate-300 text-xl text-slate-300">o von o</p>
+				<p class="mt-1 bg-slate-300 text-xl text-slate-300">0 von 0</p>
 				<div class="ml-4 h-5 grow bg-slate-300"></div>
 			</div>
 		</div>
@@ -44,8 +52,13 @@
 			href="/swipe/{category.letterCode}"
 		>
 			<div class="flex items-center">
-				<span class="fi mr-1 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
-				></span>
+				{#if category.letterCode}
+					<span class="fi mr-1 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
+					></span>
+				{:else}
+					<i class="fa-solid fa-dice h-[50px] w-[50px] text-4xl text-red-500"></i>
+				{/if}
+
 				<h1 class="ml-2 text-2xl font-semibold">{category.name}</h1>
 			</div>
 			<div class="flex items-baseline">

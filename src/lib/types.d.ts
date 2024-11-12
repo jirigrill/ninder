@@ -16,7 +16,8 @@ export type CategoryProgress = {
 export type Category = {
 	name: string;
 	letterCode: string;
-	progress: number;
+	totalCards: number;
+	id: number;
 };
 
 export type PartnerSession = {
