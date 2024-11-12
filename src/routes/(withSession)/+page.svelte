@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { CategoryRepository } from '$lib/CategoryRepository';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
+	import { Progress } from '$lib/components/ui/progress';
 	import { getStore } from '$lib/FirebaseStore.svelte';
 	import type { CategoryProgress } from '$lib/types';
 
@@ -63,8 +64,7 @@
 			</div>
 			<div class="flex items-baseline">
 				<p class="text-xl">{category.swipedCards} von {category.totalCards}</p>
-				<progress class="ml-4 grow" value={category.swipedCards} max={category.totalCards}
-				></progress>
+				<Progress class="ml-4 w-auto grow" value={category.swipedCards} max={category.totalCards} />
 			</div>
 		</a>
 	{/snippet}
