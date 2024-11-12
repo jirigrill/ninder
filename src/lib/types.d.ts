@@ -3,7 +3,6 @@ export type Card = {
 	name: string;
 	countries: string[];
 	meaning: string;
-	swipeStatus: 'none' | 'liked' | 'disliked';
 };
 
 export type CategoryProgress = {
@@ -15,7 +14,7 @@ export type CategoryProgress = {
 
 export type Category = {
 	name: string;
-	letterCode: string;
+	letterCode: string | null;
 	totalCards: number;
 	id: number;
 };
@@ -24,4 +23,10 @@ export type PartnerSession = {
 	pairingCode: string | null;
 	initiatorUserId: string;
 	partnerUserId: string | null;
+};
+
+export type CardInteraction = {
+	userId: string;
+	cardId: number;
+	swipe: 'liked' | 'disliked';
 };

@@ -7,13 +7,15 @@
 	import TitleHeader from './TitleHeader.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import SwipeFeedback from './SwipeFeedback.svelte';
+	import { CardRepository } from '$lib/CardRepository';
+	import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
 
+	const repository = new CardRepository(getStore());
 	let swipeableCardStack: SwipeableCardStack;
 	let cards: Card[] = $state([]);
 	let loadingAnimation = $state(true);
 	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
-
 	let take = 10;
 	let country = $page.params.category;
 
@@ -23,14 +25,14 @@
 
 	async function onLike(card: Card) {
 		cards.shift();
-		await fetch(`/api/cards/${card.id}/like`, { method: 'POST' });
-		await tryLoadNextStack(take);
+		repository.like(getUserStore().user?.uid, card.id, country);
+		tryLoadNextStack(take);
 	}
 
 	async function onDislike(card: Card) {
 		cards.shift();
-		await fetch(`/api/cards/${card.id}/dislike`, { method: 'POST' });
-		await tryLoadNextStack(take);
+		repository.dislike(getUserStore().user?.uid, card.id, country);
+		tryLoadNextStack(take);
 	}
 
 	async function tryLoadNextStack(take: number) {
@@ -39,10 +41,7 @@
 		}
 
 		loadingAnimation = true;
-		const response = await fetch(`/api/cards?country=${country}&take=${take}`, {
-			method: 'GET'
-		});
-		const newStack: Card[] = await response.json();
+		const newStack = repository.getNextCards(country, take);
 
 		for (let newCard of newStack) {
 			if (cards.some((oldCard) => newCard.id == oldCard.id)) {
@@ -76,8 +75,10 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-col items-center {backgroundColor} background-color-transition p-4">
-	<div class="w-full mb-4">
+<div
+	class="flex h-full w-full flex-col items-center {backgroundColor} background-color-transition p-4"
+>
+	<div class="mb-4 w-full">
 		<TitleHeader title="Entdecke" />
 	</div>
 
@@ -89,11 +90,10 @@
 	<SwipeFeedback {swipeFeedbackState} />
 	<div class="mt-4 w-full">
 		<CardActionBar
-		onDislikeButton={() => swipeableCardStack.swipe('left')}
-		onLikeButton={() => swipeableCardStack.swipe('right')}
-	/>
+			onDislikeButton={() => swipeableCardStack.swipe('left')}
+			onLikeButton={() => swipeableCardStack.swipe('right')}
+		/>
 	</div>
-
 </div>
 
 <style>
