@@ -1,0 +1,86 @@
+[
+    {
+        "id": "0",
+        "name": "Gemischt",
+        "letterCode": null,
+        "totalCards": 0
+    },
+    {
+        "id": "1",
+        "name": "Deutschland",
+        "letterCode": "DE",
+        "totalCards": 0
+    },
+    {
+        "id": "2",
+        "name": "Finnland",
+        "letterCode": "FI",
+        "totalCards": 0
+    },
+    {
+        "id": "3",
+        "name": "Frankreich",
+        "letterCode": "FR",
+        "totalCards": 0
+    },
+    {
+        "id": "4",
+        "name": "Griechenland",
+        "letterCode": "GR",
+        "totalCards": 0
+    },
+    {
+        "id": "5",
+        "name": "Italien",
+        "letterCode": "IT",
+        "totalCards": 0
+    },
+    {
+        "id": "6",
+        "name": "Kanada",
+        "letterCode": "CA",
+        "totalCards": 0
+    },
+    {
+        "id": "7",
+        "name": "Portugal",
+        "letterCode": "PT",
+        "totalCards": 0
+    },
+    {
+        "id": "8",
+        "name": "Russland",
+        "letterCode": "RU",
+        "totalCards": 0
+    },
+    {
+        "id": "9",
+        "name": "Schweden",
+        "letterCode": "SE",
+        "totalCards": 0
+    },
+    {
+        "id": "10",
+        "name": "Spanien",
+        "letterCode": "ES",
+        "totalCards": 0
+    },
+    {
+        "id": "11",
+        "name": "Ukraine",
+        "letterCode": "UA",
+        "totalCards": 0
+    },
+    {
+        "id": "12",
+        "name": "USA",
+        "letterCode": "US",
+        "totalCards": 0
+    },
+    {
+        "id": "13",
+        "name": "Vereinigtes Königreich",
+        "letterCode": "GB",
+        "totalCards": 0
+    }
+]
