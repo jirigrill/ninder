@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
+	import type { MouseEventHandler } from 'svelte/elements';
 	import { Button } from './ui/button';
 
-	let { onclick, status, text } = $props();
-	let variant = $derived.by(() => {
+	type Props = {
+		onclick: MouseEventHandler<HTMLButtonElement>;
+		status: 'none' | 'succeeded' | 'failed' | 'loading';
+		text: string;
+	};
+
+	let { onclick, status, text }: Props = $props();
+	let variant: 'default' | 'success' | 'error' = $derived.by(() => {
 		if (status == 'succeeded') {
 			return 'success';
 		} else if (status == 'failed') {
@@ -13,7 +20,7 @@
 	});
 </script>
 
-<Button class="w-full" {variant} disabled={status == 'loading'}>
+<Button class="w-full" {variant} disabled={status == 'loading'} {onclick}>
 	<div class="flex items-center">
 		{#if status == 'loading'}
 			<i class="fa-solid fa-circle-notch fa-spin mr-2 text-2xl"></i>
