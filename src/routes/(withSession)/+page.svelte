@@ -49,23 +49,18 @@
 
 	{#snippet categorySnippet(category: CategoryProgress)}
 		<a
-			class="mb-4 flex flex-col rounded-xl bg-white p-4 shadow-lg"
+			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
 			href="/swipe/{category.letterCode}"
 		>
-			<div class="flex items-center">
-				{#if category.letterCode}
-					<span class="fi mr-1 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
-					></span>
-				{:else}
-					<i class="fa-solid fa-dice h-[50px] w-[50px] text-4xl text-red-500"></i>
-				{/if}
+			{#if category.letterCode}
+				<span class="fi shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
+			{:else}
+				<i class="fa-solid fa-dice h-[50px] w-[50px] text-4xl text-red-500"></i>
+			{/if}
 
-				<h1 class="ml-2 text-2xl font-semibold">{category.name}</h1>
-			</div>
-			<div class="flex items-baseline">
-				<p class="text-xl">{category.swipedCards} von {category.totalCards}</p>
-				<Progress class="ml-4 w-auto grow" value={category.swipedCards} max={category.totalCards} />
-			</div>
+			<h1 class="self-center text-2xl font-semibold">{category.name}</h1>
+			<p class="text-xl leading-none">{category.swipedCards}/{category.totalCards}</p>
+			<Progress class="h-full w-full" value={category.swipedCards} max={category.totalCards} />
 		</a>
 	{/snippet}
 </div>
