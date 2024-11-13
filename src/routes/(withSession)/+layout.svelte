@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { SessionRepository } from '$lib/SessionRepository';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	let { children, data } = $props();
 
 	let loading = $state(true);
@@ -52,26 +53,28 @@
 	}
 </script>
 
-{#if loading}
-	<div class="flex h-full w-full flex-col items-center justify-center bg-slate-100">
-		<i class="fa-solid fa-circle-notch fa-spin mr-2 text-5xl"></i>
-		<p class="mt-4 text-base font-normal text-slate-900">Bitte warte einen Moment</p>
-	</div>
-{:else}
-	<div class="flex h-full w-full flex-col bg-slate-100">
-		{@render children()}
-		<div
-			class="flex flex-row justify-between border-t-4 border-solid border-slate-200 bg-white pb-2 pl-8 pr-8 pt-2"
-		>
-			<a href="/" aria-label="categories">
-				<i class="fa-solid fa-earth-americas text-5xl text-slate-400"></i>
-			</a>
-			<a href="/matches" aria-label="categories">
-				<i class="fa-solid fa-hands-holding-child text-5xl text-slate-400"></i>
-			</a>
+<QueryClientProvider client={data.queryClient}>
+	{#if loading}
+		<div class="flex h-full w-full flex-col items-center justify-center bg-slate-100">
+			<i class="fa-solid fa-circle-notch fa-spin mr-2 text-5xl"></i>
+			<p class="mt-4 text-base font-normal text-slate-900">Bitte warte einen Moment</p>
 		</div>
-	</div>
-{/if}
+	{:else}
+		<div class="flex h-full w-full flex-col bg-slate-100">
+			{@render children()}
+			<div
+				class="flex flex-row justify-between border-t-4 border-solid border-slate-200 bg-white pb-2 pl-8 pr-8 pt-2"
+			>
+				<a href="/" aria-label="categories">
+					<i class="fa-solid fa-earth-americas text-5xl text-slate-400"></i>
+				</a>
+				<a href="/matches" aria-label="categories">
+					<i class="fa-solid fa-hands-holding-child text-5xl text-slate-400"></i>
+				</a>
+			</div>
+		</div>
+	{/if}
+</QueryClientProvider>
 
 <style>
 </style>

@@ -1,38 +1,27 @@
 <script lang="ts">
-	import { CategoryRepository } from '$lib/CategoryRepository';
+	import { getCategories } from '$lib/client/CategoryClient';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
 	import { Progress } from '$lib/components/ui/progress';
-	import { getStore } from '$lib/FirebaseStore.svelte';
 	import type { CategoryProgress } from '$lib/types';
+	import { createQuery } from '@tanstack/svelte-query';
 
-	let categories: CategoryProgress[] = $state([]);
-
-	async function loadCategories() {
-		const repo = new CategoryRepository(getStore());
-		const loadedCategories = (await repo.getCategories()).map((c) => {
-			return {
-				name: c.name,
-				letterCode: c.letterCode,
-				totalCards: c.totalCards,
-				swipedCards: 0
-			};
-		});
-
-		categories.push(...loadedCategories);
-	}
+	const query = createQuery<CategoryProgress[], Error>({
+		queryKey: ['categories'],
+		queryFn: () => getCategories()
+	});
 </script>
 
 <GenericTitleHeader title={'Länder'} />
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
-	{#await loadCategories()}
+	{#if $query.isLoading}
 		{#each Array(10) as index}
 			{@render skeletonSnippet()}
 		{/each}
-	{:then}
-		{#each categories as category}
+	{:else if $query.isSuccess}
+		{#each $query.data as category}
 			{@render categorySnippet(category)}
 		{/each}
-	{/await}
+	{/if}
 
 	{#snippet skeletonSnippet()}
 		<div class="mb-4 flex flex-col rounded-xl bg-slate-200 p-4 shadow-lg">

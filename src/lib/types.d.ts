@@ -10,6 +10,7 @@ export type CategoryProgress = {
 	letterCode: string;
 	totalCards: number;
 	swipedCards: number;
+	id: number;
 };
 
 export type Category = {

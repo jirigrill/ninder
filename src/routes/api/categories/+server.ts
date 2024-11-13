@@ -1,20 +1,45 @@
-import { json, type RequestEvent, type RequestHandler } from "@sveltejs/kit";
+import type { CategoryProgress } from '$lib/types';
+import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
+import pkg from 'pg';
+import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
 
-import * as db from '../data';
-import type { CategoryProgress } from "$lib/types";
+const { Pool } = pkg;
+
+const pool = new Pool({
+	user: DB_USER,
+	host: DB_HOST,
+	database: DB_NAME,
+	password: DB_PASSWORD,
+	port: parseInt(DB_PORT),
+	ssl: {
+		rejectUnauthorized: false
+	}
+});
+
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-    const categories = db.getCategories();
+	try {
+		const client = await pool.connect();
 
-    const categoryProgress = new Array<CategoryProgress>();
-    for(let category of categories) {
-        categoryProgress.push({
-            name: category.name,
-            letterCode: category.letterCode,
-            totalCards: db.getTotalCards(category.letterCode),
-            swipedCards: db.getTotalSwipedCards(category.letterCode)
-        });
-    }
-
-    return json(categoryProgress);
+		try {
+			const res = await client.query('SELECT * FROM categories');
+			const categories: CategoryProgress[] = res.rows.map((row) => ({
+				name: row.name,
+				letterCode: row.letter_code,
+				totalCards: row.total_cards,
+				swipedCards: 0,
+				id: row.id
+			}));
+			await sleep(2000);
+			return json(categories);
+		} finally {
+			client.release();
+		}
+	} catch (error) {
+		console.log(error);
+		return json({ error: 'Failed to fetch categories' }, { status: 500 });
+	}
 };
