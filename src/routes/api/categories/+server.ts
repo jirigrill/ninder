@@ -16,16 +16,12 @@ const pool = new Pool({
 	}
 });
 
-function sleep(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	try {
 		const client = await pool.connect();
 
 		try {
-			const res = await client.query('SELECT * FROM categories');
+			const res = await client.query('SELECT * FROM categories WHERE visible = TRUE');
 			const categories: CategoryProgress[] = res.rows.map((row) => ({
 				name: row.name,
 				letterCode: row.letter_code,
@@ -33,13 +29,11 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 				swipedCards: 0,
 				id: row.id
 			}));
-			await sleep(2000);
 			return json(categories);
 		} finally {
 			client.release();
 		}
 	} catch (error) {
-		console.log(error);
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
 	}
 };

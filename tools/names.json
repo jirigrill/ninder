@@ -209,5 +209,13 @@
             "FI"
         ],
         "meaning": "Einzigartige"
+    },
+    {
+        "id": "23",
+        "name": "meep",
+        "countries": [
+            "ZA"
+        ],
+        "meaning": "no"
     }
 ]
