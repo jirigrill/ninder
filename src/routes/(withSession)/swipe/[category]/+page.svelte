@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Card } from '$lib/types';
 	import { page } from '$app/stores';
-	import { browser } from '$app/environment';
 	import CardActionBar from './CardActionBar.svelte';
 	import SwipeableCardStack from '$lib/components/SwipeableCardStack.svelte';
 	import TitleHeader from './TitleHeader.svelte';
@@ -9,19 +8,23 @@
 	import SwipeFeedback from './SwipeFeedback.svelte';
 	import { CardRepository } from '$lib/CardRepository';
 	import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
+	import { getCards } from '$lib/client/CardClient';
 
 	const repository = new CardRepository(getStore());
 	let swipeableCardStack: SwipeableCardStack;
-	let cards: Card[] = $state([]);
 	let loadingAnimation = $state(true);
 	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 10;
 	let country = $page.params.category;
 
-	if (browser) {
-		tryLoadNextStack(take);
-	}
+	const cardsQuery = createQuery<Card[], Error>({
+		queryKey: ['cards', country, take],
+		queryFn: () => getCards(country, take)
+	});
+
+	let cards: Card[] = $derived.by(() => loadCards());
 
 	async function onLike(card: Card) {
 		cards.shift();
@@ -73,6 +76,19 @@
 			onLike(cards[0]);
 		}
 	}
+
+	function loadCards(): Card[]{
+		if($cardsQuery.data === null || $cardsQuery.data === undefined) {
+			return [];
+		}
+
+		let stack = [];
+		console.log($cardsQuery.data);
+		for(let card of $cardsQuery.data){
+			stack.push(card);
+		}
+		return stack;
+	}
 </script>
 
 <div
@@ -82,9 +98,19 @@
 		<TitleHeader title="Entdecke" />
 	</div>
 
-	{#if loadingAnimation && cards.length === 0}
-		<LoadingSpinner />
+	{#if $cardsQuery.isLoading}
+	<LoadingSpinner />
 	{/if}
+	{#if $cardsQuery.isSuccess}
+	<!-- {loadCards()} -->
+	<!-- {#each $cardsQuery.data as item}
+		<p>{item.name}</p>
+	{/each} -->
+	{/if}
+
+	<!-- {#if loadingAnimation && cards.length === 0}
+		<LoadingSpinner />
+	{/if} -->
 
 	<SwipeableCardStack bind:this={swipeableCardStack} {cards} {onSwipeFeedback} {onSwipe} />
 	<SwipeFeedback {swipeFeedbackState} />
