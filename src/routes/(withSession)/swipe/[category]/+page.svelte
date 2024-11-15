@@ -7,7 +7,7 @@
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import SwipeFeedback from './SwipeFeedback.svelte';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
-	import { getCards } from '$lib/client/CardClient';
+	import { getCards, swipeCard } from '$lib/client/CardClient';
 
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
@@ -20,14 +20,11 @@
 		queryFn: () => getCards(country, take)
 	});
 
-	const swipeCard = async (swipeAction: {card: Card, swipeAction: 'like' | 'dislike'}): Promise<void> => {
-		await new Promise((r) => setTimeout(r, 2000));
-	};
-
 	const client = useQueryClient();
 	const swipeMutation = createMutation({
 		mutationFn: swipeCard,
 		onMutate: async (swipeAction: {card: Card, swipeAction: 'like' | 'dislike'}) => {
+			console.log("before onMutate");
 			await client.cancelQueries({queryKey: ['cards', country, take]});
 			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
 
@@ -35,10 +32,13 @@
 				client.setQueryData<Card[]>(['cards', country, take], () => [...(previousCards.filter(c => c.id != swipeAction.card.id))]);
 			}
 
+			console.log("after onMutate");
 			return { previousCards }
 		},
-		onSettled: () => {
-			client.invalidateQueries({ queryKey: ['cards', country, take] });
+		onSuccess: async () => {
+			console.log("before invalidate");
+			await client.invalidateQueries({ queryKey: ['cards', country, take] });
+			console.log("after invalidate");
 		}
 	});
 
@@ -82,11 +82,6 @@
 
 	{#if $cardsQuery.isLoading}
 		<LoadingSpinner />
-	{/if}
-	{#if $cardsQuery.isSuccess}
-		{#each $cardsQuery.data as item}
-			<p>{item.name}</p>
-		{/each}
 	{/if}
 
 	<SwipeableCardStack bind:this={swipeableCardStack} cards={$cardsQuery.data} {onSwipeFeedback} {onSwipe} />

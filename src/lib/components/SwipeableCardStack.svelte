@@ -88,8 +88,9 @@
 				<NameCard card={cards[1]} shadow={false} />
 			</div>
 		{/key}
+	{/if}
 
-		{#if cards.length >= 1}
+	{#if cards && cards.length >= 1}
 			{#key cards[0]}
 				<div
 					use:pan
@@ -104,5 +105,4 @@
 				</div>
 			{/key}
 		{/if}
-	{/if}
 </div>
