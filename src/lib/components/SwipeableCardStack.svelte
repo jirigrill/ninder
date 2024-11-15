@@ -6,7 +6,7 @@
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
 		onSwipe: (swipe: 'left' | 'right') => void;
-		cards: Card[];
+		cards: Card[] | undefined;
 	};
 
 	const { onSwipeFeedback, onSwipe, cards }: Props = $props();
@@ -78,7 +78,7 @@
 </script>
 
 <div class="relative h-full w-full">
-	{#if cards.length <= 1}
+	{#if cards == undefined || cards.length <= 1}
 		<div class="absolute h-full w-full">
 			<NameCard card={undefined} shadow={true} />
 		</div>
@@ -88,21 +88,21 @@
 				<NameCard card={cards[1]} shadow={false} />
 			</div>
 		{/key}
-	{/if}
 
-	{#if cards.length >= 1}
-		{#key cards[0]}
-			<div
-				use:pan
-				{onpan}
-				{onpanend}
-				class="absolute h-full w-full"
-				class:duration-500={transitionAnimation}
-				class:transition-all={transitionAnimation}
-				style="transform: translateX({translateX}px) rotate({rotation}deg);"
-			>
-				<NameCard card={cards[0]} shadow={true}/>
-			</div>
-		{/key}
+		{#if cards.length >= 1}
+			{#key cards[0]}
+				<div
+					use:pan
+					{onpan}
+					{onpanend}
+					class="absolute h-full w-full"
+					class:duration-500={transitionAnimation}
+					class:transition-all={transitionAnimation}
+					style="transform: translateX({translateX}px) rotate({rotation}deg);"
+				>
+					<NameCard card={cards[0]} shadow={true} />
+				</div>
+			{/key}
+		{/if}
 	{/if}
 </div>

@@ -6,14 +6,10 @@
 	import TitleHeader from './TitleHeader.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import SwipeFeedback from './SwipeFeedback.svelte';
-	import { CardRepository } from '$lib/CardRepository';
-	import { getStore, getUserStore } from '$lib/FirebaseStore.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getCards } from '$lib/client/CardClient';
 
-	const repository = new CardRepository(getStore());
 	let swipeableCardStack: SwipeableCardStack;
-	let loadingAnimation = $state(true);
 	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 10;
@@ -24,37 +20,34 @@
 		queryFn: () => getCards(country, take)
 	});
 
-	let cards: Card[] = $derived.by(() => loadCards());
+	const swipeCard = async (swipeAction: {card: Card, swipeAction: 'like' | 'dislike'}): Promise<void> => {
+		await new Promise((r) => setTimeout(r, 2000));
+	};
+
+	const client = useQueryClient();
+	const swipeMutation = createMutation({
+		mutationFn: swipeCard,
+		onMutate: async (swipeAction: {card: Card, swipeAction: 'like' | 'dislike'}) => {
+			await client.cancelQueries({queryKey: ['cards', country, take]});
+			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
+
+			if(previousCards) {
+				client.setQueryData<Card[]>(['cards', country, take], () => [...(previousCards.filter(c => c.id != swipeAction.card.id))]);
+			}
+
+			return { previousCards }
+		},
+		onSettled: () => {
+			client.invalidateQueries({ queryKey: ['cards', country, take] });
+		}
+	});
 
 	async function onLike(card: Card) {
-		cards.shift();
-		repository.like(getUserStore().user?.uid, card.id, country);
-		tryLoadNextStack(take);
+		$swipeMutation.mutate({ card: card, swipeAction: "like"});
 	}
 
 	async function onDislike(card: Card) {
-		cards.shift();
-		repository.dislike(getUserStore().user?.uid, card.id, country);
-		tryLoadNextStack(take);
-	}
-
-	async function tryLoadNextStack(take: number) {
-		if (cards.length > take / 2) {
-			return;
-		}
-
-		loadingAnimation = true;
-		const newStack = repository.getNextCards(country, take);
-
-		for (let newCard of newStack) {
-			if (cards.some((oldCard) => newCard.id == oldCard.id)) {
-				continue;
-			}
-
-			cards.push(newCard);
-		}
-
-		loadingAnimation = false;
+		$swipeMutation.mutate({ card: card, swipeAction: "dislike"});
 	}
 
 	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none') {
@@ -71,23 +64,10 @@
 
 	function onSwipe(swipe: 'left' | 'right') {
 		if (swipe == 'left') {
-			onDislike(cards[0]);
+			onDislike($cardsQuery.data[0]);
 		} else if (swipe == 'right') {
-			onLike(cards[0]);
+			onLike($cardsQuery.data[0]);
 		}
-	}
-
-	function loadCards(): Card[]{
-		if($cardsQuery.data === null || $cardsQuery.data === undefined) {
-			return [];
-		}
-
-		let stack = [];
-		console.log($cardsQuery.data);
-		for(let card of $cardsQuery.data){
-			stack.push(card);
-		}
-		return stack;
 	}
 </script>
 
@@ -98,22 +78,18 @@
 		<TitleHeader title="Entdecke" />
 	</div>
 
+	<SwipeFeedback {swipeFeedbackState} />
+
 	{#if $cardsQuery.isLoading}
-	<LoadingSpinner />
+		<LoadingSpinner />
 	{/if}
 	{#if $cardsQuery.isSuccess}
-	<!-- {loadCards()} -->
-	<!-- {#each $cardsQuery.data as item}
-		<p>{item.name}</p>
-	{/each} -->
+		{#each $cardsQuery.data as item}
+			<p>{item.name}</p>
+		{/each}
 	{/if}
 
-	<!-- {#if loadingAnimation && cards.length === 0}
-		<LoadingSpinner />
-	{/if} -->
-
-	<SwipeableCardStack bind:this={swipeableCardStack} {cards} {onSwipeFeedback} {onSwipe} />
-	<SwipeFeedback {swipeFeedbackState} />
+	<SwipeableCardStack bind:this={swipeableCardStack} cards={$cardsQuery.data} {onSwipeFeedback} {onSwipe} />
 	<div class="mt-4 w-full">
 		<CardActionBar
 			onDislikeButton={() => swipeableCardStack.swipe('left')}
