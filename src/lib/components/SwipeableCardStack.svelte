@@ -14,6 +14,7 @@
 	let translateX = $state(0);
 	let rotation = $derived(translateX / 10);
 	let transitionAnimation = $state(false);
+	let cardsLength = $derived(cards?.length || 0);
 
 	function onpan(event: CustomEvent<PanEvent>) {
 		transitionAnimation = false;
@@ -75,34 +76,31 @@
 	function translateLeft() {
 		translateX = -(window.innerWidth * 1.5);
 	}
+
+	function isTopMostCard(index: number) {
+		return index === cardsLength - 1;
+	}
+
+	let derivedTransformStyle = $derived.by(() => {
+		return `transform: translateX(${translateX}px) rotate(${rotation}deg);`;
+	})
 </script>
 
 <div class="relative h-full w-full">
-	{#if cards == undefined || cards.length <= 1}
-		<div class="absolute h-full w-full">
-			<NameCard card={undefined} shadow={true} />
+	<div class="absolute h-full w-full">
+		<NameCard card={undefined} shadow={true} />
+	</div>
+	{#each cards || [] as card, index}
+		<div
+			use:pan={isTopMostCard(index)}
+			{onpan}
+			{onpanend}
+			class="absolute h-full w-full"
+			class:duration-500={isTopMostCard(index) && transitionAnimation}
+			class:transition-all={isTopMostCard(index) && transitionAnimation}
+			style={isTopMostCard(index) ? derivedTransformStyle : ''}
+		>
+			<NameCard {card} shadow={isTopMostCard(index)} />
 		</div>
-	{:else}
-		{#key cards[1]}
-			<div class="absolute h-full w-full">
-				<NameCard card={cards[1]} shadow={false} />
-			</div>
-		{/key}
-	{/if}
-
-	{#if cards && cards.length >= 1}
-			{#key cards[0]}
-				<div
-					use:pan
-					{onpan}
-					{onpanend}
-					class="absolute h-full w-full"
-					class:duration-500={transitionAnimation}
-					class:transition-all={transitionAnimation}
-					style="transform: translateX({translateX}px) rotate({rotation}deg);"
-				>
-					<NameCard card={cards[0]} shadow={true} />
-				</div>
-			{/key}
-		{/if}
+	{/each}
 </div>

@@ -37,9 +37,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
             return json({ error: `Names with the id ${name_id} not found` }, { status: 404 });
         }
 
-        console.log("like");
         return new Response(null, { status: 204 });
-    0
+        
     } catch (error) {
         console.error(error);
         return json({ error: "Internal server error" }, { status: 500 });

@@ -54,7 +54,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 				meaning: row.meaning,
 				countries: []
 			}));
-			console.log(`get cards length: ${categories.length}`);
+	
 			return new Response(JSON.stringify(categories), {
 				status: 200,
 				headers: {

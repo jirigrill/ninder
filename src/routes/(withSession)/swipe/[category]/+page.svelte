@@ -23,31 +23,28 @@
 	const client = useQueryClient();
 	const swipeMutation = createMutation({
 		mutationFn: swipeCard,
-		onMutate: async (swipeAction: {card: Card, swipeAction: 'like' | 'dislike'}) => {
-			console.log("before onMutate");
-			await client.cancelQueries({queryKey: ['cards', country, take]});
+		onMutate: async (swipeAction: { card: Card; swipeAction: 'like' | 'dislike' }) => {
+			await client.cancelQueries({ queryKey: ['cards', country, take] });
 			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
 
-			if(previousCards) {
-				client.setQueryData<Card[]>(['cards', country, take], () => [...(previousCards.filter(c => c.id != swipeAction.card.id))]);
+			if (previousCards) {
+				let optimisticCards = previousCards.filter((c) => c.id != swipeAction.card.id);
+				client.setQueryData<Card[]>(['cards', country, take], () => [...optimisticCards]);
 			}
 
-			console.log("after onMutate");
-			return { previousCards }
+			return { previousCards };
 		},
 		onSuccess: async () => {
-			console.log("before invalidate");
 			await client.invalidateQueries({ queryKey: ['cards', country, take] });
-			console.log("after invalidate");
 		}
 	});
 
 	async function onLike(card: Card) {
-		$swipeMutation.mutate({ card: card, swipeAction: "like"});
+		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
 	}
 
 	async function onDislike(card: Card) {
-		$swipeMutation.mutate({ card: card, swipeAction: "dislike"});
+		$swipeMutation.mutate({ card: card, swipeAction: 'dislike' });
 	}
 
 	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none') {
@@ -63,10 +60,14 @@
 	}
 
 	function onSwipe(swipe: 'left' | 'right') {
+		if (!$cardsQuery.data) {
+			return;
+		}
+
 		if (swipe == 'left') {
-			onDislike($cardsQuery.data[0]);
+			onDislike($cardsQuery.data[$cardsQuery.data.length - 1]);
 		} else if (swipe == 'right') {
-			onLike($cardsQuery.data[0]);
+			onLike($cardsQuery.data[$cardsQuery.data.length - 1]);
 		}
 	}
 </script>
@@ -84,7 +85,12 @@
 		<LoadingSpinner />
 	{/if}
 
-	<SwipeableCardStack bind:this={swipeableCardStack} cards={$cardsQuery.data} {onSwipeFeedback} {onSwipe} />
+	<SwipeableCardStack
+		bind:this={swipeableCardStack}
+		cards={$cardsQuery.data}
+		{onSwipeFeedback}
+		{onSwipe}
+	/>
 	<div class="mt-4 w-full">
 		<CardActionBar
 			onDislikeButton={() => swipeableCardStack.swipe('left')}
