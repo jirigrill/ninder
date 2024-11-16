@@ -7,7 +7,7 @@
 
 {#if card}
 	<div
-		use:randombackgroundcolor
+		use:randombackgroundcolor={card.id}
 		class="flex h-full w-full flex-col items-center justify-center rounded-lg p-4"
 		class:shadow-xl={shadow}
 	>
