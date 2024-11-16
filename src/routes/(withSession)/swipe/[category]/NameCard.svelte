@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { randombackgroundcolor } from '$lib/actions/randomBackgroundColor';
 	import type { Card } from '$lib/types';
-
-	const { card, shadow }: { card: Card | undefined, shadow: boolean} = $props();
+	const { card, shadow }: { card: Card | undefined; shadow: boolean } = $props();
+	import { fittedtext } from '$lib/actions/fittedtext';
 </script>
 
 {#if card}
 	<div
 		use:randombackgroundcolor
-		class="flex h-full w-full flex-col items-center justify-center rounded-lg"
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg p-4"
 		class:shadow-xl={shadow}
-	>	
-		<h1 class="text-8xl font-bold text-white">{card.name}</h1>
-		<h2 class="mt-10 text-3xl font-bold text-white">- {card.meaning} -</h2>
+	>
+		<h1 use:fittedtext class="w-full text-8xl font-bold text-white">{card.name}</h1>
+		<h2 use:fittedtext class="mt-10 w-full text-3xl font-bold text-white">- {card.meaning} -</h2>
 		<div class="mb-5 mt-5 flex text-2xl">
-			<p class="mr-5 font-bold text-white">Herkunft: </p>
+			<p class="mr-5 font-bold text-white">Herkunft:</p>
 			{#each card.countries as country}
 				<span class="fi ml-1 mr-1 fi-{country.toLowerCase()}"></span>
 			{/each}
