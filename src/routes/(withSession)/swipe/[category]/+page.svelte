@@ -35,7 +35,10 @@
 			return { previousCards };
 		},
 		onSuccess: async () => {
-			await client.invalidateQueries({ queryKey: ['cards', country, take] });
+			let remainingCards = client.getQueryData<Card[]>(['cards', country, take]);
+			if (remainingCards && remainingCards.length <= take / 2) {
+				await client.invalidateQueries({ queryKey: ['cards', country, take] });
+			}
 		}
 	});
 

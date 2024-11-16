@@ -10,11 +10,11 @@ const gradients = [
 	['bg-gradient-to-br', 'from-violet-200', 'to-violet-400']
 ];
 
-export function randombackgroundcolor(node: HTMLElement, cardId: number): ActionReturn {
-	setBackgroundColor(node, cardId);
+export function randombackgroundcolor(node: HTMLElement, cardId: string): ActionReturn {
+	setBackgroundColor(node, parseInt(cardId));
 	return {
 		update: () => {
-			setBackgroundColor(node, cardId);
+			setBackgroundColor(node, parseInt(cardId));
 		}
 	};
 }

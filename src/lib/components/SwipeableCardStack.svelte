@@ -83,7 +83,7 @@
 
 	let derivedTransformStyle = $derived.by(() => {
 		return `transform: translateX(${translateX}px) rotate(${rotation}deg);`;
-	})
+	});
 </script>
 
 <div class="relative h-full w-full">
@@ -91,16 +91,18 @@
 		<NameCard card={undefined} shadow={true} />
 	</div>
 	{#each cards || [] as card, index}
-		<div
-			use:pan={isTopMostCard(index)}
-			{onpan}
-			{onpanend}
-			class="absolute h-full w-full"
-			class:duration-500={isTopMostCard(index) && transitionAnimation}
-			class:transition-all={isTopMostCard(index) && transitionAnimation}
-			style={isTopMostCard(index) ? derivedTransformStyle : ''}
-		>
-			<NameCard {card} shadow={isTopMostCard(index)} />
-		</div>
+		{#key card.id}
+			<div
+				use:pan={isTopMostCard(index)}
+				{onpan}
+				{onpanend}
+				class="absolute h-full w-full"
+				class:duration-500={isTopMostCard(index) && transitionAnimation}
+				class:transition-all={isTopMostCard(index) && transitionAnimation}
+				style={isTopMostCard(index) ? derivedTransformStyle : ''}
+			>
+				<NameCard {card} shadow={isTopMostCard(index)} />
+			</div>
+		{/key}
 	{/each}
 </div>
