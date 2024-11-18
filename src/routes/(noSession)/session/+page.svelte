@@ -7,15 +7,6 @@
 	import CreateSessionSkeleton from './CreateSessionSkeleton.svelte';
 	import { goto } from '$app/navigation';
 
-	let { data } = $props();
-	let loaded = $state(false);
-	const sessionStore = getSessionStore();
-
-	data.partnerSession().then((partnerSession) => {
-		sessionStore.session = partnerSession;
-		loaded = true;
-	});
-
 	function onjoined() {
 		setTimeout(async () => await goto('/'), 1000);
 	}
@@ -30,11 +21,7 @@
 			<Tabs.Trigger value="join">Beitreten</Tabs.Trigger>
 		</Tabs.List>
 		<Tabs.Content value="create" class="mb-10 mt-10">
-			{#if loaded}
-				<CreateSession {onjoined} />
-			{:else}
-				<CreateSessionSkeleton />
-			{/if}
+			<CreateSession {onjoined} />
 		</Tabs.Content>
 		<Tabs.Content value="join" class="mb-10 mt-10">
 			<JoinSession {onjoined} />

@@ -4,19 +4,15 @@ import { QueryClient } from '@tanstack/svelte-query';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 
 export const load: PageLoad = async () => {
-	if (browser) {
-		await login();
-	}
-
-	function getAuthUser(): Promise<User | null> {
-		return new Promise((resolve) => {
-			onAuthStateChanged(auth, (user) => {
-				resolve(user);
-			});
-		});
-	}
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser
+			}
+		}
+	});
 
 	return {
-		getAuthUser: getAuthUser
+		queryClient
 	};
 };
