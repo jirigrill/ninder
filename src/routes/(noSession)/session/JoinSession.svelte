@@ -3,34 +3,26 @@
 	import QrCode from '$lib/components/QrCode.svelte';
 	import StatusButton from '$lib/components/StatusButton.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte';
-	import { SessionRepository } from '$lib/SessionRepository';
+	import {  getUserStore } from '$lib/FirebaseStore.svelte';
 
 	type Props = { onjoined: () => void };
-	const { onjoined }: Props = $props();
+	import { joinSession } from '$lib/client/SessionClient';
 
+	const { onjoined }: Props = $props();
 	let sessionJoinState: 'none' | 'loading' | 'failed' | 'succeeded' = $state('none');
 	let pinState = '';
-
-	const repo = new SessionRepository(getStore());
 	const userStore = getUserStore();
-	const sessionStore = getSessionStore();
 
 	function onPinInput(pin: string) {
 		pinState = pin;
-		joinSession();
+		onJoinSession();
 	}
 
-	async function joinSession() {
+	async function onJoinSession() {
 		sessionJoinState = 'loading';
-		const result = await repo.join(pinState, userStore.user?.uid);
+		const result = await joinSession(userStore.user?.uid, pinState);
 		sessionJoinState = result ? 'succeeded' : 'failed';
-
-		if (sessionJoinState == 'succeeded') {
-			const session = await repo.getCurrentSessionByPairingCode(pinState, userStore.user?.uid);
-			sessionStore.session = session;
-			onjoined();
-		}
+		setTimeout(() => onjoined(), 1000);
 	}
 </script>
 
@@ -48,7 +40,7 @@
 			<QrCode url={'test'} />
 		</div>
 		<StatusButton
-			onclick={async () => await joinSession()}
+			onclick={async () => await onJoinSession()}
 			status={sessionJoinState}
 			text="Session beitreten"
 		/>

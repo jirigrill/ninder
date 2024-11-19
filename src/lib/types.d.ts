@@ -32,6 +32,20 @@ export type Session = {
 	partnerUserId: string | null;
 };
 
+export type CreateSession = {
+	initiatorUserId: string;
+};
+
+export type JoinSession = {
+	pairingCode: string;
+	partnerUserId: string;
+};
+
+export type JoinSession = {
+	pairingCode: string;
+	partnerUserId: string;
+};
+
 export type CardInteraction = {
 	userId: string;
 	cardId: number;

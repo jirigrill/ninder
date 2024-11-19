@@ -2,26 +2,15 @@
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	import '/node_modules/flag-icons/css/flag-icons.min.css';
 	import '../../app.css';
-	import { getSessionStore, getStore, getUserStore } from '$lib/FirebaseStore.svelte';
+	import {  getUserStore } from '$lib/FirebaseStore.svelte';
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { SessionRepository } from '$lib/SessionRepository';
-	import { createQuery, QueryClientProvider, useQueryClient } from '@tanstack/svelte-query';
-	import type { Session } from '$lib/types';
 	import { getSession } from '$lib/client/SessionClient';
-	import { error } from '@sveltejs/kit';
+	import { redirect } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
 	let { children, data } = $props();
 
 	let loading = $state(true);
 	const userStore = getUserStore();
-
-	const client = useQueryClient();
-
-	let query = createQuery<Session, Error>({
-		queryKey: ['session'],
-		queryFn: () => getSession(),
-		enabled: true
-	});
 
 	$effect(() => {
 		if (!browser) {
@@ -30,22 +19,6 @@
 
 		handleUserAuthentication();
 	});
-
-	// async function gotoSessionPageIfNotPaired() {
-	// 	const store = getSessionStore();
-
-	// 	if (store.session == null) {
-	// 		const repo = new SessionRepository(getStore());
-	// 		const session = await repo.getPairedSession(userStore.user?.uid);
-	// 		store.session = session;
-	// 	}
-
-	// 	if (store.session == null || store.session.partnerUserId == null) {
-	// 		await goto('/session');
-	// 	} else {
-	// 		loading = false;
-	// 	}
-	// }
 
 	function updateUserStore(user) {
 		userStore.user = user;
@@ -58,23 +31,23 @@
 			}
 
 			updateUserStore(user);
-			console.log('dd');
-			await client.refetchQueries({ queryKey: ['session'] });
-			// gotoSessionPageIfNotPaired();
+			let session = await getSession(user.uid)
+
+			if (!session || !session.partnerUserId) {
+				goto("/session");
+			}
+
+			loading = false;
 		});
 	}
 </script>
 
-a
-{#if $query.isLoading}
-	loading
+{#if loading}
 	<div class="flex h-full w-full flex-col items-center justify-center bg-slate-100">
 		<i class="fa-solid fa-circle-notch fa-spin mr-2 text-5xl"></i>
 		<p class="mt-4 text-base font-normal text-slate-900">Bitte warte einen Moment</p>
 	</div>
-{/if}
-{#if $query.isSuccess}
-	success
+{:else}
 	<div class="flex h-full w-full flex-col bg-slate-100">
 		{@render children()}
 		<div
@@ -88,9 +61,6 @@ a
 			</a>
 		</div>
 	</div>
-{/if}
-{#if $query.error}
-	error
 {/if}
 
 <style>
