@@ -7,10 +7,12 @@
 
 	type Props = { onjoined: () => void };
 	import { joinSession } from '$lib/client/SessionClient';
+	import { onMount } from 'svelte';
 
 	const { onjoined }: Props = $props();
 	let sessionJoinState: 'none' | 'loading' | 'failed' | 'succeeded' = $state('none');
 	let pinState = '';
+	let pinValue: string[] = $state([]);
 	const userStore = getUserStore();
 
 	function onPinInput(pin: string) {
@@ -22,8 +24,20 @@
 		sessionJoinState = 'loading';
 		const result = await joinSession(userStore.user?.uid, pinState);
 		sessionJoinState = result ? 'succeeded' : 'failed';
-		setTimeout(() => onjoined(), 1000);
+
+		if (result) {
+			setTimeout(() => onjoined(), 1000);
+		}
 	}
+
+	onMount(() => {
+        const query = new URLSearchParams(window.location.search);
+        const pairingCode = query.get('pairingCode');
+        if (pairingCode) {
+            pinValue = Array.from(pairingCode)
+			onPinInput(pairingCode);
+        }
+    });
 </script>
 
 <Card.Root class="flex flex-col items-center">
@@ -35,7 +49,7 @@
 		{#if sessionJoinState == 'failed'}
 			<p class="mb-2 text-center text-sm text-red-600">Ungültiger Session Code</p>
 		{/if}
-		<PinInput readonly={false} {onPinInput} />
+		<PinInput value={pinValue} readonly={false} {onPinInput} />
 		<div class="mb-4 mt-4 w-full rounded-2xl bg-white p-4 shadow">
 			<QrCode url={'test'} />
 		</div>

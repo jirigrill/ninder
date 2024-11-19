@@ -33,7 +33,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 
 		try {
 			const result = await client.query(
-				`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1 LIMIT 1`,
+				`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1`,
 				[userId]
 			);
 
@@ -41,13 +41,23 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 				return json({ error: 'No session found' }, { status: 404 });
 			}
 
-			const dbRow = result.rows[0];
-            const session: Session = {
-				initiatorUserId: dbRow.initiatoruserid,
-				partnerUserId: dbRow.partneruserid,
-				pairingCode: dbRow.pairingcode
+			const sessions = result.rows;
+            let preferredSession = sessions.find(session => session.partneruserid === userId);
+
+            if (!preferredSession) {
+                preferredSession = sessions.find(session => session.initiatoruserid === userId);
+            }
+
+            if (!preferredSession) {
+                return json({ error: 'No session found' }, { status: 404 });
+            }
+
+			const session: Session = {
+				initiatorUserId: preferredSession.initiatoruserid,
+				partnerUserId: preferredSession.partneruserid,
+				pairingCode: preferredSession.pairingcode
 			};
-			return json(session);
+            return json(session);
 		} finally {
 			client.release();
 		}

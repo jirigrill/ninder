@@ -25,11 +25,11 @@
 	)
 
 	function getPinCodeAsArray(): string[] {
-		return Array.from(getPinCodeAsString());
+		return Array.from(session?.pairingCode);
 	}
 
-	function getPinCodeAsString(): string {
-		return session?.pairingCode;
+	function getJoinerUrl(): string {
+		return `${window.location.origin}/session?action=join&pairingCode=${session?.pairingCode}`;
 	}
 
 	async function fetchOrCreateSession() {
@@ -58,7 +58,7 @@
 		<Card.Content>
 			<PinInput value={getPinCodeAsArray()} readonly={true} />
 			<div class="mt-4 w-full rounded-2xl bg-white p-4 shadow">
-				<QrCode url={getPinCodeAsString()} />
+				<QrCode url={getJoinerUrl()} />
 			</div>
 			{#if session.partnerUserId}
 				<div class="item-end mt-4 flex items-center">
