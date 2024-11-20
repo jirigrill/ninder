@@ -5,11 +5,12 @@
 	import {  getUserStore } from '$lib/FirebaseStore.svelte';
 	import { browser } from '$app/environment';
 	import { getSession } from '$lib/client/SessionClient';
-	import { redirect } from '@sveltejs/kit';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	let { children, data } = $props();
 
 	let loading = $state(true);
+	let pathSegment = $state('categories');
 	const userStore = getUserStore();
 
 	$effect(() => {
@@ -40,6 +41,28 @@
 			loading = false;
 		});
 	}
+
+	onMount(() => {
+		setPathSegment();
+    });
+
+	afterNavigate(() => {
+		setPathSegment();
+	})
+
+	function setPathSegment() {
+        const path = window.location.pathname;
+        const segments = path.split('/');
+
+		if (segments.length < 2) {
+			return;
+		}
+
+		pathSegment = segments[1];
+		if(pathSegment === "") {
+			pathSegment = "categories";
+		}
+	}
 </script>
 
 {#if loading}
@@ -51,13 +74,19 @@
 	<div class="flex h-full w-full flex-col bg-slate-100">
 		{@render children()}
 		<div
-			class="flex flex-row justify-between border-t-4 border-solid border-slate-200 bg-white pb-2 pl-8 pr-8 pt-2"
+			class="flex flex-row justify-between pb-2 pl-4 pr-4 pt-2"
 		>
-			<a href="/" aria-label="categories">
-				<i class="fa-solid fa-earth-americas text-5xl text-slate-400"></i>
+			<a href="/" aria-label="categories" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "categories"}>
+				<i class="fa-solid fa-earth-americas text-5xl text-slate-400" class:text-red-700={pathSegment == "categories"}></i>
 			</a>
-			<a href="/matches" aria-label="categories">
-				<i class="fa-solid fa-hands-holding-child text-5xl text-slate-400"></i>
+			<a href="/swipe" aria-label="swipe" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "swipe"}>
+				<i class="fa-solid fa-chess text-5xl text-slate-400" class:text-red-700={pathSegment == "swipe"}></i>
+			</a>
+			<a href="/matches" aria-label="matches" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "matches"}>
+				<i class="fa-solid fa-heart text-5xl text-slate-400" class:text-red-700={pathSegment == "matches"}></i>
+			</a>
+			<a href="/session" aria-label="session" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "session"}>
+				<i class="fa-solid fa-gear text-5xl text-slate-400" class:text-red-700={pathSegment == "session"}></i>
 			</a>
 		</div>
 	</div>

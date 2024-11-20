@@ -52,3 +52,9 @@ export type CardInteraction = {
 	cardId: number;
 	swipe: 'liked' | 'disliked' | 'superliked';
 };
+
+export type Match = {
+	cardId: number;
+	name: string;
+	meaning: string;
+}
