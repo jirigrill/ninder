@@ -62,6 +62,7 @@
 		if(pathSegment === "") {
 			pathSegment = "categories";
 		}
+		console.log(pathSegment);
 	}
 </script>
 
@@ -73,22 +74,20 @@
 {:else}
 	<div class="flex h-full w-full flex-col bg-slate-100">
 		{@render children()}
-		<div
-			class="flex flex-row justify-between pb-2 pl-4 pr-4 pt-2"
-		>
-			<a href="/" aria-label="categories" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "categories"}>
-				<i class="fa-solid fa-earth-americas text-5xl text-slate-400" class:text-red-700={pathSegment == "categories"}></i>
-			</a>
-			<a href="/swipe" aria-label="swipe" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "swipe"}>
-				<i class="fa-solid fa-chess text-5xl text-slate-400" class:text-red-700={pathSegment == "swipe"}></i>
-			</a>
-			<a href="/matches" aria-label="matches" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "matches"}>
-				<i class="fa-solid fa-heart text-5xl text-slate-400" class:text-red-700={pathSegment == "matches"}></i>
-			</a>
-			<a href="/session" aria-label="session" class="border-t-4 border-solid border-slate-200 pt-2 grow flex justify-center" class:border-red-700={pathSegment == "session"}>
-				<i class="fa-solid fa-gear text-5xl text-slate-400" class:text-red-700={pathSegment == "session"}></i>
-			</a>
-		</div>
+		<div class="flex flex-row justify-between pb-2 pl-4 pr-4 pt-2">
+            <a href="/" aria-label="categories" class="border-t-4 border-solid pt-2 grow flex justify-center" class:border-red-700={pathSegment === "categories"} class:border-slate-200={pathSegment !== "categories"}>
+                <i class="fa-solid fa-earth-americas text-5xl" class:text-red-700={pathSegment === "categories"} class:text-slate-400={pathSegment !== "categories"}></i>
+            </a>
+            <a href="/swipe/DE" aria-label="swipe" class="border-t-4 border-solid pt-2 grow flex justify-center" class:border-red-700={pathSegment === "swipe"} class:border-slate-200={pathSegment !== "swipe"}>
+                <i class="fa-solid fa-chess text-5xl" class:text-red-700={pathSegment === "swipe"} class:text-slate-400={pathSegment !== "swipe"}></i>
+            </a>
+            <a href="/matches" aria-label="matches" class="border-t-4 border-solid pt-2 grow flex justify-center" class:border-red-700={pathSegment === "matches"} class:border-slate-200={pathSegment !== "matches"}>
+                <i class="fa-solid fa-heart text-5xl" class:text-red-700={pathSegment === "matches"} class:text-slate-400={pathSegment !== "matches"}></i>
+            </a>
+            <a href="/session" aria-label="session" class="border-t-4 border-solid pt-2 grow flex justify-center" class:border-red-700={pathSegment === "session"} class:border-slate-200={pathSegment !== "session"}>
+                <i class="fa-solid fa-gear text-5xl" class:text-red-700={pathSegment === "session"} class:text-slate-400={pathSegment !== "session"}></i>
+            </a>
+        </div>
 	</div>
 {/if}
 
