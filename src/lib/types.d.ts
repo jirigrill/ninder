@@ -1,8 +1,9 @@
 export type Card = {
-	id: string;
+	id: number;
 	name: string;
 	countries: string[];
 	meaning: string;
+	partnerInteraction: CardInteraction | null;
 };
 
 export type CategoryProgress = {
@@ -49,5 +50,5 @@ export type JoinSession = {
 export type CardInteraction = {
 	userId: string;
 	cardId: number;
-	swipe: 'liked' | 'disliked';
+	swipe: 'liked' | 'disliked' | 'superliked';
 };

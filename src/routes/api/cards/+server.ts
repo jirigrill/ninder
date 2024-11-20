@@ -1,7 +1,7 @@
 import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
 import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
-import type { Card } from '$lib/types';
+import type { Card, CardInteraction } from '$lib/types';
 
 const { Pool } = pkg;
 
@@ -22,8 +22,37 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') || '10') : 10;
 	const userId = url.searchParams.get('user_id');
 
+
+	try {
+		const client = await pool.connect();
+
+		try {
+			let cards = await getNextCards(userId, country, take, client);
+			cards = await addPartnerCardInteractions(cards, userId, client);
+
+			return new Response(JSON.stringify(cards), {
+				status: 200,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		} finally {
+			client.release();
+		}
+	} catch (error) {
+		console.error('Database query failed', error);
+		return new Response(JSON.stringify({ error: 'Failed to fetch names' }), {
+			status: 500,
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+	}
+};
+
+async function getNextCards(userId: string, country: string, take: number, client: pkg.PoolClient): Promise<Card[]> {
 	let query = `
-  SELECT n.id, n.name, n.meaning, c.name AS category_name
+  		SELECT n.id, n.name, n.meaning, c.name AS category_name
         FROM names n
         LEFT JOIN name_categories nc ON n.id = nc.name_id
         LEFT JOIN categories c ON nc.category_id = c.id
@@ -43,34 +72,56 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	query += ' LIMIT $3';
 	params.push(take);
 
-	try {
-		const client = await pool.connect();
+	const res = await client.query(query, params);
+	const categories: Card[] = res.rows.map((row) => ({
+		id: row.id,
+		name: row.name,
+		meaning: row.meaning,
+		countries: [],
+		partnerInteraction: null
+	}));
+	return categories;
+}
 
-		try {
-			const res = await client.query(query, params);
-			const categories: Card[] = res.rows.map((row) => ({
-				id: row.id,
-				name: row.name,
-				meaning: row.meaning,
-				countries: []
-			}));
-	
-			return new Response(JSON.stringify(categories), {
-				status: 200,
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-		} finally {
-			client.release();
-		}
-	} catch (error) {
-		console.error('Database query failed', error);
-		return new Response(JSON.stringify({ error: 'Failed to fetch names' }), {
-			status: 500,
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+async function getPartnerUserId(userId: string, client: pkg.PoolClient): Promise<string | null> {
+	const query = `
+		SELECT partneruserid, initiatoruserid
+		FROM sessions
+		WHERE initiatoruserid = $1 OR partneruserid = $1
+	`;
+	const res = await client.query(query, [userId]);
+	if (res.rows.length === 0) {
+		return null;
 	}
-};
+	const session = res.rows[0];
+	const partnerUserId = session.initiatoruserid === userId ? session.partneruserid : session.initiatoruserid;
+	return partnerUserId;
+}
+
+async function addPartnerCardInteractions(cards: Card[], userId: string, client: pkg.PoolClient): Promise<Card[]> {
+	const partnerUserId = await getPartnerUserId(userId, client);
+
+	const query = `
+		SELECT ci.name_id, ci.action
+		FROM card_interactions ci
+		WHERE ci.user_id = $1
+		AND ci.name_id = ANY($2)
+	`;
+
+	const params: any[] = [partnerUserId, cards.map((card) => card.id)];
+	const res = await client.query(query, params);
+	const interactions: CardInteraction[] = res.rows.map((row) => ({
+		cardId: row.name_id,
+		swipe: row.action,
+		userId: partnerUserId
+	}));
+
+	cards.forEach((card) => {
+		const interaction = interactions.find((interaction) => interaction.cardId === card.id);
+		if (interaction) {
+			card.partnerInteraction = interaction
+		}
+	});
+
+	return cards;
+}

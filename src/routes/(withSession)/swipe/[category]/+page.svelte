@@ -8,12 +8,14 @@
 	import SwipeFeedback from './SwipeFeedback.svelte';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getCards, swipeCard } from '$lib/client/CardClient';
+	import Match from './Match.svelte';
 
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 10;
 	let country = $page.params.category;
+	let matchDialog: Match | null = $state(null);
 
 	const cardsQuery = createQuery<Card[], Error>({
 		queryKey: ['cards', country, take],
@@ -44,10 +46,16 @@
 
 	async function onLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
+		if(card.partnerInteraction?.swipe == 'liked' || card.partnerInteraction?.swipe == 'superliked') {
+			onMatch(card);
+		}
 	}
 
 	async function onDislike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'dislike' });
+		if(card.partnerInteraction?.swipe == 'superliked') {
+			onMatch(card);
+		}
 	}
 
 	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none') {
@@ -73,6 +81,11 @@
 			onLike($cardsQuery.data[$cardsQuery.data.length - 1]);
 		}
 	}
+
+	function onMatch(card: Card) {
+		console.log('Match');
+		matchDialog?.showMatch(card);
+	}
 </script>
 
 <div
@@ -94,6 +107,9 @@
 		{onSwipeFeedback}
 		{onSwipe}
 	/>
+
+	<Match bind:this={matchDialog} card={$cardsQuery.data[$cardsQuery.data.length - 1]} />
+
 	<div class="mt-4 w-full">
 		<CardActionBar
 			onDislikeButton={() => swipeableCardStack.swipe('left')}
