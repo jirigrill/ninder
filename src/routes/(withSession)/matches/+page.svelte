@@ -4,6 +4,8 @@
 	import { createQuery } from '@tanstack/svelte-query';
 	import { getMatches } from '$lib/client/MatchClient';
 	import { randombackgroundcolor } from '$lib/actions/randomBackgroundColor';
+	import { fittedtext } from '$lib/actions/fittedtext';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	const matchQuery = createQuery<Match[], Error>({
 		queryKey: ['matches'],
@@ -15,28 +17,56 @@
 
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
 	{#if $matchQuery.isLoading}
-		<p>loading</p>
+		{@render matchSkeleton()}
+		{@render matchSkeleton()}
+		{@render matchSkeleton()}
 	{/if}
 	{#if $matchQuery.isSuccess}
-		{#each $matchQuery.data as match}
-			{@render matchSnippet(match)}
-		{/each}
+		{#if $matchQuery.isFetching}
+			<i class="fa-solid fa-circle-notch fa-spin mb-4 w-full self-center text-center text-xl"></i>
+		{/if}
+		{#if $matchQuery.data.length === 0}
+			{@render noMatchSnippet()}
+		{:else}
+			{#each $matchQuery.data as match}
+				{@render matchSnippet(match)}
+			{/each}
+		{/if}
 	{/if}
 </div>
 
 {#snippet matchSnippet(match: Match)}
-	<div use:randombackgroundcolor={match.cardId} class="mb-4 rounded-xl bg-white p-4 shadow-lg flex">
-		<div
-		class="flex items-center justify-center rounded-full bg-white p-2 h-full self-center mr-4"
-	>
-		<i
-			class="fa-solid fa-heart inline-block bg-gradient-to-tr from-green-600 to-emerald-400 bg-clip-text text-4xl text-transparent"
-		></i>
-	</div>
+	<div use:randombackgroundcolor={match.cardId} class="mb-4 flex rounded-xl bg-white p-4 shadow-lg">
+		<div class="mr-4 flex h-full items-center justify-center self-center rounded-full bg-white p-2">
+			<i
+				class="fa-solid fa-heart inline-block bg-gradient-to-tr from-green-600 to-emerald-400 bg-clip-text text-4xl text-transparent"
+			></i>
+		</div>
 		<div>
 			<h1 class="text-4xl font-bold text-white">{match.name}</h1>
 			<p class="text-2xl font-semibold text-white">Bedeutung: {match.meaning}</p>
 		</div>
+	</div>
+{/snippet}
+
+{#snippet matchSkeleton()}
+	<div class="mb-4 flex rounded-xl bg-slate-200 p-4 shadow-lg">
+		<Skeleton class="mr-4 aspect-square w-14 self-center rounded-full" />
+		<div class="grow">
+			<Skeleton class="mb-2 h-10 w-full rounded-lg" />
+			<Skeleton class="h-8 w-full rounded-lg" />
+		</div>
+	</div>
+{/snippet}
+
+{#snippet noMatchSnippet()}
+	<div
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-400 bg-slate-300 p-5 shadow-xl"
+	>
+		<h1 use:fittedtext={true} class="w-full text-center text-6xl font-bold text-slate-50">
+			Du hast bisher, noch keine Übereinstimmungen. Swipe weiter!
+		</h1>
+		<i class="fa-solid fa-rocket mt-10 text-9xl text-slate-50"></i>
 	</div>
 {/snippet}
 

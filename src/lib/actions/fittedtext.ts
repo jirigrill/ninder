@@ -1,8 +1,8 @@
 import textfit from 'textfit';
 
-export function fittedtext(node: HTMLElement) {
+export function fittedtext(node: HTMLElement, detectMultiLine: boolean = false) {
 	textfit(node, {
-		detectMultiLine: false,
+		detectMultiLine: detectMultiLine,
 		alignVertWithFlexbox: true,
 		alignHoriz: true
 	});

@@ -18,6 +18,9 @@
 			{@render skeletonSnippet()}
 		{/each}
 	{:else if $query.isSuccess}
+		{#if $query.isFetching}
+			<i class="fa-solid fa-circle-notch fa-spin mb-4 w-full self-center text-center text-xl"></i>
+		{/if}
 		{#each $query.data as category}
 			{@render categorySnippet(category)}
 		{/each}
