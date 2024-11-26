@@ -77,14 +77,45 @@ async function getNextCards(userId: string, country: string, take: number, clien
 	}
 
 	const res = await client.query(query, params);
-	const categories: Card[] = res.rows.map((row) => ({
+	let categories: Card[] = res.rows.map((row) => ({
 		id: row.id,
 		name: row.name,
 		meaning: row.meaning,
 		countries: [],
 		partnerInteraction: null
 	}));
+
+	categories = await enhanceWithCountries(categories, client);
+	
 	return categories;
+}
+
+async function enhanceWithCountries(cards: Card[], client: pkg.PoolClient): Promise<Card[]> {
+	const query = `
+		SELECT n.id, c.letter_code
+		FROM names n
+		LEFT JOIN name_categories nc ON n.id = nc.name_id
+		LEFT JOIN categories c ON nc.category_id = c.id
+		WHERE n.id = ANY($1)
+	`;
+	const params: any[] = [cards.map((card) => card.id)];
+	const res = await client.query(query, params);
+	const countries: Record<number, string[]> = res.rows.reduce((acc, row) => {
+		if (!acc[row.id]) {
+			acc[row.id] = [];
+		}
+		acc[row.id].push(row.letter_code);
+		return acc;
+	}, {});
+
+	cards.forEach((card) => {
+		const cardCountries = countries[card.id];
+		if (cardCountries) {
+			card.countries = cardCountries;
+		}
+	});
+
+	return cards;
 }
 
 async function getPartnerUserId(userId: string, client: pkg.PoolClient): Promise<string | null> {
