@@ -38,7 +38,7 @@
 				goto('/session');
 			}
 
-			umami.identify({ user_id: user.uid, pairing_code: session.pairingCode });
+			umami.identify({ user_id: user.uid, pairing_code: session?.pairingCode || '' });
 			loading = false;
 		});
 	}
