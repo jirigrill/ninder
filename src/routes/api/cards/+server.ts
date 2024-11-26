@@ -52,7 +52,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 
 async function getNextCards(userId: string, country: string, take: number, client: pkg.PoolClient): Promise<Card[]> {
 	let query = `
-  		SELECT n.id, n.name, n.meaning, c.name AS category_name
+  		SELECT  DISTINCT ON (n.id) n.id, n.name, n.meaning, c.name AS category_name
         FROM names n
         LEFT JOIN name_categories nc ON n.id = nc.name_id
         LEFT JOIN categories c ON nc.category_id = c.id
@@ -62,15 +62,19 @@ async function getNextCards(userId: string, country: string, take: number, clien
             WHERE user_id = $1
         )
     `;
-
 	const params: any[] = [userId];
-	if (country) {
+
+	if (country && country !== 'mixed') {
 		query += ' AND c.letter_code = $2';
 		params.push(country);
+		query += ' ORDER BY n.id ASC';
+		query += ' LIMIT $3';
+		params.push(take);
+	} else {
+		query += ' ORDER BY n.id ASC';
+		query += ' LIMIT $2';
+		params.push(take);
 	}
-	query += ' ORDER BY n.id ASC';
-	query += ' LIMIT $3';
-	params.push(take);
 
 	const res = await client.query(query, params);
 	const categories: Card[] = res.rows.map((row) => ({

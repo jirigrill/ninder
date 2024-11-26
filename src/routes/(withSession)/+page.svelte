@@ -39,7 +39,7 @@
 	{#snippet categorySnippet(category: CategoryProgress)}
 		<a
 			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
-			href="/swipe/{category.letterCode}"
+			href="/swipe/{category.letterCode ?? "mixed"}"
 		>
 			{#if category.letterCode}
 				<span class="fi shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
