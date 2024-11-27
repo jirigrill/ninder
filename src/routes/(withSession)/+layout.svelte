@@ -7,6 +7,7 @@
 	import { getSession } from '$lib/client/SessionClient';
 	import { afterNavigate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { setLanguageTag, sourceLanguageTag } from '$lib/paraglide/runtime';
 	let { children, data } = $props();
 
 	let loading = $state(true);
@@ -19,6 +20,7 @@
 			return;
 		}
 
+		setUserLanguage();
 		handleUserAuthentication();
 	});
 
@@ -69,6 +71,17 @@
 		pathSegment = segments[1];
 		if (pathSegment === '') {
 			pathSegment = 'categories';
+		}
+	}
+
+	function setUserLanguage() {
+		const language = navigator?.language || navigator?.userLanguage;
+
+		const twoLetterCode = language.slice(0, 2);
+		if (twoLetterCode === 'en') {
+			setLanguageTag('en');
+		} else {
+			setLanguageTag(sourceLanguageTag);
 		}
 	}
 </script>

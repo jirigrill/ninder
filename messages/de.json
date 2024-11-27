@@ -1,0 +1,15 @@
+{
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "session_new_title": "Sitzung",
+    "session_new_create": "Erstellen",
+    "session_new_join": "Beitreten",
+    "session_new_create_cardtitle": "Du erstellst die Session",
+    "session_new_create_carddescription": "Lass deinen Code von deinem Partner einscanner oder eintippen!",
+    "session_new_create_cardstatus_joined": "Partner ist beigetreten",
+    "session_new_create_cardstatus_waiting": "Warte auf beitritt...",
+    "session_new_create_cardstatus_creating": "Erstelle Session...",
+    "session_new_join_cardtitle": "Du trittst einer Session bei",
+    "session_new_join_carddescription": "Tippe oder Scanne den Code deines Partners ein!",
+    "session_new_join_cardstatus_invalidcode": "Ungültiger Session Code",
+    "session_new_join_button": "Session beitreten"
+}

@@ -5,16 +5,10 @@
 	import CreateSession from './CreateSession.svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { getSession } from '$lib/client/SessionClient';
-	import type { Session } from '$lib/types';
-	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
-	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import { useQueryClient } from '@tanstack/svelte-query';
+	import * as m from '$lib/paraglide/messages.js';
 
 	const client = useQueryClient();
-	const sessionQuery = createQuery<Session, Error>({
-		queryKey: ['session'],
-		queryFn: () => getSession(getUserStore().user.uid)
-	});
 
 	let tabValue = $state('create');
 	let isRefetching = $state(false);
@@ -43,13 +37,13 @@
 	});
 </script>
 
-<GenericTitleHeader title={'Session'} />
+<GenericTitleHeader title={m.session_new_title()} />
 
 <div class="flex h-full flex-col items-center justify-center">
 	<Tabs.Root value={tabValue} class="w-4/5" onValueChange={(event) => handleTabChange(event)}>
 		<Tabs.List class="grid grid-cols-2 bg-slate-200">
-			<Tabs.Trigger value="create">Erstellen</Tabs.Trigger>
-			<Tabs.Trigger value="join">Beitreten</Tabs.Trigger>
+			<Tabs.Trigger value="create">{m.session_new_create()}</Tabs.Trigger>
+			<Tabs.Trigger value="join">{m.session_new_join()}</Tabs.Trigger>
 		</Tabs.List>
 		<Tabs.Content value="create" class="">
 			<CreateSession {onjoined} />

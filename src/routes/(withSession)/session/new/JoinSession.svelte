@@ -1,9 +1,9 @@
 <script lang="ts">
 	import PinInput from '$lib/components/PinInput.svelte';
-	import QrCode from '$lib/components/QrCode.svelte';
 	import StatusButton from '$lib/components/StatusButton.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = { onjoined: () => void };
 	import { joinSession } from '$lib/client/SessionClient';
@@ -42,19 +42,21 @@
 
 <Card.Root class="flex flex-col items-center">
 	<Card.Header>
-		<Card.Title>Du trittst einer Session bei</Card.Title>
-		<Card.Description>Tippe oder Scanne den Code deines Partners ein!</Card.Description>
+		<Card.Title>{m.session_new_join_cardtitle()}</Card.Title>
+		<Card.Description>{m.session_new_join_carddescription()}</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		{#if sessionJoinState == 'failed'}
-			<p class="mb-2 text-center text-sm text-red-600">Ungültiger Session Code</p>
+			<p class="mb-2 text-center text-sm text-red-600">
+				{m.session_new_join_cardstatus_invalidcode()}
+			</p>
 		{/if}
 		<PinInput value={pinValue} readonly={false} {onPinInput} />
 		<div class="mt-4"></div>
 		<StatusButton
 			onclick={async () => await onJoinSession()}
 			status={sessionJoinState}
-			text="Session beitreten"
+			text={m.session_new_join_button()}
 		/>
 	</Card.Content>
 </Card.Root>

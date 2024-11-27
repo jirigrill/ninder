@@ -6,6 +6,7 @@
 	import { getUserStore } from '$lib/FirebaseStore.svelte';
 	import type { Session } from '$lib/types';
 	import CreateSessionSkeleton from './CreateSessionSkeleton.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = { onjoined: () => void };
 	import { poll } from '$lib/client/FetchPolling';
@@ -51,10 +52,8 @@
 {#if session}
 	<Card.Root class="flex flex-col items-center">
 		<Card.Header>
-			<Card.Title>Du erstellst die Session</Card.Title>
-			<Card.Description
-				>Lass deinen Code von deinem Partner einscanner oder eintippen!</Card.Description
-			>
+			<Card.Title>{m.session_new_create_cardtitle()}</Card.Title>
+			<Card.Description>{m.session_new_create_carddescription()}</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<PinInput value={getPinCodeAsArray()} readonly={true} />
@@ -64,12 +63,16 @@
 			{#if session.partnerUserId}
 				<div class="item-end mt-4 flex items-center">
 					<i class="fa-solid fa-check mr-2 text-2xl text-green-600"></i>
-					<p class="text-base font-normal text-green-600">Partner ist beigetreten</p>
+					<p class="text-base font-normal text-green-600">
+						{m.session_new_create_cardstatus_joined()}
+					</p>
 				</div>
 			{:else}
 				<div class="item-end mt-4 flex items-center">
 					<i class="fa-solid fa-circle-notch fa-spin mr-2 text-3xl"></i>
-					<p class="text-base font-normal text-slate-900">Warte auf beitritt...</p>
+					<p class="text-base font-normal text-slate-900">
+						{m.session_new_create_cardstatus_waiting()}
+					</p>
 				</div>
 			{/if}
 		</Card.Content>
