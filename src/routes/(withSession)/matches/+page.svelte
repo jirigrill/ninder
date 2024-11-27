@@ -22,9 +22,6 @@
 		{@render matchSkeleton()}
 	{/if}
 	{#if $matchQuery.isSuccess}
-		{#if $matchQuery.isFetching}
-			<i class="fa-solid fa-circle-notch fa-spin mb-4 w-full self-center text-center text-xl"></i>
-		{/if}
 		{#if $matchQuery.data.length === 0}
 			{@render noMatchSnippet()}
 		{:else}

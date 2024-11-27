@@ -18,9 +18,6 @@
 			{@render skeletonSnippet()}
 		{/each}
 	{:else if $query.isSuccess}
-		{#if $query.isFetching}
-			<i class="fa-solid fa-circle-notch fa-spin mb-4 w-full self-center text-center text-xl"></i>
-		{/if}
 		{#each $query.data as category}
 			{@render categorySnippet(category)}
 		{/each}
@@ -42,7 +39,7 @@
 	{#snippet categorySnippet(category: CategoryProgress)}
 		<a
 			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
-			href="/swipe/{category.letterCode ?? "mixed"}"
+			href="/swipe/{category.letterCode ?? 'mixed'}"
 		>
 			{#if category.letterCode}
 				<span class="fi shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>

@@ -3,7 +3,7 @@
 	import QrCode from '$lib/components/QrCode.svelte';
 	import StatusButton from '$lib/components/StatusButton.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import {  getUserStore } from '$lib/FirebaseStore.svelte';
+	import { getUserStore } from '$lib/FirebaseStore.svelte';
 
 	type Props = { onjoined: () => void };
 	import { joinSession } from '$lib/client/SessionClient';
@@ -31,13 +31,13 @@
 	}
 
 	onMount(() => {
-        const query = new URLSearchParams(window.location.search);
-        const pairingCode = query.get('pairingCode');
-        if (pairingCode) {
-            pinValue = Array.from(pairingCode)
+		const query = new URLSearchParams(window.location.search);
+		const pairingCode = query.get('pairingCode');
+		if (pairingCode) {
+			pinValue = Array.from(pairingCode);
 			onPinInput(pairingCode);
-        }
-    });
+		}
+	});
 </script>
 
 <Card.Root class="flex flex-col items-center">
@@ -50,9 +50,7 @@
 			<p class="mb-2 text-center text-sm text-red-600">Ungültiger Session Code</p>
 		{/if}
 		<PinInput value={pinValue} readonly={false} {onPinInput} />
-		<div class="mb-4 mt-4 w-full rounded-2xl bg-white p-4 shadow">
-			<QrCode url={'test'} />
-		</div>
+		<div class="mt-4"></div>
 		<StatusButton
 			onclick={async () => await onJoinSession()}
 			status={sessionJoinState}

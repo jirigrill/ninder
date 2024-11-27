@@ -10,9 +10,7 @@ export interface Attributes {
 	'on:event': (e: CustomEvent<PanEvent>) => void;
 }
 
-export function pan(node: HTMLElement, enabled: boolean): ActionReturn<Attributes> {
-	if (!enabled) return { destroy: () => {} };
-
+export function pan(node: HTMLElement): ActionReturn<Attributes> {
 	let destroyHammertime = () => {};
 
 	import('hammerjs').then(() => {

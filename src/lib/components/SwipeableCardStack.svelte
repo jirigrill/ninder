@@ -93,7 +93,7 @@
 	{#each cards || [] as card, index}
 		{#key card.id}
 			<div
-				use:pan={isTopMostCard(index)}
+				use:pan
 				{onpan}
 				{onpanend}
 				class="absolute h-full w-full"
