@@ -1,68 +1,64 @@
 <script lang="ts">
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import JoinSession from './JoinSession.svelte';
-	import CreateSession from './CreateSession.svelte';
-	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { getSession } from '$lib/client/SessionClient';
-	import type { Session } from '$lib/types';
-	import ExistingSession from './ExistingSession.svelte';
-	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+	import { deleteSession } from '$lib/client/SessionClient';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import * as Card from '$lib/components/ui/card';
+	import { Button } from '$lib/components/ui/button';
+	import { goto } from '$app/navigation';
 
 	const client = useQueryClient();
-	const sessionQuery = createQuery<Session, Error>({
-		queryKey: ['session'],
-		queryFn: () => getSession(getUserStore().user.uid)
+	const userId = getUserStore().user.uid;
+
+	const deleteSessionMutation = createMutation({
+		mutationFn: deleteSession,
+		onSuccess: async () => {
+			setTimeout(async () => {
+				await client.invalidateQueries({ queryKey: ['session'] });
+				goto('/session/new');
+			}, 1000);
+		}
 	});
 
-	let tabValue = $state('create');
-	let isRefetching = $state(false);
-
-	async function onjoined() {
-		isRefetching = true;
-		await client.invalidateQueries({ queryKey: ['session'] });
-		await client.refetchQueries({ queryKey: ['session'] });
-		setTimeout(async () => {
-			await goto('/'), (isRefetching = false);
-		}, 1000);
-	}
-
-	function handleTabChange(value: string) {
-		const query = new URLSearchParams(window.location.search);
-		query.set('action', value);
-		history.replaceState(null, '', `${window.location.pathname}?${query.toString()}`);
-	}
-
-	onMount(() => {
-		const query = new URLSearchParams(window.location.search);
-		const action = query.get('action');
-		if (action === 'create' || action === 'join') {
-			tabValue = action;
+	let buttonText = $derived.by(() => {
+		if ($deleteSessionMutation.isPending) {
+			return 'Session wird aufgelöst...';
+		} else if ($deleteSessionMutation.isSuccess) {
+			return 'Session aufgelöst';
 		}
+		return 'Session auflösen';
 	});
 </script>
 
 <GenericTitleHeader title={'Session'} />
 
 <div class="flex h-full flex-col items-center justify-center">
-	{#if $sessionQuery.data && $sessionQuery.data?.partnerUserId && !isRefetching}
-		<div class="w-4/5">
-			<ExistingSession />
-		</div>
-	{:else}
-		<Tabs.Root value={tabValue} class="w-4/5" onValueChange={(event) => handleTabChange(event)}>
-			<Tabs.List class="grid grid-cols-2 bg-slate-200">
-				<Tabs.Trigger value="create">Erstellen</Tabs.Trigger>
-				<Tabs.Trigger value="join">Beitreten</Tabs.Trigger>
-			</Tabs.List>
-			<Tabs.Content value="create" class="">
-				<CreateSession {onjoined} />
-			</Tabs.Content>
-			<Tabs.Content value="join" class="">
-				<JoinSession {onjoined} />
-			</Tabs.Content>
-		</Tabs.Root>
-	{/if}
+	<div class="w-4/5">
+		<Card.Root class="flex flex-col items-center">
+			<Card.Header>
+				<Card.Title>Deine Session</Card.Title>
+				<Card.Description
+					>Du befindest dich im Moment bereits in einer aktiven Session.</Card.Description
+				>
+			</Card.Header>
+			<Card.Content>
+				<p>
+					Wenn du dich entscheidest deine Session aufzulösen, wird dein Fortschritt und der
+					Fortschritt deines Partners unwiederufbar gelöscht.
+				</p>
+
+				<Button
+					class="mt-4 w-full bg-red-600"
+					onclick={() => $deleteSessionMutation.mutate(userId)}
+				>
+					{#if $deleteSessionMutation.isPending}
+						<i class="fa-solid fa-circle-notch fa-spin mr-2 text-2xl"></i>
+					{:else if $deleteSessionMutation.isSuccess}
+						<i class="fa-solid fa-check mr-2 text-2xl"></i>
+					{/if}
+					{buttonText}
+				</Button>
+			</Card.Content>
+		</Card.Root>
+	</div>
 </div>

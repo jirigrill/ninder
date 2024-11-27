@@ -18,35 +18,36 @@
 		fetchOrCreateSession,
 		(e: Session | null) => !!e && !!e.partnerUserId,
 		(joinedSession: Session | null) => {
-			if(joinedSession === null) throw "session is null";
+			if (joinedSession === null) throw 'session is null';
 			session = joinedSession;
 			setTimeout(() => onjoined(), 1000);
 		}
-	)
+	);
 
 	function getPinCodeAsArray(): string[] {
 		return Array.from(session?.pairingCode);
 	}
 
 	function getJoinerUrl(): string {
-		return `${window.location.origin}/session?action=join&pairingCode=${session?.pairingCode}`;
+		return `${window.location.origin}/session/new?action=join&pairingCode=${session?.pairingCode}`;
 	}
 
 	async function fetchOrCreateSession() {
-        let existingSession = await getSession(userId);
-        if (!existingSession && !session) {
-            session = await createSession(userId);
+		let existingSession = await getSession(userId);
+		if (!existingSession && !session) {
+			session = await createSession(userId);
 			existingSession = session;
-        } else if (existingSession) {
+		} else if (existingSession) {
 			session = existingSession;
 		}
-        return existingSession;
-    }
+		return existingSession;
+	}
 
 	onDestroy(() => {
-        stop();
-    });
+		stop();
+	});
 </script>
+
 {#if session}
 	<Card.Root class="flex flex-col items-center">
 		<Card.Header>
