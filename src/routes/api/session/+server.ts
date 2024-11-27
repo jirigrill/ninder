@@ -135,6 +135,34 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 };
 
+async function getSessionId(userId: string, client: pkg.PoolClient): Promise<number | null> {
+	const result = await client.query(
+		`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1`,
+		[userId]
+	);
+
+	if (result.rows.length === 0) {
+		return null;
+	}
+
+	const sessions = result.rows;
+	let preferredSession = sessions.find((session) => session.partneruserid === userId);
+
+	if (!preferredSession) {
+		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
+	}
+
+	if (!preferredSession) {
+		return null;
+	}
+
+	return preferredSession.id;
+}
+
+async function deleteCardInteractions(sessionId: number, client: pkg.PoolClient) {
+	await client.query(`DELETE FROM card_interactions WHERE session_id = $1`, [sessionId]);
+}
+
 export const DELETE: RequestHandler = async (event) => {
 	const url = new URL(event.request.url);
 	const userId = url.searchParams.get('user_id');
@@ -147,10 +175,9 @@ export const DELETE: RequestHandler = async (event) => {
 		const client = await pool.connect();
 
 		try {
-			const result = await client.query(
-				`DELETE FROM sessions WHERE initiatorUserId = $1 OR partnerUserId = $1 RETURNING *`,
-				[userId]
-			);
+			const sessionId = await getSessionId(userId, client);
+			await deleteCardInteractions(sessionId ?? -1, client);
+			const result = await client.query(`DELETE FROM sessions WHERE id = $1`, [sessionId]);
 
 			if (result.rows.length === 0) {
 				return json({ error: 'No session found to delete' }, { status: 404 });

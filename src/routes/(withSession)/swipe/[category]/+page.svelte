@@ -46,14 +46,17 @@
 
 	async function onLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
-		if(card.partnerInteraction?.swipe == 'liked' || card.partnerInteraction?.swipe == 'superliked') {
+		if (
+			card.partnerInteraction?.swipe == 'liked' ||
+			card.partnerInteraction?.swipe == 'superliked'
+		) {
 			onMatch(card);
 		}
 	}
 
 	async function onDislike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'dislike' });
-		if(card.partnerInteraction?.swipe == 'superliked') {
+		if (card.partnerInteraction?.swipe == 'superliked') {
 			onMatch(card);
 		}
 	}
@@ -83,7 +86,6 @@
 	}
 
 	function onMatch(card: Card) {
-		console.log('Match');
 		matchDialog?.showMatch(card);
 	}
 </script>
