@@ -22,7 +22,6 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') || '10') : 10;
 	const userId = url.searchParams.get('user_id');
 
-
 	try {
 		const client = await pool.connect();
 
@@ -50,7 +49,12 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 };
 
-async function getNextCards(userId: string, country: string, take: number, client: pkg.PoolClient): Promise<Card[]> {
+async function getNextCards(
+	userId: string,
+	country: string,
+	take: number,
+	client: pkg.PoolClient
+): Promise<Card[]> {
 	let query = `
   		SELECT  DISTINCT ON (n.id) n.id, n.name, n.meaning, c.name AS category_name
         FROM names n
@@ -86,7 +90,7 @@ async function getNextCards(userId: string, country: string, take: number, clien
 	}));
 
 	categories = await enhanceWithCountries(categories, client);
-	
+
 	return categories;
 }
 
@@ -118,24 +122,38 @@ async function enhanceWithCountries(cards: Card[], client: pkg.PoolClient): Prom
 	return cards;
 }
 
-async function getPartnerUserId(userId: string, client: pkg.PoolClient): Promise<string | null> {
-	const query = `
-		SELECT partneruserid, initiatoruserid
-		FROM sessions
-		WHERE initiatoruserid = $1 OR partneruserid = $1
-	`;
-	const res = await client.query(query, [userId]);
-	if (res.rows.length === 0) {
+async function getPartnerUserId(userId: string, client: pkg.PoolClient): Promise<number | null> {
+	const result = await client.query(
+		`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1`,
+		[userId]
+	);
+
+	if (result.rows.length === 0) {
 		return null;
 	}
-	const session = res.rows[0];
-	const partnerUserId = session.initiatoruserid === userId ? session.partneruserid : session.initiatoruserid;
-	return partnerUserId;
+
+	const sessions = result.rows;
+	let preferredSession = sessions.find((session) => session.partneruserid === userId);
+
+	if (!preferredSession) {
+		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
+	}
+
+	if (!preferredSession) {
+		return null;
+	}
+
+	return preferredSession.partneruserid === userId
+		? preferredSession.initiatoruserid
+		: preferredSession.partneruserid;
 }
 
-async function addPartnerCardInteractions(cards: Card[], userId: string, client: pkg.PoolClient): Promise<Card[]> {
+async function addPartnerCardInteractions(
+	cards: Card[],
+	userId: string,
+	client: pkg.PoolClient
+): Promise<Card[]> {
 	const partnerUserId = await getPartnerUserId(userId, client);
-
 	const query = `
 		SELECT ci.name_id, ci.action
 		FROM card_interactions ci
@@ -154,7 +172,7 @@ async function addPartnerCardInteractions(cards: Card[], userId: string, client:
 	cards.forEach((card) => {
 		const interaction = interactions.find((interaction) => interaction.cardId === card.id);
 		if (interaction) {
-			card.partnerInteraction = interaction
+			card.partnerInteraction = interaction;
 		}
 	});
 
