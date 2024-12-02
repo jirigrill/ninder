@@ -57,4 +57,5 @@ export type Match = {
 	cardId: number;
 	name: string;
 	meaning: string;
-}
+	superMatch: boolean;
+};

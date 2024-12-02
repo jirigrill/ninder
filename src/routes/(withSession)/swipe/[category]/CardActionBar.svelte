@@ -4,9 +4,9 @@
 	type Props = {
 		onDislikeButton: () => void;
 		onLikeButton: () => void;
-		// onSuperLikeButton: () => void;
+		onSuperLikeButton: () => void;
 	};
-	let { onDislikeButton, onLikeButton }: Props = $props();
+	let { onDislikeButton, onLikeButton, onSuperLikeButton }: Props = $props();
 </script>
 
 <div class="card-navigation space-between flex w-full flex-row items-center justify-center">
@@ -29,6 +29,7 @@
 	/>
 	<span class="ml-4"></span>
 	<IconButton
+		onclick={onSuperLikeButton}
 		iconClass="fa-star"
 		ariaLabel="Super Like"
 		gradientStartColor="from-amber-500"

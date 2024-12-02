@@ -4,8 +4,8 @@
 	import { pan, type PanEvent } from '../actions/pan';
 
 	type Props = {
-		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none') => void;
-		onSwipe: (swipe: 'left' | 'right') => void;
+		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none' | 'top') => void;
+		onSwipe: (swipe: 'left' | 'right' | 'top') => void;
 		cards: Card[] | undefined;
 	};
 
@@ -43,11 +43,11 @@
 		}
 	}
 
-	export function swipe(direction: 'right' | 'left') {
+	export function swipe(direction: 'right' | 'left' | 'top') {
 		transitionAnimation = true;
 		onSwipeFeedback(direction);
 
-		if (direction == 'right') {
+		if (direction == 'right' || direction == 'top') {
 			translateRight();
 		} else {
 			translateLeft();

@@ -34,10 +34,18 @@
 
 {#snippet matchSnippet(match: Match)}
 	<div use:randombackgroundcolor={match.cardId} class="mb-4 flex rounded-xl bg-white p-4 shadow-lg">
-		<div class="mr-4 flex h-full items-center justify-center self-center rounded-full bg-white p-2">
-			<i
-				class="fa-solid fa-heart inline-block bg-gradient-to-tr from-green-600 to-emerald-400 bg-clip-text text-4xl text-transparent"
-			></i>
+		<div
+			class="mr-4 flex aspect-square h-full items-center justify-center self-center rounded-full bg-white p-2"
+		>
+			{#if match.superMatch}
+				<i
+					class="fa-solid fa-star inline-block bg-gradient-to-tr from-amber-500 to-yellow-300 bg-clip-text text-4xl text-transparent"
+				></i>
+			{:else}
+				<i
+					class="fa-solid fa-heart inline-block bg-gradient-to-tr from-green-600 to-emerald-400 bg-clip-text text-4xl text-transparent"
+				></i>
+			{/if}
 		</div>
 		<div>
 			<h1 class="text-4xl font-bold text-white">{match.name}</h1>

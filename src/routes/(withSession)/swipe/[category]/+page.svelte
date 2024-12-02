@@ -11,7 +11,7 @@
 	import Match from './Match.svelte';
 
 	let swipeableCardStack: SwipeableCardStack;
-	let swipeFeedbackState: 'left' | 'right' | 'none' = $state('none');
+	let swipeFeedbackState: 'left' | 'right' | 'none' | 'top' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 10;
 	let country = $page.params.category;
@@ -25,7 +25,10 @@
 	const client = useQueryClient();
 	const swipeMutation = createMutation({
 		mutationFn: swipeCard,
-		onMutate: async (swipeAction: { card: Card; swipeAction: 'like' | 'dislike' }) => {
+		onMutate: async (swipeAction: {
+			card: Card;
+			swipeAction: 'like' | 'dislike' | 'superlike';
+		}) => {
 			await client.cancelQueries({ queryKey: ['cards', country, take] });
 			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
 
@@ -44,12 +47,16 @@
 		}
 	});
 
+	async function onSuperLike(card: Card) {
+		$swipeMutation.mutate({ card: card, swipeAction: 'superlike' });
+		if (card.partnerInteraction?.swipe == 'superliked') {
+			onMatch(card);
+		}
+	}
+
 	async function onLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
-		if (
-			card.partnerInteraction?.swipe == 'liked' ||
-			card.partnerInteraction?.swipe == 'superliked'
-		) {
+		if (card.partnerInteraction?.swipe == 'liked') {
 			onMatch(card);
 		}
 	}
@@ -61,10 +68,10 @@
 		}
 	}
 
-	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none') {
+	function onSwipeFeedback(feedbackType: 'left' | 'right' | 'none' | 'top') {
 		swipeFeedbackState = feedbackType;
 
-		if (feedbackType == 'right') {
+		if (feedbackType == 'right' || feedbackType == 'top') {
 			backgroundColor = 'bg-emerald-400';
 		} else if (feedbackType == 'left') {
 			backgroundColor = 'bg-red-400';
@@ -73,15 +80,17 @@
 		}
 	}
 
-	function onSwipe(swipe: 'left' | 'right') {
+	function onSwipe(swipe: 'left' | 'right' | 'top') {
 		if (!$cardsQuery.data) {
 			return;
 		}
 
-		if (swipe == 'left') {
+		if (swipe === 'left') {
 			onDislike($cardsQuery.data[$cardsQuery.data.length - 1]);
-		} else if (swipe == 'right') {
+		} else if (swipe === 'right') {
 			onLike($cardsQuery.data[$cardsQuery.data.length - 1]);
+		} else if (swipe === 'top') {
+			onSuperLike($cardsQuery.data[$cardsQuery.data.length - 1]);
 		}
 	}
 
@@ -116,6 +125,7 @@
 		<CardActionBar
 			onDislikeButton={() => swipeableCardStack.swipe('left')}
 			onLikeButton={() => swipeableCardStack.swipe('right')}
+			onSuperLikeButton={() => swipeableCardStack.swipe('top')}
 		/>
 	</div>
 </div>

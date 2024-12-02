@@ -26,9 +26,13 @@
 		<Dialog.Header class="z-10">
 			<Dialog.Title
 				><h1
-					class="justify-self-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-6xl font-bold text-transparent"
+					class="justify-self-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-4xl font-bold text-transparent"
 				>
-					It's a Match!
+					{#if card?.partnerInteraction?.swipe == 'superliked'}
+						Super Match von deinem Partner!
+					{:else}
+						It's a Match!
+					{/if}
 				</h1></Dialog.Title
 			>
 		</Dialog.Header>
