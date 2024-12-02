@@ -3,7 +3,7 @@ import type { Match } from '$lib/types';
 
 export const getMatches = async () => {
 	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/matches?user_id=${getUserStore().user?.uid}`, {
+	const response = await fetch(`/api/matches`, {
 		headers: { Authorization: `Bearer ${idToken}` }
 	});
 	const data = await response.json();

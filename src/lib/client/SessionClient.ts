@@ -2,10 +2,12 @@ import { getUserStore } from '$lib/FirebaseStore.svelte';
 import type { CreateSession, JoinSession, Session } from '$lib/types';
 
 export const deleteSession = async (userId: string) => {
-	const response = await fetch(`/api/session?user_id=${userId}`, {
+	const idToken = await getUserStore().user?.getIdToken();
+	const response = await fetch(`/api/session`, {
 		method: 'DELETE',
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${idToken}`
 		}
 	});
 
@@ -23,9 +25,7 @@ export const deleteSession = async (userId: string) => {
 
 export const getSession = async (userId: string) => {
 	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/session?user_id=${userId}`,
-		{ headers: { 'Authorization': `Bearer ${idToken}` } }
-	);
+	const response = await fetch(`/api/session`, { headers: { Authorization: `Bearer ${idToken}` } });
 	const data = await response.json();
 	if (response.status === 404) {
 		return null;
@@ -43,7 +43,7 @@ export const createSession = async (userId: string) => {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${idToken}`
+			Authorization: `Bearer ${idToken}`
 		},
 		body: JSON.stringify(session)
 	});
@@ -61,7 +61,7 @@ export const joinSession = async (userId: string, pairingCode: string) => {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${idToken}`
+			Authorization: `Bearer ${idToken}`
 		},
 		body: JSON.stringify(session)
 	});

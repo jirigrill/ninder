@@ -1,6 +1,7 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
 import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
+import { authenticate } from '$lib/server/authenticate';
 const { Pool } = pkg;
 
 const pool = new Pool({
@@ -38,9 +39,13 @@ async function getSessionId(client: pkg.PoolClient, userId: string): Promise<str
 	return preferredSession.id;
 }
 
-export const POST: RequestHandler = async ({ params, request }) => {
-	const name_id: string | undefined = params.id;
-	const { user_id } = await request.json();
+export const POST: RequestHandler = async (event: RequestEvent) => {
+	const user_id = await authenticate(event);
+	if (!user_id) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const name_id: string | undefined = event.params.id;
 
 	if (!name_id || !user_id) {
 		return json({ error: 'Missing name_id or user_id' }, { status: 400 });

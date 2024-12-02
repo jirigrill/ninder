@@ -1,7 +1,8 @@
-import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
+import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
 import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
 import type { Card, CardInteraction } from '$lib/types';
+import { authenticate } from '$lib/server/authenticate';
 
 const { Pool } = pkg;
 
@@ -17,10 +18,14 @@ const pool = new Pool({
 });
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const url = new URL(event.request.url);
 	const country = url.searchParams.get('country');
 	const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') || '10') : 10;
-	const userId = url.searchParams.get('user_id');
 
 	try {
 		const client = await pool.connect();

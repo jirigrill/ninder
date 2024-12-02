@@ -1,7 +1,16 @@
 import type { CategoryProgress } from '$lib/types';
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
-import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
+import admin from 'firebase-admin';
+import {
+	DB_USER,
+	DB_HOST,
+	DB_NAME,
+	DB_PASSWORD,
+	DB_PORT,
+	FIREBASE_ADMIN_CREDENTIALS
+} from '$env/static/private';
+import { authenticate } from '$lib/server/authenticate';
 
 const { Pool } = pkg;
 
@@ -17,8 +26,10 @@ const pool = new Pool({
 });
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-	const url = new URL(event.request.url);
-	const userId = url.searchParams.get('user_id');
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	try {
 		const client = await pool.connect();
@@ -43,7 +54,10 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 };
 
-async function getCategoryProgress(client: pkg.PoolClient, userId: string): Promise<Map<string, number>> {
+async function getCategoryProgress(
+	client: pkg.PoolClient,
+	userId: string
+): Promise<Map<string, number>> {
 	let query = `
 		SELECT c.id AS category_id, c.name AS category_name, COUNT(ci.name_id) AS total_swiped_cards
 		FROM categories c
@@ -60,7 +74,7 @@ async function getCategoryProgress(client: pkg.PoolClient, userId: string): Prom
 	const res = await client.query(query, [userId]);
 
 	const categoryProgressMap = new Map<string, number>();
-	res.rows.forEach(row => {
+	res.rows.forEach((row) => {
 		categoryProgressMap.set(row.category_name, row.total_swiped_cards);
 	});
 

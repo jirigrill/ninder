@@ -2,6 +2,7 @@ import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
 import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
 import type { Match } from '$lib/types';
+import { authenticate } from '$lib/server/authenticate';
 
 const { Pool } = pkg;
 
@@ -19,8 +20,10 @@ const pool = new Pool({
 type MatchPair = { id: number; superMatch: boolean };
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-	const url = new URL(event.request.url);
-	const userId = url.searchParams.get('user_id');
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	try {
 		const client = await pool.connect();

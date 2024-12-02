@@ -2,6 +2,7 @@ import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import pkg from 'pg';
 import { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } from '$env/static/private';
 import type { Session } from '$lib/types';
+import { authenticate } from '$lib/server/authenticate';
 
 const { Pool } = pkg;
 
@@ -21,8 +22,10 @@ function generatePairingCode(): string {
 }
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-	const url = new URL(event.request.url);
-	const userId = url.searchParams.get('user_id');
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	if (!userId) {
 		return json({ error: 'user_id is required' }, { status: 400 });
@@ -66,9 +69,13 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event: RequestEvent) => {
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 	try {
-		const newSession: Session = await request.json();
+		const newSession: Session = await event.request.json();
 		if (!newSession.initiatorUserId && !newSession.partnerUserId) {
 			return json(
 				{ error: 'when creating a session, initiator_user_id is required!' },
@@ -164,8 +171,10 @@ async function deleteCardInteractions(sessionId: number, client: pkg.PoolClient)
 }
 
 export const DELETE: RequestHandler = async (event) => {
-	const url = new URL(event.request.url);
-	const userId = url.searchParams.get('user_id');
+	const userId = await authenticate(event);
+	if (!userId) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
 	if (!userId) {
 		return json({ error: 'user_id is required' }, { status: 400 });
