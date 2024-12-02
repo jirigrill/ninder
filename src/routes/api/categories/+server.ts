@@ -35,7 +35,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		const client = await pool.connect();
 
 		try {
-			const categories = await client.query('SELECT * FROM categories WHERE visible = TRUE');
+			const categories = await client.query(
+				'SELECT * FROM categories WHERE visible = TRUE ORDER BY id'
+			);
 			const progress = await getCategoryProgress(client, userId);
 
 			const categoryProgress: CategoryProgress[] = categories.rows.map((row) => ({
@@ -45,6 +47,15 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 				swipedCards: progress.get(row.name) || 0,
 				id: row.id
 			}));
+
+			categoryProgress.unshift({
+				name: 'Dein Partner',
+				letterCode: '[DP]',
+				totalCards: 0,
+				swipedCards: 0,
+				id: -1
+			});
+
 			return json(categoryProgress);
 		} finally {
 			client.release();
