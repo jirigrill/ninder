@@ -1,0 +1,55 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Install Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Create .env File
+        run: |
+          echo "DB_USER: ${{ secrets.DB_USER }}" >> .env
+          echo "DB_HOST: ${{ secrets.DB_HOST }}" >> .env
+          echo "DB_NAME: ${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
+          echo "FIREBASE_ADMIN_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}" >> .env
+          echo "NODE_ENV=production" >> .env
+
+      # Log in to GitHub Docker Registry
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          export REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          export IMAGE_NAME=ghcr.io/$REPO_NAME/ninder
+          export COMMIT_HASH=$(git rev-parse --short HEAD)
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$COMMIT_HASH .
+
+      # Push Docker image to GitHub Docker Registry
+      - name: Push Docker Image
+        run: |
+          export REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          export IMAGE_NAME=ghcr.io/$REPO_NAME/ninder
+          export COMMIT_HASH=$(git rev-parse --short HEAD)
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:$COMMIT_HASH
