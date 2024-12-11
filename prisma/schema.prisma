@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model card_interactions {
+  id         Int     @id @default(autoincrement())
+  name_id    Int?
+  user_id    String  @db.VarChar(255)
+  action     String? @db.VarChar(10)
+  session_id Int?
+  names      names?  @relation(fields: [name_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model categories {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  letter_code     String?           @db.VarChar(10)
+  total_cards     Int?              @default(0)
+  visible         Boolean?          @default(false)
+  name_categories name_categories[]
+
+  @@unique([name, letter_code])
+}
+
+model name_categories {
+  name_id     Int
+  category_id Int
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  names       names      @relation(fields: [name_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([name_id, category_id])
+}
+
+model names {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique @db.VarChar(255)
+  meaning           String?
+  card_interactions card_interactions[]
+  name_categories   name_categories[]
+}
+
+model sessions {
+  id              Int     @id @default(autoincrement())
+  pairingcode     String  @db.VarChar(255)
+  initiatoruserid String  @db.VarChar(255)
+  partneruserid   String? @db.VarChar(255)
+}

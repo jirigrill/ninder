@@ -1,29 +1,9 @@
 import type { CategoryProgress } from '$lib/types';
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
-import pkg from 'pg';
-import admin from 'firebase-admin';
-import {
-	DB_USER,
-	DB_HOST,
-	DB_NAME,
-	DB_PASSWORD,
-	DB_PORT,
-	FIREBASE_ADMIN_CREDENTIALS
-} from '$env/static/private';
 import { authenticate } from '$lib/server/authenticate';
-
-const { Pool } = pkg;
-
-const pool = new Pool({
-	user: DB_USER,
-	host: DB_HOST,
-	database: DB_NAME,
-	password: DB_PASSWORD,
-	port: parseInt(DB_PORT),
-	ssl: {
-		rejectUnauthorized: false
-	}
-});
+import { PrismaClient } from '@prisma/client';
+import { getCategories } from '$lib/server/CategoryRepository';
+import { getCardInteractions, type InteractedCards } from '$lib/server/CardInteractionRepository';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -31,63 +11,74 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
+	const prisma = new PrismaClient();
 	try {
-		const client = await pool.connect();
+		const categories = await getCategories(prisma);
+		const interactedCards = await getCardInteractions(prisma, userId);
 
-		try {
-			const categories = await client.query(
-				'SELECT * FROM categories WHERE visible = TRUE ORDER BY id'
-			);
-			const progress = await getCategoryProgress(client, userId);
+		let categoryProgress: CategoryProgress[] = calculateCountryCategoryProgress(
+			interactedCards,
+			categories
+		);
+		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
+		categoryProgress = enhanceWithPartnerCategory(categoryProgress);
 
-			const categoryProgress: CategoryProgress[] = categories.rows.map((row) => ({
-				name: row.name,
-				letterCode: row.letter_code,
-				totalCards: row.total_cards,
-				swipedCards: progress.get(row.name) || 0,
-				id: row.id
-			}));
-
-			categoryProgress.unshift({
-				name: 'Dein Partner',
-				letterCode: '[DP]',
-				totalCards: 0,
-				swipedCards: 0,
-				id: -1
-			});
-
-			return json(categoryProgress);
-		} finally {
-			client.release();
-		}
-	} catch (error) {
+		return json(categoryProgress);
+	} catch {
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
+	} finally {
+		await prisma.$disconnect();
 	}
 };
 
-async function getCategoryProgress(
-	client: pkg.PoolClient,
-	userId: string
-): Promise<Map<string, number>> {
-	let query = `
-		SELECT c.id AS category_id, c.name AS category_name, COUNT(ci.name_id) AS total_swiped_cards
-		FROM categories c
-		LEFT JOIN name_categories nc ON c.id = nc.category_id
-		LEFT JOIN card_interactions ci ON nc.name_id = ci.name_id
-		WHERE ci.user_id = $1
-		GROUP BY c.id, c.name
-		UNION ALL
-		SELECT NULL AS category_id, 'Gemischt' AS category_name, COUNT(DISTINCT ci.name_id) AS total_swiped_cards
-		FROM card_interactions ci
-		WHERE ci.user_id = $1
-		ORDER BY total_swiped_cards DESC
-	`;
-	const res = await client.query(query, [userId]);
-
-	const categoryProgressMap = new Map<string, number>();
-	res.rows.forEach((row) => {
-		categoryProgressMap.set(row.category_name, row.total_swiped_cards);
+function enhanceWithPartnerCategory(categoryProgress: CategoryProgress[]) {
+	categoryProgress.unshift({
+		name: 'Dein Partner',
+		letterCode: '[DP]',
+		totalCards: 0,
+		swipedCards: 0,
+		id: -1
 	});
 
-	return categoryProgressMap;
+	return categoryProgress;
+}
+
+function calculateCountryCategoryProgress(
+	interactedCards: InteractedCards[],
+	categories: {
+		name: string;
+		id: number;
+		letter_code: string | null;
+		total_cards: number | null;
+		visible: boolean | null;
+	}[]
+) {
+	const categoryProgress: CategoryProgress[] = categories.map((category) => ({
+		name: category.name,
+		letterCode: category.letter_code ?? '',
+		totalCards: category.total_cards ?? 0,
+		swipedCards: calculateCardCountForCategory(interactedCards, category.id),
+		id: category.id
+	}));
+	return categoryProgress;
+}
+
+function calculateMixedCategoryProgress(
+	categoryProgress: CategoryProgress[],
+	interactedCards: InteractedCards[]
+) {
+	const mixedCategoryId = 1;
+	const mixedCategory = categoryProgress.find((category) => category.id === mixedCategoryId);
+	if (mixedCategory) {
+		mixedCategory.swipedCards = interactedCards.length;
+	}
+
+	return categoryProgress;
+}
+
+function calculateCardCountForCategory(interactedCards: InteractedCards[], categoryId: number) {
+	const interactedCardsInCategory = interactedCards.filter((card) =>
+		card.categories.includes(categoryId)
+	);
+	return interactedCardsInCategory.length;
 }
