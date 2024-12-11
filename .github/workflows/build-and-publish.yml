@@ -28,7 +28,34 @@ jobs:
           echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB_PORT: ${{ secrets.DB_PORT }}" >> .env
           echo "FIREBASE_ADMIN_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}" >> .env
-          echo "NODE_ENV=production" >> .env
+
+      - name: Create .env File
+        run: |
+          echo "DB_USER: ${{ secrets.DB_USER }}" >> hello.txt
+          echo "DB_HOST: ${{ secrets.DB_HOST }}" >> hello.txt
+          echo "DB_NAME: ${{ secrets.DB_NAME }}" >> hello.txt
+          echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}" >> hello.txt
+          echo "DB_PORT: ${{ secrets.DB_PORT }}" >> hello.txt
+          echo "FIREBASE_ADMIN_CREDENTIALS: ${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}" >> hello.txt
+
+      - name: Log content to the Actions log
+        run: |
+          echo "Logging content to GitHub Actions log:"
+          cat .env
+
+      - name: List files again to confirm .env creation
+        run: |
+          ls -la
+
+      - name: Save file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: env
+          path: hello.txt
+
+   # Install Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       # Log in to GitHub Docker Registry
       - name: Log in to GitHub Docker Registry
@@ -38,18 +65,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker Image
+      - name: Build and Push Docker Image
         run: |
           export REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           export IMAGE_NAME=ghcr.io/$REPO_NAME/ninder
           export COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$COMMIT_HASH .
-
-      # Push Docker image to GitHub Docker Registry
-      - name: Push Docker Image
-        run: |
-          export REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          export IMAGE_NAME=ghcr.io/$REPO_NAME/ninder
-          export COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker push $IMAGE_NAME:latest
-          docker push $IMAGE_NAME:$COMMIT_HASH
+          docker buildx build \
+            --platform linux/arm64 \
+            --tag $IMAGE_NAME:latest \
+            --tag $IMAGE_NAME:$COMMIT_HASH \
+            --push .
