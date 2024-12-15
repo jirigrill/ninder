@@ -1,5 +1,5 @@
 import type { Card } from '$lib/types';
-import type { names, Prisma, PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 export async function getNextCards(
 	prisma: PrismaClient,
@@ -34,4 +34,17 @@ export async function getNextCards(
 			.filter((code): code is string => code !== null),
 		partnerInteraction: null
 	}));
+}
+
+export type Name = {
+	name_id: number;
+	name: string;
+};
+
+export async function getNames(prisma: PrismaClient, nameIds: number[]): Promise<Name[]> {
+	const names = await prisma.names.findMany({
+		where: { id: { in: nameIds } },
+		select: { id: true, name: true }
+	});
+	return names.map((name) => ({ name_id: name.id, name: name.name }));
 }

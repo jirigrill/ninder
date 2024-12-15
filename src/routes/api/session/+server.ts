@@ -1,21 +1,15 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
-import pkg from 'pg';
-import { env } from '$env/dynamic/private';
 import type { Session } from '$lib/types';
 import { authenticate } from '$lib/server/authenticate';
-
-const { Pool } = pkg;
-
-const pool = new Pool({
-	user: env.DB_USER,
-	host: env.DB_HOST,
-	database: env.DB_NAME,
-	password: env.DB_PASSWORD,
-	port: parseInt(env.DB_PORT),
-	ssl: {
-		rejectUnauthorized: false
-	}
-});
+import { PrismaClient } from '@prisma/client';
+import {
+	createSession,
+	deleteSession,
+	getSessionId,
+	getSessions,
+	joinSession
+} from '$lib/server/SessionRepository';
+import { deleteAllCardInteractions } from '$lib/server/CardInteractionRepository';
 
 function generatePairingCode(): string {
 	return Math.floor(1000 + Math.random() * 9000).toString();
@@ -31,41 +25,29 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'user_id is required' }, { status: 400 });
 	}
 
+	const prisma = new PrismaClient();
 	try {
-		const client = await pool.connect();
+		const sessions = await getSessions(prisma, userId);
 
-		try {
-			const result = await client.query(
-				`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1`,
-				[userId]
-			);
-
-			if (result.rows.length === 0) {
-				return json({ error: 'No session found' }, { status: 404 });
-			}
-
-			const sessions = result.rows;
-			let preferredSession = sessions.find((session) => session.partneruserid === userId);
-
-			if (!preferredSession) {
-				preferredSession = sessions.find((session) => session.initiatoruserid === userId);
-			}
-
-			if (!preferredSession) {
-				return json({ error: 'No session found' }, { status: 404 });
-			}
-
-			const session: Session = {
-				initiatorUserId: preferredSession.initiatoruserid,
-				partnerUserId: preferredSession.partneruserid,
-				pairingCode: preferredSession.pairingcode
-			};
-			return json(session);
-		} finally {
-			client.release();
+		if (sessions.length === 0) {
+			return json({ error: 'No session found' }, { status: 404 });
 		}
+
+		let preferredSession = sessions.find((session) => session.partnerUserId === userId);
+
+		if (!preferredSession) {
+			preferredSession = sessions.find((session) => session.initiatorUserId === userId);
+		}
+
+		if (!preferredSession) {
+			return json({ error: 'No session found' }, { status: 404 });
+		}
+
+		return json(preferredSession);
 	} catch (error) {
 		return json({ error: 'Failed to fetch session' }, { status: 500 });
+	} finally {
+		await prisma.$disconnect();
 	}
 };
 
@@ -96,79 +78,29 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
 		let isNewSession = !!newSession.initiatorUserId;
 
-		const client = await pool.connect();
+		const prisma = new PrismaClient();
 
 		try {
 			if (isNewSession) {
 				const pairingCode = generatePairingCode();
-				const result = await client.query(
-					`INSERT INTO sessions (initiatorUserId, partnerUserId, pairingCode) VALUES ($1, $2, $3) RETURNING *`,
-					[newSession.initiatorUserId, null, pairingCode]
-				);
+				const session = await createSession(prisma, newSession.initiatorUserId, pairingCode);
 
-				const dbRow = result.rows[0];
-				const session: Session = {
-					initiatorUserId: dbRow.initiatoruserid,
-					partnerUserId: dbRow.partneruserid,
-					pairingCode: dbRow.pairingcode
-				};
 				return json(session, { status: 201 });
 			} else {
-				const result = await client.query(
-					`UPDATE sessions SET partnerUserId = $1 WHERE pairingCode = $2 AND partnerUserId IS NULL RETURNING *`,
-					[newSession.partnerUserId, newSession.pairingCode]
+				const session = await joinSession(
+					prisma,
+					newSession.partnerUserId || '',
+					newSession.pairingCode
 				);
-
-				if (result.rowCount === 0) {
-					return json(
-						{ error: 'No available session found with the provided pairing code' },
-						{ status: 404 }
-					);
-				}
-
-				const dbRow = result.rows[0];
-				const session: Session = {
-					initiatorUserId: dbRow.initiatoruserid,
-					partnerUserId: dbRow.partneruserid,
-					pairingCode: dbRow.pairingcode
-				};
 				return json(session, { status: 200 });
 			}
 		} finally {
-			client.release();
+			await prisma.$disconnect();
 		}
 	} catch (error) {
 		return json({ error: 'Failed to create session' }, { status: 500 });
 	}
 };
-
-async function getSessionId(userId: string, client: pkg.PoolClient): Promise<number | null> {
-	const result = await client.query(
-		`SELECT * FROM sessions WHERE partnerUserId = $1 OR initiatorUserId = $1`,
-		[userId]
-	);
-
-	if (result.rows.length === 0) {
-		return null;
-	}
-
-	const sessions = result.rows;
-	let preferredSession = sessions.find((session) => session.partneruserid === userId);
-
-	if (!preferredSession) {
-		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
-	}
-
-	if (!preferredSession) {
-		return null;
-	}
-
-	return preferredSession.id;
-}
-
-async function deleteCardInteractions(sessionId: number, client: pkg.PoolClient) {
-	await client.query(`DELETE FROM card_interactions WHERE session_id = $1`, [sessionId]);
-}
 
 export const DELETE: RequestHandler = async (event) => {
 	const userId = await authenticate(event);
@@ -181,21 +113,16 @@ export const DELETE: RequestHandler = async (event) => {
 	}
 
 	try {
-		const client = await pool.connect();
+		const prisma = new PrismaClient();
 
 		try {
-			const sessionId = await getSessionId(userId, client);
-			await deleteCardInteractions(sessionId ?? -1, client);
-			const result = await client.query(`DELETE FROM sessions WHERE id = $1`, [sessionId]);
+			const sessionId = await getSessionId(prisma, userId);
+			await deleteAllCardInteractions(prisma, sessionId || -1);
+			await deleteSession(prisma, sessionId || -1);
 
-			if (result.rows.length === 0) {
-				return json({ error: 'No session found to delete' }, { status: 404 });
-			}
-
-			const deletedSession = result.rows[0];
-			return json({ message: 'Session deleted successfully', session: deletedSession });
+			return json({ message: 'Session deleted successfully' });
 		} finally {
-			client.release();
+			prisma.$disconnect();
 		}
 	} catch (error) {
 		return json({ error: 'Failed to delete session' }, { status: 500 });

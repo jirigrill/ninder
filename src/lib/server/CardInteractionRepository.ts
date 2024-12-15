@@ -1,5 +1,5 @@
 import type { CardInteraction } from '$lib/types';
-import type { card_interactions, PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 export type InteractedCards = {
 	name_id: number;
@@ -36,12 +36,30 @@ export async function getPartnerCardInteractions(
 	cardIds: number[]
 ): Promise<CardInteraction[]> {
 	const result = await prisma.card_interactions.findMany({
-		where: { user_id: userId, id: { in: cardIds } }
+		where: { user_id: userId, name_id: { in: cardIds } }
 	});
 	return result.map((interaction) => ({
 		userId: userId,
-		cardId: interaction.id,
-		nameId: interaction.name_id,
+		cardId: interaction.name_id || -1,
 		swipe: interaction.action as 'disliked' | 'liked' | 'superliked'
 	}));
+}
+
+export async function deleteAllCardInteractions(
+	prisma: PrismaClient,
+	sessionId: number
+): Promise<void> {
+	await prisma.card_interactions.deleteMany({ where: { session_id: sessionId } });
+}
+
+export async function createInteraction(
+	prisma: PrismaClient,
+	nameId: number,
+	userId: string,
+	sessionId: number,
+	action: 'disliked' | 'liked' | 'superliked'
+): Promise<void> {
+	await prisma.card_interactions.create({
+		data: { name_id: nameId, user_id: userId, action: action, session_id: sessionId }
+	});
 }

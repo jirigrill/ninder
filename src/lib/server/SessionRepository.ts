@@ -1,3 +1,4 @@
+import type { Session } from '$lib/types';
 import type { PrismaClient } from '@prisma/client';
 
 export async function getPartnerUserId(
@@ -25,4 +26,92 @@ export async function getPartnerUserId(
 	return preferredSession.partneruserid === userId
 		? preferredSession.initiatoruserid
 		: preferredSession.partneruserid;
+}
+
+export async function getSessions(prisma: PrismaClient, userId: string): Promise<Session[]> {
+	const sessions = await prisma.sessions.findMany({
+		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
+	});
+
+	return sessions.map((session) => ({
+		id: session.id,
+		pairingCode: session.pairingcode,
+		initiatorUserId: session.initiatoruserid,
+		partnerUserId: session.partneruserid
+	}));
+}
+
+export async function createSession(
+	prisma: PrismaClient,
+	userId: string,
+	pairingCode: string
+): Promise<Session> {
+	const session = await prisma.sessions.create({
+		data: {
+			initiatoruserid: userId,
+			pairingcode: pairingCode
+		}
+	});
+
+	return {
+		pairingCode: session.pairingcode,
+		initiatorUserId: session.initiatoruserid,
+		partnerUserId: session.partneruserid
+	};
+}
+
+export async function joinSession(
+	prisma: PrismaClient,
+	partnerUserId: string,
+	pairingCode: string
+): Promise<Session | null> {
+	const sessions = await prisma.sessions.updateMany({
+		where: { pairingcode: pairingCode },
+		data: { partneruserid: partnerUserId }
+	});
+
+	//if greater than 1, something really bad happens #yolo
+	if (sessions.count != 1) {
+		return null;
+	}
+
+	const updatedSession = await prisma.sessions.findFirst({
+		where: {
+			pairingcode: pairingCode
+		}
+	});
+
+	return updatedSession
+		? {
+				pairingCode: updatedSession.pairingcode,
+				initiatorUserId: updatedSession.initiatoruserid,
+				partnerUserId: updatedSession.partneruserid
+			}
+		: null;
+}
+
+export async function getSessionId(prisma: PrismaClient, userId: string): Promise<number | null> {
+	const sessions = await prisma.sessions.findMany({
+		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
+	});
+
+	if (sessions.length === 0) {
+		return null;
+	}
+
+	let preferredSession = sessions.find((session) => session.partneruserid === userId);
+
+	if (!preferredSession) {
+		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
+	}
+
+	if (!preferredSession) {
+		return null;
+	}
+
+	return preferredSession.id;
+}
+
+export async function deleteSession(prisma: PrismaClient, id: number): Promise<void> {
+	await prisma.sessions.deleteMany({ where: { id: id } });
 }

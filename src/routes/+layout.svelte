@@ -11,7 +11,9 @@
 </script>
 
 <ParaglideJS {i18n}>
-	<QueryClientProvider client={data.queryClient}>
-		{@render children()}
-	</QueryClientProvider>
+	<ParaglideJS {i18n}>
+		<QueryClientProvider client={data.queryClient}>
+			{@render children()}
+		</QueryClientProvider>
+	</ParaglideJS>
 </ParaglideJS>

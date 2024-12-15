@@ -33,7 +33,7 @@
 </div>
 
 {#snippet matchSnippet(match: Match)}
-	<div use:randombackgroundcolor={match.cardId} class="mb-4 flex rounded-xl bg-white p-4 shadow-lg">
+	<div use:randombackgroundcolor={match.cardId} class="mb-3 flex rounded-xl bg-white p-2 shadow-lg">
 		<div
 			class="mr-4 flex aspect-square h-full items-center justify-center self-center rounded-full bg-white p-2"
 		>
@@ -47,10 +47,7 @@
 				></i>
 			{/if}
 		</div>
-		<div>
-			<h1 class="text-4xl font-bold text-white">{match.name}</h1>
-			<p class="text-2xl font-semibold text-white">Bedeutung: {match.meaning}</p>
-		</div>
+		<h1 class="self-center text-4xl font-bold text-white">{match.name}</h1>
 	</div>
 {/snippet}
 
