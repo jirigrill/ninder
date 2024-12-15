@@ -63,3 +63,18 @@ export async function createInteraction(
 		data: { name_id: nameId, user_id: userId, action: action, session_id: sessionId }
 	});
 }
+
+export async function getLikedByPartner(
+	prisma: PrismaClient,
+	partnerUserId: string
+): Promise<CardInteraction[]> {
+	const result = await prisma.card_interactions.findMany({
+		where: { user_id: partnerUserId, OR: [{ action: 'liked' }, { action: 'superliked' }] }
+	});
+
+	return result.map((interaction) => ({
+		userId: interaction.user_id,
+		cardId: interaction.name_id || -1,
+		swipe: interaction.action as 'disliked' | 'liked' | 'superliked'
+	}));
+}

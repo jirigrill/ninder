@@ -3,7 +3,13 @@ import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
 import { PrismaClient } from '@prisma/client';
 import { getCategories } from '$lib/server/CategoryRepository';
-import { getCardInteractions, type InteractedCards } from '$lib/server/CardInteractionRepository';
+import {
+	getCardInteractions,
+	getLikedByPartner,
+	getPartnerCardInteractions,
+	type InteractedCards
+} from '$lib/server/CardInteractionRepository';
+import { getPartnerUserId } from '$lib/server/SessionRepository';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -21,7 +27,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 			categories
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		categoryProgress = enhanceWithPartnerCategory(categoryProgress);
+		categoryProgress = await enhanceWithPartnerCategory(prisma, userId, categoryProgress);
 
 		return json(categoryProgress);
 	} catch {
@@ -31,12 +37,24 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 };
 
-function enhanceWithPartnerCategory(categoryProgress: CategoryProgress[]) {
+async function enhanceWithPartnerCategory(
+	prisma: PrismaClient,
+	userId: string,
+	categoryProgress: CategoryProgress[]
+) {
+	const partnerUserId = await getPartnerUserId(userId, prisma);
+	const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '');
+	const ownInteractions = await getPartnerCardInteractions(
+		prisma,
+		userId,
+		partnerInteractions.map((i) => i.cardId)
+	);
+
 	categoryProgress.unshift({
 		name: 'Dein Partner',
 		letterCode: '[DP]',
-		totalCards: 0,
-		swipedCards: 0,
+		totalCards: partnerInteractions.length,
+		swipedCards: ownInteractions.length,
 		id: -1
 	});
 

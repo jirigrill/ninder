@@ -94,8 +94,10 @@
 		}
 	}
 
-	function onMatch(card: Card) {
+	async function onMatch(card: Card) {
 		matchDialog?.showMatch(card);
+		await client.refetchQueries({ queryKey: ['matches'] });
+		await client.refetchQueries({ queryKey: ['categories'] });
 	}
 </script>
 
