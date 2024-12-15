@@ -14,11 +14,7 @@ services:
         published: 3002
         protocol: tcp
     environment:
-      - DB_USER=${DB_USER}
-      - DB_HOST=${DB_HOST}
-      - DB_NAME=${DB_NAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=${DB_PORT}
+      - DATABASE_URL=${DATABASE_URL}
       - FIREBASE_ADMIN_CREDENTIALS=${FIREBASE_ADMIN_CREDENTIALS}
     deploy:
       replicas: 1

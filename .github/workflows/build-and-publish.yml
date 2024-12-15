@@ -46,11 +46,7 @@ jobs:
       - name: Replace variables in docker-stack.yml
         run: |
           sed -i \
-            -e "s|\${DB_USER}|${{ secrets.DB_USER }}|g" \
-            -e "s|\${DB_HOST}|${{ secrets.DB_HOST }}|g" \
-            -e "s|\${DB_NAME}|${{ secrets.DB_NAME }}|g" \
-            -e "s|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g" \
-            -e "s|\${DB_PORT}|${{ secrets.DB_PORT }}|g" \
+            -e "s|\${DATABASE_URL}|${{ secrets.DATABASE_URL }}|g" \
             -e "s|\${FIREBASE_ADMIN_CREDENTIALS}|${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}|g" \
             docker-stack.yml
 

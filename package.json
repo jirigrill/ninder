@@ -5,11 +5,13 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"start:prod": "node build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check ."
+		"lint": "prettier --check .",
+		"start:migrate:prod": "prisma migrate deploy && npm run start:prod"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "1.11.3",
