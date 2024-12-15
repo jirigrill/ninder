@@ -21,18 +21,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Create dockerenv File
-        run: |
-          echo "DB_USER=${{ secrets.DB_USER }}" >> dockerenv
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> dockerenv
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> dockerenv
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> dockerenv
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> dockerenv
-          echo "FIREBASE_ADMIN_CREDENTIALS=${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}" >> dockerenv
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       - name: Log in to GitHub Docker Registry
         uses: docker/login-action@v2
         with:
@@ -55,15 +43,26 @@ jobs:
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:$COMMIT_HASH
 
+      - name: Replace variables in docker-stack.yml
+        run: |
+          sed -i \
+            -e "s|\${DB_USER}|${{ secrets.DB_USER }}|g" \
+            -e "s|\${DB_HOST}|${{ secrets.DB_HOST }}|g" \
+            -e "s|\${DB_NAME}|${{ secrets.DB_NAME }}|g" \
+            -e "s|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g" \
+            -e "s|\${DB_PORT}|${{ secrets.DB_PORT }}|g" \
+            -e "s|\${FIREBASE_ADMIN_CREDENTIALS}|${{ secrets.FIREBASE_ADMIN_CREDENTIALS }}|g" \
+            docker-stack.yml
+
       - name: Deploy stack to swarm
         uses: kitconcept/docker-stack-deploy@v1.2.0
         with:
-          registry: "ghcr.io"
+          registry: 'ghcr.io'
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           remote_host: ${{ secrets.REMOTE_HOST }}
           remote_user: ${{ secrets.REMOTE_USER }}
           remote_private_key: ${{ secrets.REMOTE_PRIVATE_KEY }}
-          stack_file: "./docker-stack.yml"
-          stack_name: "ninder"
-          env_file: "dockerenv"
+          stack_file: './docker-stack.yml'
+          stack_name: 'ninder'
+          env_file: 'dockerenv'
