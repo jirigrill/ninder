@@ -8,6 +8,8 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { setLanguageTag, sourceLanguageTag } from '$lib/paraglide/runtime';
+	import * as m from '$lib/paraglide/messages.js';
+
 	let { children, data } = $props();
 
 	let loading = $state(true);
@@ -89,7 +91,7 @@
 {#if loading}
 	<div class="flex h-full w-full flex-col items-center justify-center bg-slate-100">
 		<i class="fa-solid fa-circle-notch fa-spin mr-2 text-5xl"></i>
-		<p class="mt-4 text-base font-normal text-slate-900">Bitte warte einen Moment</p>
+		<p class="mt-4 text-base font-normal text-slate-900">{m.layout_please_wait()}</p>
 	</div>
 {:else}
 	<div class="flex h-full w-full flex-col bg-slate-100">
@@ -152,6 +154,3 @@
 		{/if}
 	</div>
 {/if}
-
-<style>
-</style>

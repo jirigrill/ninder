@@ -9,6 +9,7 @@
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getCards, swipeCard } from '$lib/client/CardClient';
 	import Match from './Match.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' | 'top' = $state('none');
@@ -105,7 +106,7 @@
 	class="flex h-full w-full flex-col items-center {backgroundColor} background-color-transition p-4"
 >
 	<div class="mb-4 w-full">
-		<TitleHeader title="Entdecke" />
+		<TitleHeader title={m.swipe_header()} />
 	</div>
 
 	<SwipeFeedback {swipeFeedbackState} />

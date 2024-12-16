@@ -11,5 +11,22 @@
     "session_new_join_cardtitle": "Join a session",
     "session_new_join_carddescription": "Type or scan your partner's code!",
     "session_new_join_cardstatus_invalidcode": "Invalid session code",
-    "session_new_join_button": "Join session"
+    "session_new_join_button": "Join session",
+    "layout_please_wait": "Please wait a moment",
+    "categories_header": "Countries",
+    "swipe_header": "Discover",
+    "match_its_match": "It's a Match!",
+    "match_super_match": "Super match from your partner!",
+    "swipe_continue": "Continue swiping",
+    "match_goto_match": "Go to matches",
+    "session_dialog_title": "Your Session",
+    "session_dialog_description": "You're part of an active session.",
+    "session_dialog_content": "If you decide to delete this session. Your progress and the progress of your partner will be deleted and can't be restored anymore.",
+    "matches_remove": "Remove",
+    "matches_back_to_matches": "Back to matches",
+    "matches_no_matches": "You don't have any matches right now. Continue swiping!",
+    "session_remove": "Delete session",
+    "session_deleted": "Session deleted",
+    "session_is_deliting": "Deleting session...",
+    "namecard_thats_it": "Yeah, you swiped all names!"
 }

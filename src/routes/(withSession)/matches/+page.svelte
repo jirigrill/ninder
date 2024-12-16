@@ -7,6 +7,7 @@
 	import { fittedtext } from '$lib/actions/fittedtext';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import MatchDialog from './MatchDialog.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let matchDialog: MatchDialog | null = $state(null);
 
@@ -75,7 +76,7 @@
 		class="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-400 bg-slate-300 p-5 shadow-xl"
 	>
 		<h1 use:fittedtext={true} class="w-full text-center text-6xl font-bold text-slate-50">
-			Du hast bisher, noch keine Übereinstimmungen. Swipe weiter!
+			{m.matches_no_matches()}
 		</h1>
 		<i class="fa-solid fa-rocket mt-10 text-9xl text-slate-50"></i>
 	</div>

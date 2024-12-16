@@ -11,5 +11,22 @@
     "session_new_join_cardtitle": "Du trittst einer Session bei",
     "session_new_join_carddescription": "Tippe oder Scanne den Code deines Partners ein!",
     "session_new_join_cardstatus_invalidcode": "Ungültiger Session Code",
-    "session_new_join_button": "Session beitreten"
+    "session_new_join_button": "Session beitreten",
+    "layout_please_wait": "Bitte warte einen Moment",
+    "categories_header": "Länder",
+    "swipe_header": "Entdecke",
+    "match_its_match": "It's a Match!",
+    "match_super_match": "Super Match von deinem Partner!",
+    "swipe_continue": "Weiter Swipen",
+    "match_goto_match": "Zu den Matches",
+    "session_dialog_title": "Deine Session",
+    "session_dialog_description": "Du befindest dich im Moment bereits in einer aktiven Session.",
+    "session_dialog_content": "Wenn du dich entscheidest deine Session aufzulösen, wird dein Fortschritt und der\r\n\t\t\t\t\tFortschritt deines Partners unwiederufbar gelöscht.",
+    "matches_remove": "Entfernen",
+    "matches_back_to_matches": "Zurück zu Matches",
+    "matches_no_matches": "Du hast bisher, noch keine Übereinstimmungen. Swipe weiter!",
+    "session_remove": "Session auflösen",
+    "session_deleted": "Session aufgelöst",
+    "session_is_deliting": "Session wird aufgelöst...",
+    "namecard_thats_it": "Yeah, das waren alle Namen!"
 }

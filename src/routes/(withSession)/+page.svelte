@@ -4,6 +4,7 @@
 	import { Progress } from '$lib/components/ui/progress';
 	import type { CategoryProgress } from '$lib/types';
 	import { createQuery } from '@tanstack/svelte-query';
+	import * as m from '$lib/paraglide/messages.js';
 
 	const query = createQuery<CategoryProgress[], Error>({
 		queryKey: ['categories'],
@@ -11,7 +12,7 @@
 	});
 </script>
 
-<GenericTitleHeader title={'Länder'} />
+<GenericTitleHeader title={m.categories_header()} />
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
 	{#if $query.isLoading}
 		{#each Array(10) as index}

@@ -4,6 +4,7 @@
 	import type { Card } from '$lib/types';
 	import NameCard from '../../../../lib/components/NameCard.svelte';
 	import AnimatedStars from '$lib/components/AnimatedStars.svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let card: Card | null = $state(null);
 	let open = $state(false);
@@ -29,9 +30,9 @@
 					class="justify-self-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-4xl font-bold text-transparent"
 				>
 					{#if card?.partnerInteraction?.swipe == 'superliked'}
-						Super Match von deinem Partner!
+						{m.match_super_match()}
 					{:else}
-						It's a Match!
+						{m.match_its_match()}
 					{/if}
 				</h1></Dialog.Title
 			>
@@ -42,11 +43,11 @@
 		</div>
 
 		<Dialog.Footer class="z-10">
-			<Button onclick={close} class="text-xl font-bold" type="submit">Weiter Swipen</Button>
+			<Button onclick={close} class="text-xl font-bold" type="submit">{m.swipe_continue()}</Button>
 			<Button
 				href="/matches"
 				class="mb-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-xl font-bold"
-				type="submit">Zu den Matches</Button
+				type="submit">{m.match_goto_match()}</Button
 			>
 		</Dialog.Footer>
 	</Dialog.Content>

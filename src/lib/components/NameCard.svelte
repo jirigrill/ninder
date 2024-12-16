@@ -3,6 +3,7 @@
 	import type { Card } from '$lib/types';
 	const { card, shadow }: { card: Card | undefined; shadow: boolean } = $props();
 	import { fittedtext } from '$lib/actions/fittedtext';
+	import * as m from '$lib/paraglide/messages.js';
 </script>
 
 {#if card}
@@ -22,7 +23,7 @@
 	<div
 		class="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-400 bg-slate-300 p-5 shadow-xl"
 	>
-		<h1 class="text-center text-6xl font-bold text-slate-50">Yeah, das waren alle Namen!</h1>
+		<h1 class="text-center text-6xl font-bold text-slate-50">{m.namecard_thats_it()}</h1>
 		<i class="fa-solid fa-flag-checkered mt-10 text-9xl text-slate-50"></i>
 	</div>
 {/if}

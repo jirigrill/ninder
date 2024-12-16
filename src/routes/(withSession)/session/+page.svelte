@@ -6,6 +6,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { goto } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	const client = useQueryClient();
 	const userId = getUserStore().user.uid;
@@ -22,11 +23,11 @@
 
 	let buttonText = $derived.by(() => {
 		if ($deleteSessionMutation.isPending) {
-			return 'Session wird aufgelöst...';
+			return m.session_is_deliting();
 		} else if ($deleteSessionMutation.isSuccess) {
-			return 'Session aufgelöst';
+			return m.session_deleted();
 		}
-		return 'Session auflösen';
+		return m.session_remove();
 	});
 </script>
 
@@ -36,15 +37,12 @@
 	<div class="w-4/5">
 		<Card.Root class="flex flex-col items-center">
 			<Card.Header>
-				<Card.Title>Deine Session</Card.Title>
-				<Card.Description
-					>Du befindest dich im Moment bereits in einer aktiven Session.</Card.Description
-				>
+				<Card.Title>{m.session_dialog_title()}</Card.Title>
+				<Card.Description>{m.session_dialog_description()}</Card.Description>
 			</Card.Header>
 			<Card.Content>
 				<p>
-					Wenn du dich entscheidest deine Session aufzulösen, wird dein Fortschritt und der
-					Fortschritt deines Partners unwiederufbar gelöscht.
+					{m.session_dialog_content()}
 				</p>
 
 				<Button

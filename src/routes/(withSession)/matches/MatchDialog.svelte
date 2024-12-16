@@ -6,7 +6,7 @@
 	import NameCard from '$lib/components/NameCard.svelte';
 	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
 	import { deleteMatch } from '$lib/client/MatchClient';
-	import { goto } from '$app/navigation';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let card: Card | null = $state(null);
 	let match: Match | null = $state(null);
@@ -55,9 +55,9 @@
 					class="justify-self-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-4xl font-bold text-transparent"
 				>
 					{#if card?.partnerInteraction?.swipe == 'superliked'}
-						Super Match von deinem Partner!
+						{m.match_super_match()}
 					{:else}
-						It's a Match!
+						{m.match_its_match()}
 					{/if}
 				</h1></Dialog.Title
 			>
@@ -72,13 +72,13 @@
 				>{#if $deleteMatchMutation.isPending}
 					<i class="fa-solid fa-circle-notch fa-spin mr-2 text-2xl"></i>
 				{/if}
-				Entfernen
+				{m.matches_remove()}
 			</Button>
 			<Button
 				onclick={close}
 				href="/matches"
 				class="mb-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-xl font-bold"
-				type="submit">Zurück zu Matches</Button
+				type="submit">{m.matches_back_to_matches()}</Button
 			>
 		</Dialog.Footer>
 	</Dialog.Content>
