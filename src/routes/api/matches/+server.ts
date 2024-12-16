@@ -1,5 +1,4 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
-import type { Match } from '$lib/types';
 import { authenticate } from '$lib/server/authenticate';
 import { PrismaClient } from '@prisma/client';
 import { getPartnerUserId } from '$lib/server/SessionRepository';
@@ -18,22 +17,19 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		if (!partnerUserId) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}
-		let matches = await getCardIdsOfMatches(prisma, userId, partnerUserId);
+		let matchIds = await getCardIdsOfMatches(prisma, userId, partnerUserId);
 		let superMatches = await getSuperLikeMatches(prisma, userId, partnerUserId);
-		const cardIds = [...matches, ...superMatches];
-		const names = await getNames(
+		const cardIds = [...matchIds, ...superMatches];
+		const matches = await getNames(
 			prisma,
 			cardIds.map((card) => card.id)
 		);
 
-		const response: Match[] = names.map((name) => ({
-			cardId: name.name_id,
-			name: name.name,
-			meaning: '',
-			superMatch: superMatches.some((match) => match.id === name.name_id)
-		}));
+		matches.forEach((match) => {
+			match.superMatch = superMatches.some((superMatch) => superMatch.id === match.cardId);
+		});
 
-		return json(response);
+		return json(matches);
 	} catch (error) {
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
 	} finally {

@@ -6,6 +6,9 @@
 	import { randombackgroundcolor } from '$lib/actions/randomBackgroundColor';
 	import { fittedtext } from '$lib/actions/fittedtext';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import MatchDialog from './MatchDialog.svelte';
+
+	let matchDialog: MatchDialog | null = $state(null);
 
 	const matchQuery = createQuery<Match[], Error>({
 		queryKey: ['matches'],
@@ -14,6 +17,8 @@
 </script>
 
 <GenericTitleHeader title="Matches" />
+
+<MatchDialog bind:this={matchDialog} />
 
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
 	{#if $matchQuery.isLoading}
@@ -33,7 +38,11 @@
 </div>
 
 {#snippet matchSnippet(match: Match)}
-	<div use:randombackgroundcolor={match.cardId} class="mb-3 flex rounded-xl bg-white p-2 shadow-lg">
+	<button
+		onclick={() => matchDialog?.showMatch(match)}
+		use:randombackgroundcolor={match.cardId}
+		class="mb-3 flex w-full rounded-xl bg-white p-2 shadow-lg"
+	>
 		<div
 			class="mr-4 flex aspect-square h-full items-center justify-center self-center rounded-full bg-white p-2"
 		>
@@ -48,7 +57,7 @@
 			{/if}
 		</div>
 		<h1 class="self-center text-4xl font-bold text-white">{match.name}</h1>
-	</div>
+	</button>
 {/snippet}
 
 {#snippet matchSkeleton()}

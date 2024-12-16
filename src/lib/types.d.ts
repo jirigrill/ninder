@@ -57,5 +57,6 @@ export type Match = {
 	cardId: number;
 	name: string;
 	meaning: string;
+	countries: string[];
 	superMatch: boolean;
 };

@@ -1,4 +1,4 @@
-import type { Card } from '$lib/types';
+import type { Card, Match } from '$lib/types';
 import type { PrismaClient } from '@prisma/client';
 import { getPartnerUserId } from './SessionRepository';
 import { getLikedByPartner } from './CardInteractionRepository';
@@ -68,10 +68,23 @@ export type Name = {
 	name: string;
 };
 
-export async function getNames(prisma: PrismaClient, nameIds: number[]): Promise<Name[]> {
+export async function getNames(prisma: PrismaClient, nameIds: number[]): Promise<Match[]> {
 	const names = await prisma.names.findMany({
-		where: { id: { in: nameIds } },
-		select: { id: true, name: true }
+		where: {
+			id: { in: nameIds }
+		},
+		distinct: ['id'],
+		orderBy: { name: 'asc' },
+		include: { name_categories: { include: { categories: { select: { letter_code: true } } } } }
 	});
-	return names.map((name) => ({ name_id: name.id, name: name.name }));
+
+	return names.map((name) => ({
+		cardId: name.id,
+		name: name.name,
+		meaning: '',
+		countries: name.name_categories
+			.map((nc) => nc.categories.letter_code)
+			.filter((code): code is string => code !== null),
+		superMatch: false
+	}));
 }

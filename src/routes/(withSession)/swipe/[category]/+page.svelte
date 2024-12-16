@@ -121,7 +121,7 @@
 		{onSwipe}
 	/>
 
-	<Match bind:this={matchDialog} card={$cardsQuery.data[$cardsQuery.data.length - 1]} />
+	<Match bind:this={matchDialog} />
 
 	<div class="mt-4 w-full">
 		<CardActionBar

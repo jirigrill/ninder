@@ -12,9 +12,7 @@
 		class:shadow-xl={shadow}
 	>
 		<h1 use:fittedtext class="w-full text-8xl font-bold text-white">{card.name}</h1>
-		<h2 use:fittedtext class="mt-10 w-full text-3xl font-bold text-white">- {card.meaning} -</h2>
-		<div class="mb-5 mt-5 flex text-2xl">
-			<p class="mr-5 font-bold text-white">Herkunft:</p>
+		<div class="mb-5 mt-5 flex text-4xl">
 			{#each card.countries as country}
 				<span class="fi ml-1 mr-1 fi-{country.toLowerCase()}"></span>
 			{/each}
