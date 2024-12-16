@@ -4,9 +4,23 @@
 	import type { Card, Match } from '$lib/types';
 	import AnimatedStars from '$lib/components/AnimatedStars.svelte';
 	import NameCard from '$lib/components/NameCard.svelte';
+	import { createMutation, useQueryClient } from '@tanstack/svelte-query';
+	import { deleteMatch } from '$lib/client/MatchClient';
+	import { goto } from '$app/navigation';
 
 	let card: Card | null = $state(null);
+	let match: Match | null = $state(null);
 	let open = $state(false);
+
+	const client = useQueryClient();
+
+	const deleteMatchMutation = createMutation({
+		mutationFn: deleteMatch,
+		onSuccess: async () => {
+			await client.refetchQueries({ queryKey: ['matches'] });
+			close();
+		}
+	});
 
 	export function showMatch(newMatch: Match) {
 		card = {
@@ -16,12 +30,18 @@
 			countries: newMatch.countries,
 			partnerInteraction: null
 		};
+		match = newMatch;
 		open = true;
 	}
 
 	export function close() {
 		card = null;
+		match = null;
 		open = false;
+	}
+
+	function onDeleteMatch() {
+		$deleteMatchMutation.mutate(match);
 	}
 </script>
 
@@ -48,7 +68,12 @@
 		</div>
 
 		<Dialog.Footer class="z-10">
-			<Button onclick={close} class="text-xl font-bold" type="submit">Entfernen</Button>
+			<Button onclick={() => onDeleteMatch()} class="text-xl font-bold" type="submit"
+				>{#if $deleteMatchMutation.isPending}
+					<i class="fa-solid fa-circle-notch fa-spin mr-2 text-2xl"></i>
+				{/if}
+				Entfernen
+			</Button>
 			<Button
 				onclick={close}
 				href="/matches"

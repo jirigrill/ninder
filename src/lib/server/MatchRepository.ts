@@ -41,3 +41,19 @@ export async function getSuperLikeMatches(
 
 	return interactedCards.map((card) => ({ id: card.name_id || -1, superMatch: true }));
 }
+
+export async function deleteMatch(
+	prisma: PrismaClient,
+	userId: string,
+	partnerUserId: string,
+	cardId: number
+): Promise<void> {
+	await prisma.card_interactions.updateMany({
+		where: { user_id: userId, name_id: cardId },
+		data: { action: 'disliked' }
+	});
+	await prisma.card_interactions.updateMany({
+		where: { user_id: partnerUserId, name_id: cardId },
+		data: { action: 'disliked' }
+	});
+}
