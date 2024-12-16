@@ -41,6 +41,7 @@ model names {
   id                Int                 @id @default(autoincrement())
   name              String              @unique @db.VarChar(255)
   meaning           String?
+  sex               String              @default("male")
   card_interactions card_interactions[]
   name_categories   name_categories[]
 }

@@ -1,9 +1,9 @@
 import { getUserStore } from '$lib/FirebaseStore.svelte';
 import type { Card } from '$lib/types';
 
-export const getCards = async (country: string, take: number) => {
+export const getCards = async (country: string, take: number, sex: string) => {
 	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/cards?country=${country}&take=${take}`, {
+	const response = await fetch(`/api/cards?country=${country}&take=${take}&sex=${sex}`, {
 		headers: { Authorization: `Bearer ${idToken}` }
 	});
 	const data = await response.json();

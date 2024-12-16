@@ -28,5 +28,6 @@
     "session_remove": "Delete session",
     "session_deleted": "Session deleted",
     "session_is_deliting": "Deleting session...",
-    "namecard_thats_it": "Yeah, you swiped all names!"
+    "namecard_thats_it": "Yeah, you swiped all names!",
+    "matches_title": "Matches"
 }

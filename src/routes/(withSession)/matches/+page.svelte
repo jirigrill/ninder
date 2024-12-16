@@ -27,7 +27,7 @@
 	$deleteAdviceMutation.mutate();
 </script>
 
-<GenericTitleHeader title="Matches" />
+<GenericTitleHeader title={m.matches_title()} />
 
 <MatchDialog bind:this={matchDialog} />
 

@@ -3,24 +3,27 @@
 	import { page } from '$app/stores';
 	import CardActionBar from './CardActionBar.svelte';
 	import SwipeableCardStack from '$lib/components/SwipeableCardStack.svelte';
-	import TitleHeader from './TitleHeader.svelte';
 	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 	import SwipeFeedback from './SwipeFeedback.svelte';
 	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getCards, swipeCard } from '$lib/client/CardClient';
 	import Match from './Match.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
 
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' | 'top' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 10;
 	let country = $page.params.category;
+	const params = new URLSearchParams(window.location.search);
+	const sex = params.get('sex');
+
 	let matchDialog: Match | null = $state(null);
 
 	const cardsQuery = createQuery<Card[], Error>({
-		queryKey: ['cards', country, take],
-		queryFn: () => getCards(country, take)
+		queryKey: ['cards', country, take, sex],
+		queryFn: () => getCards(country, take, sex)
 	});
 
 	const client = useQueryClient();
@@ -30,20 +33,20 @@
 			card: Card;
 			swipeAction: 'like' | 'dislike' | 'superlike';
 		}) => {
-			await client.cancelQueries({ queryKey: ['cards', country, take] });
-			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
+			await client.cancelQueries({ queryKey: ['cards', country, take, sex] });
+			let previousCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
 
 			if (previousCards) {
 				let optimisticCards = previousCards.filter((c) => c.id != swipeAction.card.id);
-				client.setQueryData<Card[]>(['cards', country, take], () => [...optimisticCards]);
+				client.setQueryData<Card[]>(['cards', country, take, sex], () => [...optimisticCards]);
 			}
 
 			return { previousCards };
 		},
 		onSuccess: async () => {
-			let remainingCards = client.getQueryData<Card[]>(['cards', country, take]);
+			let remainingCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
 			if (remainingCards && remainingCards.length <= take / 2) {
-				await client.invalidateQueries({ queryKey: ['cards', country, take] });
+				await client.invalidateQueries({ queryKey: ['cards', country, take, sex] });
 			}
 		}
 	});
@@ -102,13 +105,10 @@
 	}
 </script>
 
+<GenericTitleHeader title={m.swipe_header()} />
 <div
 	class="flex h-full w-full flex-col items-center {backgroundColor} background-color-transition p-4"
 >
-	<div class="mb-4 w-full">
-		<TitleHeader title={m.swipe_header()} />
-	</div>
-
 	<SwipeFeedback {swipeFeedbackState} />
 
 	{#if $cardsQuery.isLoading}

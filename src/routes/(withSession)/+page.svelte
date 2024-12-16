@@ -3,22 +3,48 @@
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
 	import { Progress } from '$lib/components/ui/progress';
 	import type { CategoryProgress } from '$lib/types';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/svelte-query';
 	import * as m from '$lib/paraglide/messages.js';
+	import ToggleSwitch from './ToggleSwitch.svelte';
+	import { getSexState, setSexState } from './SexStore.svelte';
 
-	const query = createQuery<CategoryProgress[], Error>({
+	let selectedSex = getSexState();
+	const params = new URLSearchParams(window.location.search);
+	const sex = params.get('sex');
+
+	if (sex === 'male' || sex === 'female' || sex === 'all') {
+		selectedSex = sex;
+	} else if (sex === null) {
+		const query = new URLSearchParams(window.location.search);
+		query.set('sex', selectedSex);
+		history.replaceState(null, '', `${window.location.pathname}?${query.toString()}`);
+	}
+
+	const client = useQueryClient();
+	let query = createQuery<CategoryProgress[], Error>({
 		queryKey: ['categories'],
-		queryFn: () => getCategories()
+		queryFn: () => getCategories(selectedSex)
 	});
+
+	async function onSexChange(sex: 'male' | 'female' | 'all') {
+		selectedSex = sex;
+		setSexState(selectedSex);
+		const query = new URLSearchParams(window.location.search);
+		query.set('sex', selectedSex);
+		history.replaceState(null, '', `${window.location.pathname}?${query.toString()}`);
+		await client.refetchQueries({ queryKey: ['categories'] });
+	}
 </script>
 
 <GenericTitleHeader title={m.categories_header()} />
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
-	{#if $query.isLoading}
+	<ToggleSwitch bind:selectedSex {onSexChange} />
+	<div class="mb-4"></div>
+	{#if $query.isLoading || $query.isRefetching}
 		{#each Array(10) as index}
 			{@render skeletonSnippet()}
 		{/each}
-	{:else if $query.isSuccess}
+	{:else if $query && $query.isSuccess}
 		{#each $query.data as category}
 			{@render categorySnippet(category)}
 		{/each}
@@ -40,7 +66,7 @@
 	{#snippet categorySnippet(category: CategoryProgress)}
 		<a
 			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
-			href="/swipe/{category.letterCode ?? 'mixed'}"
+			href="/swipe/{category.letterCode ?? 'mixed'}?sex={selectedSex}"
 		>
 			{#if category.letterCode === '[MIX]'}
 				<i class="fa-solid fa-dice h-[50px] w-[50px] text-4xl text-red-500"></i>

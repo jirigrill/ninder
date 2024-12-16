@@ -7,21 +7,29 @@ export async function getNextCards(
 	prisma: PrismaClient,
 	userId: string,
 	letterCode: string,
-	take: number
+	take: number,
+	sex: string
 ): Promise<Card[]> {
 	let response = [];
 	const interactedCards = await prisma.card_interactions
 		.findMany({
-			where: { user_id: userId },
+			where: sex === 'all' ? { user_id: userId } : { user_id: userId, names: { sex: sex } },
 			select: { name_id: true }
 		})
 		.then((interactions) => interactions.map((interaction) => interaction.name_id || -1));
 
+	const whereClause =
+		sex === 'all'
+			? {
+					id: { notIn: interactedCards }
+				}
+			: {
+					id: { notIn: interactedCards },
+					sex: sex
+				};
 	if (letterCode === '[MIX]') {
 		response = await prisma.names.findMany({
-			where: {
-				id: { notIn: interactedCards }
-			},
+			where: whereClause,
 			distinct: ['id'],
 			orderBy: { id: 'asc' },
 			take: take,
@@ -29,7 +37,7 @@ export async function getNextCards(
 		});
 	} else if (letterCode === '[DP]') {
 		const partnerUserId = await getPartnerUserId(userId, prisma);
-		const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '');
+		const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);
 
 		response = await prisma.names.findMany({
@@ -42,7 +50,7 @@ export async function getNextCards(
 	} else {
 		response = await prisma.names.findMany({
 			where: {
-				id: { notIn: interactedCards },
+				...whereClause,
 				name_categories: { some: { categories: { letter_code: letterCode } } }
 			},
 			distinct: ['id'],

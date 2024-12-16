@@ -9,18 +9,34 @@ export type InteractedCards = {
 export async function getCardInteractions(
 	prisma: PrismaClient,
 	userId: string,
+	sex: string,
 	cardIds: number[] | null = null
 ): Promise<InteractedCards[]> {
-	let whereQuery: { user_id: string; id?: { in: number[] } } = { user_id: userId };
+	let whereQuery: {
+		user_id: string;
+		id?: { in: number[] };
+		names?: { sex: string };
+	} = { user_id: userId };
+
 	if (cardIds) {
 		whereQuery = { ...whereQuery, id: { in: cardIds } };
+	}
+
+	if (sex && sex !== 'all') {
+		whereQuery = { ...whereQuery, names: { sex: sex } };
 	}
 
 	const queryResult = await prisma.card_interactions.findMany({
 		where: whereQuery,
 		select: {
 			name_id: true,
-			names: { select: { name_categories: { select: { category_id: true } } } }
+			names: {
+				select: {
+					name_categories: {
+						select: { category_id: true }
+					}
+				}
+			}
 		}
 	});
 
@@ -66,10 +82,15 @@ export async function createInteraction(
 
 export async function getLikedByPartner(
 	prisma: PrismaClient,
-	partnerUserId: string
+	partnerUserId: string,
+	sex: string
 ): Promise<CardInteraction[]> {
+	let whereClause = { user_id: partnerUserId, OR: [{ action: 'liked' }, { action: 'superliked' }] };
+	if (sex !== 'all') {
+		whereClause = { ...whereClause, names: { sex: sex } };
+	}
 	const result = await prisma.card_interactions.findMany({
-		where: { user_id: partnerUserId, OR: [{ action: 'liked' }, { action: 'superliked' }] }
+		where: whereClause
 	});
 
 	return result.map((interaction) => ({

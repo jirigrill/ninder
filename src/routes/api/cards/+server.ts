@@ -14,10 +14,11 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const url = new URL(event.request.url);
 	const country = url.searchParams.get('country') ?? '';
 	const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') || '10') : 10;
+	const sex = url.searchParams.get('sex') || 'male';
 
 	const prisma = new PrismaClient();
 	try {
-		const nextCards = await getNextCards(prisma, userId, country, take);
+		const nextCards = await getNextCards(prisma, userId, country, take, sex);
 		const partnerUserId = await getPartnerUserId(userId, prisma);
 		if (partnerUserId === null) {
 			return json({ error: 'No partner found' }, { status: 404 });

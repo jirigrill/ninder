@@ -16,18 +16,19 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	if (!userId) {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
+	const url = new URL(event.request.url);
+	const sex = url.searchParams.get('sex') || 'male';
 
 	const prisma = new PrismaClient();
 	try {
 		const categories = await getCategories(prisma);
-		const interactedCards = await getCardInteractions(prisma, userId);
-
+		const interactedCards = await getCardInteractions(prisma, userId, sex);
 		let categoryProgress: CategoryProgress[] = calculateCountryCategoryProgress(
 			interactedCards,
 			categories
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		categoryProgress = await enhanceWithPartnerCategory(prisma, userId, categoryProgress);
+		categoryProgress = await enhanceWithPartnerCategory(prisma, userId, categoryProgress, sex);
 
 		return json(categoryProgress);
 	} catch {
@@ -40,10 +41,11 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 async function enhanceWithPartnerCategory(
 	prisma: PrismaClient,
 	userId: string,
-	categoryProgress: CategoryProgress[]
+	categoryProgress: CategoryProgress[],
+	sex: string
 ) {
 	const partnerUserId = await getPartnerUserId(userId, prisma);
-	const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '');
+	const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '', sex);
 	const ownInteractions = await getPartnerCardInteractions(
 		prisma,
 		userId,
