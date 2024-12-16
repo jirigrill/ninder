@@ -1,8 +1,9 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
 import { PrismaClient } from '@prisma/client';
-import { getSessionId } from '$lib/server/SessionRepository';
-import { createInteraction } from '$lib/server/CardInteractionRepository';
+import { getPartnerUserId, getSessionId } from '$lib/server/SessionRepository';
+import { createInteraction, isMatch } from '$lib/server/CardInteractionRepository';
+import { createAdvice } from '$lib/server/AdviceRepository';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
 	const user_id = await authenticate(event);
@@ -22,6 +23,12 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 			return json({ error: `No active session could be found!` }, { status: 400 });
 		}
 		await createInteraction(prisma, name_id, user_id, session_id, 'liked');
+		const partnerUserId = await getPartnerUserId(user_id, prisma);
+		const isLikedByPartner = await isMatch(prisma, partnerUserId || '', name_id);
+		if (isLikedByPartner) {
+			await createAdvice(prisma, partnerUserId || '');
+			await createAdvice(prisma, user_id || '');
+		}
 		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.error(error);

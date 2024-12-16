@@ -51,3 +51,8 @@ model sessions {
   initiatoruserid String  @db.VarChar(255)
   partneruserid   String? @db.VarChar(255)
 }
+
+model advices {
+  id        Int     @id @default(autoincrement())
+  user_id   String  @db.VarChar(255)
+}

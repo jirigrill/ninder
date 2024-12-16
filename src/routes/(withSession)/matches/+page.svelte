@@ -1,20 +1,30 @@
 <script lang="ts">
 	import type { Match } from '$lib/types';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getMatches } from '$lib/client/MatchClient';
 	import { randombackgroundcolor } from '$lib/actions/randomBackgroundColor';
 	import { fittedtext } from '$lib/actions/fittedtext';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import MatchDialog from './MatchDialog.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { deleteAdvices } from '$lib/client/AdviceClient';
 
 	let matchDialog: MatchDialog | null = $state(null);
+	const client = useQueryClient();
 
 	const matchQuery = createQuery<Match[], Error>({
 		queryKey: ['matches'],
 		queryFn: getMatches
 	});
+
+	const deleteAdviceMutation = createMutation({
+		mutationFn: deleteAdvices,
+		onSuccess: async () => {
+			await client.invalidateQueries({ queryKey: ['advices'] });
+		}
+	});
+	$deleteAdviceMutation.mutate();
 </script>
 
 <GenericTitleHeader title="Matches" />

@@ -60,3 +60,9 @@ export type Match = {
 	countries: string[];
 	superMatch: boolean;
 };
+
+export type Advice = {
+	id: number;
+	userId: string;
+	active: boolean;
+};

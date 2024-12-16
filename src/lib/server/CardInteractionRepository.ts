@@ -78,3 +78,14 @@ export async function getLikedByPartner(
 		swipe: interaction.action as 'disliked' | 'liked' | 'superliked'
 	}));
 }
+
+export async function isMatch(
+	prisma: PrismaClient,
+	partnerUserId: string,
+	cardId: number
+): Promise<Boolean> {
+	const result = await prisma.card_interactions.findFirst({
+		where: { user_id: partnerUserId, name_id: cardId, action: 'liked' }
+	});
+	return result !== null;
+}

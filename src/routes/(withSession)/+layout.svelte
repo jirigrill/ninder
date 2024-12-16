@@ -9,6 +9,8 @@
 	import { onMount } from 'svelte';
 	import { setLanguageTag, sourceLanguageTag } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages.js';
+	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+	import { hasActiveAdvices } from '$lib/client/AdviceClient';
 
 	let { children, data } = $props();
 
@@ -16,6 +18,12 @@
 	let hideAppBar = $state(false);
 	let pathSegment = $state('categories');
 	const userStore = getUserStore();
+
+	const query = createQuery<Boolean, Error>({
+		queryKey: ['advices'],
+		queryFn: () => hasActiveAdvices(),
+		refetchInterval: 5000
+	});
 
 	$effect(() => {
 		if (!browser) {
@@ -135,7 +143,11 @@
 						class="fa-solid fa-heart text-3xl"
 						class:text-red-700={pathSegment === 'matches'}
 						class:text-slate-400={pathSegment !== 'matches'}
-					></i>
+					>
+						{#if $query.data}
+							<span class="absolute h-[10px] w-[10px] rounded-full bg-red-700"></span>
+						{/if}
+					</i>
 				</a>
 				<a
 					href="/session"
