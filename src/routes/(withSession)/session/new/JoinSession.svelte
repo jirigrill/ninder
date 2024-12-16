@@ -26,6 +26,7 @@
 		sessionJoinState = result ? 'succeeded' : 'failed';
 
 		if (result) {
+			umami.identify({ user_id: userStore.user?.uid, pairing_code: pinState });
 			setTimeout(() => onjoined(), 1000);
 		}
 	}

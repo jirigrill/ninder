@@ -21,6 +21,7 @@
 		(joinedSession: Session | null) => {
 			if (joinedSession === null) throw 'session is null';
 			session = joinedSession;
+			umami.identify({ user_id: session.initiatorUserId, pairing_code: session.pairingCode });
 			setTimeout(() => onjoined(), 1000);
 		}
 	);
