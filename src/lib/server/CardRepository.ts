@@ -13,7 +13,10 @@ export async function getNextCards(
 	let response = [];
 	const interactedCards = await prisma.card_interactions
 		.findMany({
-			where: sex === 'all' ? { user_id: userId } : { user_id: userId, names: { sex: sex } },
+			where:
+				sex === 'all'
+					? { user_id: userId }
+					: { user_id: userId, names: { sex: { in: ['all', sex] } } },
 			select: { name_id: true }
 		})
 		.then((interactions) => interactions.map((interaction) => interaction.name_id || -1));
@@ -25,7 +28,7 @@ export async function getNextCards(
 				}
 			: {
 					id: { notIn: interactedCards },
-					sex: sex
+					sex: { in: ['all', sex] }
 				};
 	if (letterCode === '[DP]') {
 		const partnerUserId = await getPartnerUserId(userId, prisma);
