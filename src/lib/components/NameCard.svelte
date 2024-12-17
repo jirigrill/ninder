@@ -13,9 +13,9 @@
 		class:shadow-xl={shadow}
 	>
 		<h1 use:fittedtext class="w-full text-8xl font-bold text-white">{card.name}</h1>
-		<div class="mb-5 mt-5 flex text-4xl">
+		<div class="mb-5 mt-5 flex flex-wrap justify-center text-4xl">
 			{#each card.countries as country}
-				<span class="fi ml-1 mr-1 fi-{country.toLowerCase()}"></span>
+				<span class="fi mb-2 ml-1 mr-1 fi-{country.toLowerCase()}"></span>
 			{/each}
 		</div>
 	</div>

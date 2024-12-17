@@ -77,8 +77,12 @@
 			{/if}
 
 			<h1 class="self-center text-2xl font-semibold">{category.name}</h1>
-			<p class="text-xl leading-none">{category.swipedCards}/{category.totalCards}</p>
-			<Progress class="h-full w-full" value={category.swipedCards} max={category.totalCards} />
+			<div class="relative col-span-2">
+				<p class="text-ml absolute z-10 ml-2 leading-none text-white">
+					{category.swipedCards}/{category.totalCards}
+				</p>
+				<Progress class="w-full" value={category.swipedCards} max={category.totalCards} />
+			</div>
 		</a>
 	{/snippet}
 </div>
