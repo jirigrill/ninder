@@ -22,6 +22,8 @@ model categories {
   name            String            @db.VarChar(255)
   letter_code     String?           @db.VarChar(10)
   total_cards     Int?              @default(0)
+  total_male_cards     Int?              @default(0)
+  total_female_cards     Int?              @default(0)
   visible         Boolean?          @default(false)
   name_categories name_categories[]
 
