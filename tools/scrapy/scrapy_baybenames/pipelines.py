@@ -42,6 +42,19 @@ class CountryCodePipeline:
         adapter['countries'] = two_letter_codes
         return item
 
+class TransformSexPipeline:
+    def process_item(self, item, spider):
+        adapter = ItemAdapter(item)
+        sex = adapter.get('sex', '').lower()
+        if sex == 'Männlich':
+            adapter['sex'] = 'male'
+        elif sex == 'Weiblich':
+            adapter['sex'] = 'female'
+        else:
+            adapter['sex'] = 'all'
+            
+        return item
+
 class DuplicatesPipeline:
 
     def __init__(self):

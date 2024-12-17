@@ -64,9 +64,9 @@ ROBOTSTXT_OBEY = True
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'scrapy_baybenames.pipelines.CountryCodePipeline': 100,
-    'scrapy_baybenames.pipelines.DuplicatesPipeline': 200,
+    'scrapy_baybenames.pipelines.TransformSexPipeline': 200,
+    'scrapy_baybenames.pipelines.DuplicatesPipeline': 300,
 }
-
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
