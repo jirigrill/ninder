@@ -8,6 +8,11 @@ the endless struggle to find the perfect baby name finally comes to an end!
   <img src="./Animation.gif">
 </p>
 
+# Try it out!
+For the best experience, use this web app on mobile devices.
+Open https://ninder.marcel-lambacher.de and ask your partner to scan the QR code. Once your partner is joined, you can start to swipe.
+Have fun!
+
 # Disclaimer
 
 This is a learning project to get started with Svelte.
