@@ -68,9 +68,7 @@
 			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
 			href="/swipe/{category.letterCode ?? 'mixed'}?sex={selectedSex}"
 		>
-			{#if category.letterCode === '[MIX]'}
-				<i class="fa-solid fa-dice h-[50px] w-[50px] text-4xl text-red-500"></i>
-			{:else if category.letterCode === '[DP]'}
+			{#if category.letterCode === '[DP]'}
 				<i class="fa-solid fa-heart h-[50px] w-[50px] text-4xl text-red-500"></i>
 			{:else}
 				<span class="fi shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
