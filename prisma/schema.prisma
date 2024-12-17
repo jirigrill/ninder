@@ -44,6 +44,7 @@ model names {
   name              String              @unique @db.VarChar(255)
   meaning           String?
   sex               String              @default("male")
+  popular           Boolean          @default(false)
   card_interactions card_interactions[]
   name_categories   name_categories[]
 }
