@@ -1,86 +1,467 @@
 [
     {
-        "id": "0",
-        "name": "Gemischt",
-        "letterCode": null,
-        "totalCards": 22
-    },
-    {
         "id": "1",
-        "name": "Deutschland",
-        "letterCode": "DE",
-        "totalCards": 11
+        "name": "Germany",
+        "letterCode": "DE"
     },
     {
         "id": "2",
-        "name": "Finnland",
-        "letterCode": "FI",
-        "totalCards": 2
+        "name": "Austria",
+        "letterCode": "AT"
     },
     {
         "id": "3",
-        "name": "Frankreich",
-        "letterCode": "FR",
-        "totalCards": 6
+        "name": "Sweden",
+        "letterCode": "SE"
     },
     {
         "id": "4",
-        "name": "Griechenland",
-        "letterCode": "GR",
-        "totalCards": 0
+        "name": "Switzerland",
+        "letterCode": "CH"
     },
     {
         "id": "5",
-        "name": "Italien",
-        "letterCode": "IT",
-        "totalCards": 2
+        "name": "Ukraine",
+        "letterCode": "UA"
     },
     {
         "id": "6",
-        "name": "Kanada",
-        "letterCode": "CA",
-        "totalCards": 1
+        "name": "United Kingdom",
+        "letterCode": "GB"
     },
     {
         "id": "7",
-        "name": "Portugal",
-        "letterCode": "PT",
-        "totalCards": 1
+        "name": "France",
+        "letterCode": "FR"
     },
     {
         "id": "8",
-        "name": "Russland",
-        "letterCode": "RU",
-        "totalCards": 2
+        "name": "United States",
+        "letterCode": "US"
     },
     {
         "id": "9",
-        "name": "Schweden",
-        "letterCode": "SE",
-        "totalCards": 2
+        "name": "Finland",
+        "letterCode": "FI"
     },
     {
         "id": "10",
-        "name": "Spanien",
-        "letterCode": "ES",
-        "totalCards": 2
+        "name": "Italy",
+        "letterCode": "IT"
     },
     {
         "id": "11",
-        "name": "Ukraine",
-        "letterCode": "UA",
-        "totalCards": 0
+        "name": "Spain",
+        "letterCode": "ES"
     },
     {
         "id": "12",
-        "name": "USA",
-        "letterCode": "US",
-        "totalCards": 20
+        "name": "Poland",
+        "letterCode": "PL"
     },
     {
         "id": "13",
-        "name": "Vereinigtes Königreich",
-        "letterCode": "GB",
-        "totalCards": 5
+        "name": "Portugal",
+        "letterCode": "PT"
+    },
+    {
+        "id": "14",
+        "name": "Russian Federation",
+        "letterCode": "RU"
+    },
+    {
+        "id": "15",
+        "name": "Ireland",
+        "letterCode": "IE"
+    },
+    {
+        "id": "16",
+        "name": "Czechia",
+        "letterCode": "CZ"
+    },
+    {
+        "id": "17",
+        "name": "Greece",
+        "letterCode": "GR"
+    },
+    {
+        "id": "18",
+        "name": "Norway",
+        "letterCode": "NO"
+    },
+    {
+        "id": "19",
+        "name": "Denmark",
+        "letterCode": "DK"
+    },
+    {
+        "id": "20",
+        "name": "South Africa",
+        "letterCode": "ZA"
+    },
+    {
+        "id": "21",
+        "name": "Zimbabwe",
+        "letterCode": "ZW"
+    },
+    {
+        "id": "22",
+        "name": "Botswana",
+        "letterCode": "BW"
+    },
+    {
+        "id": "23",
+        "name": "Saudi Arabia",
+        "letterCode": "SA"
+    },
+    {
+        "id": "24",
+        "name": "Romania",
+        "letterCode": "RO"
+    },
+    {
+        "id": "25",
+        "name": "Hungary",
+        "letterCode": "HU"
+    },
+    {
+        "id": "26",
+        "name": "Brazil",
+        "letterCode": "BR"
+    },
+    {
+        "id": "27",
+        "name": "Estonia",
+        "letterCode": "EE"
+    },
+    {
+        "id": "28",
+        "name": "Albania",
+        "letterCode": "AL"
+    },
+    {
+        "id": "29",
+        "name": "Bosnia and Herzegovina",
+        "letterCode": "BA"
+    },
+    {
+        "id": "30",
+        "name": "Croatia",
+        "letterCode": "HR"
+    },
+    {
+        "id": "31",
+        "name": "North Macedonia",
+        "letterCode": "MK"
+    },
+    {
+        "id": "32",
+        "name": "Serbia",
+        "letterCode": "RS"
+    },
+    {
+        "id": "33",
+        "name": "Slovenia",
+        "letterCode": "SI"
+    },
+    {
+        "id": "34",
+        "name": "Israel",
+        "letterCode": "IL"
+    },
+    {
+        "id": "35",
+        "name": "Netherlands",
+        "letterCode": "NL"
+    },
+    {
+        "id": "36",
+        "name": "Bulgaria",
+        "letterCode": "BG"
+    },
+    {
+        "id": "37",
+        "name": "Faroe Islands",
+        "letterCode": "FO"
+    },
+    {
+        "id": "38",
+        "name": "Greenland",
+        "letterCode": "GL"
+    },
+    {
+        "id": "39",
+        "name": "Iceland",
+        "letterCode": "IS"
+    },
+    {
+        "id": "40",
+        "name": "Slovakia",
+        "letterCode": "SK"
+    },
+    {
+        "id": "41",
+        "name": "Latvia",
+        "letterCode": "LV"
+    },
+    {
+        "id": "42",
+        "name": "Lithuania",
+        "letterCode": "LT"
+    },
+    {
+        "id": "43",
+        "name": "Belarus",
+        "letterCode": "BY"
+    },
+    {
+        "id": "44",
+        "name": "Malta",
+        "letterCode": "MT"
+    },
+    {
+        "id": "45",
+        "name": "Georgia",
+        "letterCode": "GE"
+    },
+    {
+        "id": "46",
+        "name": "Montenegro",
+        "letterCode": "ME"
+    },
+    {
+        "id": "47",
+        "name": "Kazakhstan",
+        "letterCode": "KZ"
+    },
+    {
+        "id": "48",
+        "name": "Iran, Islamic Republic of",
+        "letterCode": "IR"
+    },
+    {
+        "id": "49",
+        "name": "T\u00c3\u00bcrkiye",
+        "letterCode": "TR"
+    },
+    {
+        "id": "50",
+        "name": "India",
+        "letterCode": "IN"
+    },
+    {
+        "id": "51",
+        "name": "Thailand",
+        "letterCode": "TH"
+    },
+    {
+        "id": "52",
+        "name": "Belgium",
+        "letterCode": "BE"
+    },
+    {
+        "id": "53",
+        "name": "Indonesia",
+        "letterCode": "ID"
+    },
+    {
+        "id": "54",
+        "name": "Japan",
+        "letterCode": "JP"
+    },
+    {
+        "id": "55",
+        "name": "Uzbekistan",
+        "letterCode": "UZ"
+    },
+    {
+        "id": "56",
+        "name": "Korea, Republic of",
+        "letterCode": "KR"
+    },
+    {
+        "id": "57",
+        "name": "Algeria",
+        "letterCode": "DZ"
+    },
+    {
+        "id": "58",
+        "name": "China",
+        "letterCode": "CN"
+    },
+    {
+        "id": "59",
+        "name": "Canada",
+        "letterCode": "CA"
+    },
+    {
+        "id": "60",
+        "name": "Australia",
+        "letterCode": "AU"
+    },
+    {
+        "id": "61",
+        "name": "Mongolia",
+        "letterCode": "MN"
+    },
+    {
+        "id": "62",
+        "name": "Iraq",
+        "letterCode": "IQ"
+    },
+    {
+        "id": "63",
+        "name": "New Zealand",
+        "letterCode": "NZ"
+    },
+    {
+        "id": "64",
+        "name": "Armenia",
+        "letterCode": "AM"
+    },
+    {
+        "id": "65",
+        "name": "Mexico",
+        "letterCode": "MX"
+    },
+    {
+        "id": "66",
+        "name": "Turkmenistan",
+        "letterCode": "TM"
+    },
+    {
+        "id": "67",
+        "name": "Peru",
+        "letterCode": "PE"
+    },
+    {
+        "id": "68",
+        "name": "Azerbaijan",
+        "letterCode": "AZ"
+    },
+    {
+        "id": "69",
+        "name": "Maldives",
+        "letterCode": "MV"
+    },
+    {
+        "id": "70",
+        "name": "Malaysia",
+        "letterCode": "MY"
+    },
+    {
+        "id": "71",
+        "name": "Luxembourg",
+        "letterCode": "LU"
+    },
+    {
+        "id": "72",
+        "name": "Philippines",
+        "letterCode": "PH"
+    },
+    {
+        "id": "73",
+        "name": "Uganda",
+        "letterCode": "UG"
+    },
+    {
+        "id": "74",
+        "name": "Moldova, Republic of",
+        "letterCode": "MD"
+    },
+    {
+        "id": "75",
+        "name": "Ghana",
+        "letterCode": "GH"
+    },
+    {
+        "id": "76",
+        "name": "Ethiopia",
+        "letterCode": "ET"
+    },
+    {
+        "id": "77",
+        "name": "Kenya",
+        "letterCode": "KE"
+    },
+    {
+        "id": "78",
+        "name": "Myanmar",
+        "letterCode": "MM"
+    },
+    {
+        "id": "79",
+        "name": "Pakistan",
+        "letterCode": "PK"
+    },
+    {
+        "id": "80",
+        "name": "Tunisia",
+        "letterCode": "TN"
+    },
+    {
+        "id": "81",
+        "name": "Morocco",
+        "letterCode": "MA"
+    },
+    {
+        "id": "82",
+        "name": "Afghanistan",
+        "letterCode": "AF"
+    },
+    {
+        "id": "83",
+        "name": "Syrian Arab Republic",
+        "letterCode": "SY"
+    },
+    {
+        "id": "84",
+        "name": "Libya",
+        "letterCode": "LY"
+    },
+    {
+        "id": "85",
+        "name": "Somalia",
+        "letterCode": "SO"
+    },
+    {
+        "id": "86",
+        "name": "Lebanon",
+        "letterCode": "LB"
+    },
+    {
+        "id": "87",
+        "name": "Senegal",
+        "letterCode": "SN"
+    },
+    {
+        "id": "88",
+        "name": "Madagascar",
+        "letterCode": "MG"
+    },
+    {
+        "id": "89",
+        "name": "Namibia",
+        "letterCode": "NA"
+    },
+    {
+        "id": "90",
+        "name": "Tajikistan",
+        "letterCode": "TJ"
+    },
+    {
+        "id": "91",
+        "name": "Jamaica",
+        "letterCode": "JM"
+    },
+    {
+        "id": "92",
+        "name": "Nigeria",
+        "letterCode": "NG"
+    },
+    {
+        "id": "93",
+        "name": "Chile",
+        "letterCode": "CL"
     }
 ]
