@@ -14,7 +14,7 @@
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' | 'top' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
-	let take = 10;
+	let take = 50;
 	let country = $page.params.category;
 	const params = new URLSearchParams(window.location.search);
 	const sex = params.get('sex');
@@ -26,6 +26,7 @@
 		queryFn: () => getCards(country, take, sex)
 	});
 
+	let isMutating = $state(false);
 	const client = useQueryClient();
 	const swipeMutation = createMutation({
 		mutationFn: swipeCard,
@@ -33,7 +34,8 @@
 			card: Card;
 			swipeAction: 'like' | 'dislike' | 'superlike';
 		}) => {
-			await client.cancelQueries({ queryKey: ['cards', country, take, sex] });
+			isMutating = true;
+			// await client.cancelQueries({ queryKey: ['cards', country, take, sex] });
 			let previousCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
 
 			if (previousCards) {
@@ -45,9 +47,10 @@
 		},
 		onSuccess: async () => {
 			let remainingCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
-			if (remainingCards && remainingCards.length <= take / 2) {
+			if (remainingCards && take - remainingCards.length >= 10) {
 				await client.invalidateQueries({ queryKey: ['cards', country, take, sex] });
 			}
+			isMutating = false;
 		}
 	});
 
@@ -57,7 +60,6 @@
 			onMatch(card);
 		}
 	}
-
 	async function onLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
 		if (card.partnerInteraction?.swipe == 'liked') {
@@ -89,6 +91,10 @@
 			return;
 		}
 
+		if ($cardsQuery.data.length === 0) {
+			return;
+		}
+
 		if (swipe === 'left') {
 			onDislike($cardsQuery.data[$cardsQuery.data.length - 1]);
 		} else if (swipe === 'right') {
@@ -102,6 +108,18 @@
 		matchDialog?.showMatch(card);
 		await client.refetchQueries({ queryKey: ['matches'] });
 		await client.refetchQueries({ queryKey: ['categories'] });
+	}
+
+	function performSwipe(direction: 'left' | 'top' | 'right') {
+		if ($cardsQuery.data?.length === 0) {
+			return;
+		}
+
+		if ($cardsQuery.isLoading || $cardsQuery.isFetching) {
+			return;
+		}
+
+		swipeableCardStack.swipe(direction);
 	}
 </script>
 
@@ -126,9 +144,9 @@
 
 	<div class="mt-4 w-full">
 		<CardActionBar
-			onDislikeButton={() => swipeableCardStack.swipe('left')}
-			onLikeButton={() => swipeableCardStack.swipe('right')}
-			onSuperLikeButton={() => swipeableCardStack.swipe('top')}
+			onDislikeButton={() => performSwipe('left')}
+			onLikeButton={() => performSwipe('right')}
+			onSuperLikeButton={() => performSwipe('top')}
 		/>
 	</div>
 </div>
