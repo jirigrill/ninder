@@ -1,5 +1,5 @@
 import type { CardInteraction } from '$lib/types';
-import type { PrismaClient } from '@prisma/client';
+import prisma from './PrismaContext';
 
 export type InteractedCards = {
 	name_id: number;
@@ -7,7 +7,6 @@ export type InteractedCards = {
 };
 
 export async function getCardInteractions(
-	prisma: PrismaClient,
 	userId: string,
 	sex: string,
 	cardIds: number[] | null = null
@@ -47,7 +46,6 @@ export async function getCardInteractions(
 }
 
 export async function getPartnerCardInteractions(
-	prisma: PrismaClient,
 	userId: string,
 	cardIds: number[]
 ): Promise<CardInteraction[]> {
@@ -61,15 +59,11 @@ export async function getPartnerCardInteractions(
 	}));
 }
 
-export async function deleteAllCardInteractions(
-	prisma: PrismaClient,
-	sessionId: number
-): Promise<void> {
+export async function deleteAllCardInteractions(sessionId: number): Promise<void> {
 	await prisma.card_interactions.deleteMany({ where: { session_id: sessionId } });
 }
 
 export async function createInteraction(
-	prisma: PrismaClient,
 	nameId: number,
 	userId: string,
 	sessionId: number,
@@ -81,7 +75,6 @@ export async function createInteraction(
 }
 
 export async function getLikedByPartner(
-	prisma: PrismaClient,
 	partnerUserId: string,
 	sex: string
 ): Promise<CardInteraction[]> {
@@ -100,11 +93,7 @@ export async function getLikedByPartner(
 	}));
 }
 
-export async function isMatch(
-	prisma: PrismaClient,
-	partnerUserId: string,
-	cardId: number
-): Promise<Boolean> {
+export async function isMatch(partnerUserId: string, cardId: number): Promise<Boolean> {
 	const result = await prisma.card_interactions.findFirst({
 		where: { user_id: partnerUserId, name_id: cardId, action: 'liked' }
 	});

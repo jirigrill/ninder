@@ -1,7 +1,6 @@
 import type { CategoryProgress } from '$lib/types';
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { PrismaClient } from '@prisma/client';
 import { getCategories } from '$lib/server/CategoryRepository';
 import {
 	getCardInteractions,
@@ -19,35 +18,30 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const url = new URL(event.request.url);
 	const sex = url.searchParams.get('sex') || 'male';
 
-	const prisma = new PrismaClient();
 	try {
-		const categories = await getCategories(prisma);
-		const interactedCards = await getCardInteractions(prisma, userId, sex);
+		const categories = await getCategories();
+		const interactedCards = await getCardInteractions(userId, sex);
 		let categoryProgress: CategoryProgress[] = calculateCountryCategoryProgress(
 			interactedCards,
 			categories
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		categoryProgress = await enhanceWithPartnerCategory(prisma, userId, categoryProgress, sex);
+		categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
 
 		return json(categoryProgress);
 	} catch {
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
-	} finally {
-		await prisma.$disconnect();
 	}
 };
 
 async function enhanceWithPartnerCategory(
-	prisma: PrismaClient,
 	userId: string,
 	categoryProgress: CategoryProgress[],
 	sex: string
 ) {
-	const partnerUserId = await getPartnerUserId(userId, prisma);
-	const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '', sex);
+	const partnerUserId = await getPartnerUserId(userId);
+	const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 	const ownInteractions = await getPartnerCardInteractions(
-		prisma,
 		userId,
 		partnerInteractions.map((i) => i.cardId)
 	);

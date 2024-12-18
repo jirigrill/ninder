@@ -2,7 +2,6 @@ import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
 import { getPartnerUserId, getSessionId } from '$lib/server/SessionRepository';
 import { createInteraction } from '$lib/server/CardInteractionRepository';
-import { PrismaClient } from '@prisma/client';
 import { createAdvice } from '$lib/server/AdviceRepository';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
@@ -16,20 +15,17 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'Missing name_id or user_id' }, { status: 400 });
 	}
 
-	const prisma = new PrismaClient();
 	try {
-		const session_id = await getSessionId(prisma, user_id);
+		const session_id = await getSessionId(user_id);
 		if (session_id === null) {
 			return json({ error: `No active session could be found!` }, { status: 400 });
 		}
-		await createInteraction(prisma, name_id, user_id, session_id, 'superliked');
-		const partnerUserId = await getPartnerUserId(user_id, prisma);
-		await createAdvice(prisma, partnerUserId || '');
+		await createInteraction(name_id, user_id, session_id, 'superliked');
+		const partnerUserId = await getPartnerUserId(user_id);
+		await createAdvice(partnerUserId || '');
 		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.error(error);
 		return json({ error: 'Internal server error' }, { status: 500 });
-	} finally {
-		prisma.$disconnect;
 	}
 };

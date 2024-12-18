@@ -1,10 +1,9 @@
 import type { Card, Match } from '$lib/types';
-import type { PrismaClient } from '@prisma/client';
 import { getPartnerUserId } from './SessionRepository';
 import { getLikedByPartner } from './CardInteractionRepository';
+import prisma from './PrismaContext';
 
 export async function getNextCards(
-	prisma: PrismaClient,
 	userId: string,
 	letterCode: string,
 	take: number,
@@ -31,7 +30,7 @@ export async function getNextCards(
 					sex: { in: ['all', sex] }
 				};
 	if (letterCode === '[DP]') {
-		const partnerUserId = await getPartnerUserId(userId, prisma);
+		const partnerUserId = await getPartnerUserId(userId);
 		const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);
 
@@ -71,7 +70,7 @@ export type Name = {
 	name: string;
 };
 
-export async function getNames(prisma: PrismaClient, nameIds: number[]): Promise<Match[]> {
+export async function getNames(nameIds: number[]): Promise<Match[]> {
 	const names = await prisma.names.findMany({
 		where: {
 			id: { in: nameIds }

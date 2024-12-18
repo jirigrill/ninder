@@ -1,10 +1,8 @@
 import type { Session } from '$lib/types';
 import type { PrismaClient } from '@prisma/client';
+import prisma from './PrismaContext';
 
-export async function getPartnerUserId(
-	userId: string,
-	prisma: PrismaClient
-): Promise<string | null> {
+export async function getPartnerUserId(userId: string): Promise<string | null> {
 	const sessions = await prisma.sessions.findMany({
 		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
 	});
@@ -28,7 +26,7 @@ export async function getPartnerUserId(
 		: preferredSession.partneruserid;
 }
 
-export async function getSessions(prisma: PrismaClient, userId: string): Promise<Session[]> {
+export async function getSessions(userId: string): Promise<Session[]> {
 	const sessions = await prisma.sessions.findMany({
 		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
 	});
@@ -41,11 +39,7 @@ export async function getSessions(prisma: PrismaClient, userId: string): Promise
 	}));
 }
 
-export async function createSession(
-	prisma: PrismaClient,
-	userId: string,
-	pairingCode: string
-): Promise<Session> {
+export async function createSession(userId: string, pairingCode: string): Promise<Session> {
 	const session = await prisma.sessions.create({
 		data: {
 			initiatoruserid: userId,
@@ -61,7 +55,6 @@ export async function createSession(
 }
 
 export async function joinSession(
-	prisma: PrismaClient,
 	partnerUserId: string,
 	pairingCode: string
 ): Promise<Session | null> {
@@ -90,7 +83,7 @@ export async function joinSession(
 		: null;
 }
 
-export async function getSessionId(prisma: PrismaClient, userId: string): Promise<number | null> {
+export async function getSessionId(userId: string): Promise<number | null> {
 	const sessions = await prisma.sessions.findMany({
 		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
 	});
@@ -112,6 +105,6 @@ export async function getSessionId(prisma: PrismaClient, userId: string): Promis
 	return preferredSession.id;
 }
 
-export async function deleteSession(prisma: PrismaClient, id: number): Promise<void> {
+export async function deleteSession(id: number): Promise<void> {
 	await prisma.sessions.deleteMany({ where: { id: id } });
 }

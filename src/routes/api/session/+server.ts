@@ -25,9 +25,8 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'user_id is required' }, { status: 400 });
 	}
 
-	const prisma = new PrismaClient();
 	try {
-		const sessions = await getSessions(prisma, userId);
+		const sessions = await getSessions(userId);
 
 		if (sessions.length === 0) {
 			return json({ error: 'No session found' }, { status: 404 });
@@ -46,8 +45,6 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json(preferredSession);
 	} catch (error) {
 		return json({ error: 'Failed to fetch session' }, { status: 500 });
-	} finally {
-		await prisma.$disconnect();
 	}
 };
 
@@ -78,24 +75,19 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
 		let isNewSession = !!newSession.initiatorUserId;
 
-		const prisma = new PrismaClient();
-
 		try {
 			if (isNewSession) {
 				const pairingCode = generatePairingCode();
-				const session = await createSession(prisma, newSession.initiatorUserId, pairingCode);
+				const session = await createSession(newSession.initiatorUserId, pairingCode);
 
 				return json(session, { status: 201 });
 			} else {
 				const session = await joinSession(
-					prisma,
 					newSession.partnerUserId || '',
 					newSession.pairingCode
 				);
 				return json(session, { status: 200 });
 			}
-		} finally {
-			await prisma.$disconnect();
 		}
 	} catch (error) {
 		return json({ error: 'Failed to create session' }, { status: 500 });
@@ -113,17 +105,11 @@ export const DELETE: RequestHandler = async (event) => {
 	}
 
 	try {
-		const prisma = new PrismaClient();
+		const sessionId = await getSessionId(userId);
+		await deleteAllCardInteractions(sessionId || -1);
+		await deleteSession(sessionId || -1);
 
-		try {
-			const sessionId = await getSessionId(prisma, userId);
-			await deleteAllCardInteractions(prisma, sessionId || -1);
-			await deleteSession(prisma, sessionId || -1);
-
-			return json({ message: 'Session deleted successfully' });
-		} finally {
-			prisma.$disconnect();
-		}
+		return json({ message: 'Session deleted successfully' });
 	} catch (error) {
 		return json({ error: 'Failed to delete session' }, { status: 500 });
 	}

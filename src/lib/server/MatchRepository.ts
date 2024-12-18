@@ -1,12 +1,8 @@
-import type { PrismaClient } from '@prisma/client';
+import prisma from './PrismaContext';
 
 export type MatchPair = { id: number; superMatch: boolean };
 
-export async function getCardIdsOfMatches(
-	prisma: PrismaClient,
-	userId: string,
-	partnerId: string
-): Promise<MatchPair[]> {
+export async function getCardIdsOfMatches(userId: string, partnerId: string): Promise<MatchPair[]> {
 	const interactedCards = await prisma.card_interactions.groupBy({
 		where: {
 			OR: [
@@ -22,11 +18,7 @@ export async function getCardIdsOfMatches(
 	return interactedCards.map((card) => ({ id: card.name_id || -1, superMatch: false }));
 }
 
-export async function getSuperLikeMatches(
-	prisma: PrismaClient,
-	userId: string,
-	partnerId: string
-): Promise<MatchPair[]> {
+export async function getSuperLikeMatches(userId: string, partnerId: string): Promise<MatchPair[]> {
 	const interactedCards = await prisma.card_interactions.groupBy({
 		where: {
 			OR: [
@@ -43,7 +35,6 @@ export async function getSuperLikeMatches(
 }
 
 export async function deleteMatch(
-	prisma: PrismaClient,
 	userId: string,
 	partnerUserId: string,
 	cardId: number

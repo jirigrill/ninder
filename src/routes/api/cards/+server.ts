@@ -1,6 +1,5 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { PrismaClient } from '@prisma/client';
 import { getNextCards } from '$lib/server/CardRepository';
 import { getPartnerUserId } from '$lib/server/SessionRepository';
 import { getPartnerCardInteractions } from '$lib/server/CardInteractionRepository';
@@ -16,16 +15,14 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const take = url.searchParams.get('take') ? parseInt(url.searchParams.get('take') || '10') : 10;
 	const sex = url.searchParams.get('sex') || 'male';
 
-	const prisma = new PrismaClient();
 	try {
-		const nextCards = await getNextCards(prisma, userId, country, take, sex);
-		const partnerUserId = await getPartnerUserId(userId, prisma);
+		const nextCards = await getNextCards(userId, country, take, sex);
+		const partnerUserId = await getPartnerUserId(userId);
 		if (partnerUserId === null) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}
 
 		const partnerInteractions = await getPartnerCardInteractions(
-			prisma,
 			partnerUserId,
 			nextCards.map((card) => card.id)
 		);
@@ -40,7 +37,5 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json(nextCards);
 	} catch {
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
-	} finally {
-		await prisma.$disconnect();
 	}
 };
