@@ -48,7 +48,7 @@ export async function getNextCards(
 				name_categories: { some: { categories: { letter_code: letterCode } } }
 			},
 			distinct: ['id'],
-			orderBy: { popular: 'desc' },
+			orderBy: [{ popular: 'desc' }, { id: 'asc' }],
 			take: take,
 			include: { name_categories: { include: { categories: { select: { letter_code: true } } } } }
 		});
