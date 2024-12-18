@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { getCategories } from '$lib/client/CategoryClient';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
-	import { Progress } from '$lib/components/ui/progress';
 	import type { CategoryProgress } from '$lib/types';
 	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import * as m from '$lib/paraglide/messages.js';
 	import SexToggle from '$lib/components/SexToggle.svelte';
 	import { getSexState } from '$lib/components/SexStore.svelte';
+	import QuickCategories from './QuickCategories.svelte';
+	import CountryCategories from './CountryCategories.svelte';
+	import PopularCategories from './PopularCategories.svelte';
+	import { Input } from '$lib/components/ui/input';
 
+	let search = $state('');
 	let selectedSex = getSexState();
 	const client = useQueryClient();
 	let query = createQuery<CategoryProgress[], Error>({
@@ -24,56 +28,21 @@
 <GenericTitleHeader title={m.categories_header()} />
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
 	<SexToggle {onSexChange} />
+	<div class="mb-3"></div>
+
+	<div class="relative">
+		<i
+			class="fa-solid fa-magnifying-glass absolute left-2 top-[50%] h-4 w-4 translate-y-[-50%] text-muted-foreground"
+		></i>
+		<Input bind:value={search} placeholder="Suche nach Kategorien..." class="pl-8" />
+	</div>
+
 	<div class="mb-4"></div>
-	{#if $query.isLoading || $query.isRefetching}
-		{#each Array(10) as index}
-			{@render skeletonSnippet()}
-		{/each}
-	{:else if $query && $query.isSuccess}
-		{#each $query.data as category}
-			{@render categorySnippet(category)}
-		{/each}
-	{/if}
-
-	{#snippet skeletonSnippet()}
-		<div class="mb-4 flex flex-col rounded-xl bg-slate-200 p-4 shadow-lg">
-			<div class="flex items-center">
-				<div class=" h-[50px] w-[50px] bg-slate-300 shadow-sm"></div>
-				<h1 class="ml-2 bg-slate-300 text-2xl font-semibold text-slate-300">Deutschland</h1>
-			</div>
-			<div class="flex items-baseline">
-				<p class="mt-1 bg-slate-300 text-xl text-slate-300">0 von 0</p>
-				<div class="ml-4 h-5 grow bg-slate-300"></div>
-			</div>
-		</div>
-	{/snippet}
-	{#snippet categorySnippet(category: CategoryProgress)}
-		<a
-			class="mb-4 grid grid-cols-[auto_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
-			href="/swipe/{category.letterCode ?? 'mixed'}?sex={selectedSex}"
-		>
-			{#if category.letterCode === '[DP]'}
-				<i class="fa-solid fa-heart mr-2 h-[50px] w-[50px] text-4xl text-red-500"></i>
-			{:else}
-				<span class="fi mr-2 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
-				></span>
-			{/if}
-
-			<h1 class="self-center text-2xl font-semibold">
-				{#if category.letterCode === '[DP]'}
-					{m.categories_your_partner()}
-				{:else}
-					{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
-				{/if}
-			</h1>
-			<p class="text-ml col-span-2 leading-none">
-				{category.swipedCards}/{category.totalCards}
-			</p>
-			<div class="relative col-span-2">
-				<Progress class="w-full" value={category.swipedCards} max={category.totalCards} />
-			</div>
-		</a>
-	{/snippet}
+	<QuickCategories {search} />
+	<div class="mb-4"></div>
+	<PopularCategories {search} />
+	<div class="mb-4"></div>
+	<CountryCategories {search} />
 </div>
 
 <style>

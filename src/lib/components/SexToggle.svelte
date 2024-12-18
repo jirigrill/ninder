@@ -10,7 +10,7 @@
 	}
 </script>
 
-<div class="flex w-full">
+<div class="grid w-full grid-cols-3 gap-x-2">
 	<button
 		class="flex grow justify-center rounded-xl bg-slate-200 p-2 shadow-sm"
 		onclick={() => onClick('male')}
@@ -21,7 +21,7 @@
 		<p class="text-sm font-semibold">{m.sex_toggle_male()}</p>
 	</button>
 	<button
-		class="ml-2 mr-2 flex grow justify-center rounded-xl bg-slate-200 p-2 shadow-sm"
+		class="flex grow justify-center rounded-xl bg-slate-200 p-2 shadow-sm"
 		onclick={() => onClick('female')}
 		class:bg-white={getSexState() === 'female'}
 		aria-label="female"
