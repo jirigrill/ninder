@@ -74,7 +74,13 @@
 				></span>
 			{/if}
 
-			<h1 class="self-center text-2xl font-semibold">{category.name}</h1>
+			<h1 class="self-center text-2xl font-semibold">
+				{#if category.letterCode === '[DP]'}
+					{m.categories_your_partner()}
+				{:else}
+					{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
+				{/if}
+			</h1>
 			<p class="text-ml col-span-2 leading-none">
 				{category.swipedCards}/{category.totalCards}
 			</p>
