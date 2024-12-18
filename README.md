@@ -1,5 +1,7 @@
 # About
 
+<img src="https://uptime.ninder.marcel-lambacher.de/api/badge/4/status" /> <img src="https://uptime.ninder.marcel-lambacher.de/api/badge/4/uptime/24" />
+
 Ninder is a mobile web app best described as "Tinder for baby names."
 Connect with your partner, swipe through names, and discover new baby name ideas together. When you both swipe right on the same name,
 the endless struggle to find the perfect baby name finally comes to an end!
