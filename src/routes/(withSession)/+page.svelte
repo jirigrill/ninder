@@ -62,23 +62,23 @@
 			</div>
 		</div>
 	{/snippet}
-
 	{#snippet categorySnippet(category: CategoryProgress)}
 		<a
-			class="mb-4 grid grid-cols-[6rem_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
+			class="mb-4 grid grid-cols-[auto_1fr] grid-rows-[auto_auto] gap-1 rounded-xl bg-white p-4 shadow-lg"
 			href="/swipe/{category.letterCode ?? 'mixed'}?sex={selectedSex}"
 		>
 			{#if category.letterCode === '[DP]'}
-				<i class="fa-solid fa-heart h-[50px] w-[50px] text-4xl text-red-500"></i>
+				<i class="fa-solid fa-heart mr-2 h-[50px] w-[50px] text-4xl text-red-500"></i>
 			{:else}
-				<span class="fi shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"></span>
+				<span class="fi mr-2 shadow-sm fi-{category.letterCode.toLowerCase()} h-[50px] w-[50px]"
+				></span>
 			{/if}
 
 			<h1 class="self-center text-2xl font-semibold">{category.name}</h1>
+			<p class="text-ml col-span-2 leading-none">
+				{category.swipedCards}/{category.totalCards}
+			</p>
 			<div class="relative col-span-2">
-				<p class="text-ml absolute z-10 ml-2 leading-none text-white">
-					{category.swipedCards}/{category.totalCards}
-				</p>
 				<Progress class="w-full" value={category.swipedCards} max={category.totalCards} />
 			</div>
 		</a>

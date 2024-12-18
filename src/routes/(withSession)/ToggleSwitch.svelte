@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		onSexChange,
@@ -31,6 +32,7 @@
 			class:bg-white={selectedSex === 'male'}
 		>
 			<i class="fa-solid fa-mars text-2xl text-sky-500"></i>
+			<p class="text-xs">{m.sex_toggle_male()}</p>
 		</div>
 	</ToggleGroup.Item>
 	<ToggleGroup.Item value="female" aria-label="Toggle female" class="m-1 h-auto w-auto p-0">
@@ -39,6 +41,7 @@
 			class:bg-white={selectedSex === 'female'}
 		>
 			<i class="fa-solid fa-venus text-2xl text-rose-500"></i>
+			<p class="text-xs">{m.sex_toggle_girls()}</p>
 		</div>
 	</ToggleGroup.Item>
 	<ToggleGroup.Item value="all" aria-label="Toggle all" class="m-1 h-auto w-auto p-0">
@@ -49,6 +52,7 @@
 			<i
 				class="fa-solid fa-venus-mars inline-block bg-gradient-to-r from-rose-500 to-sky-500 bg-clip-text text-2xl text-transparent"
 			></i>
+			<p class="text-xs">{m.sex_toggle_all()}</p>
 		</div>
 	</ToggleGroup.Item>
 </ToggleGroup.Root>

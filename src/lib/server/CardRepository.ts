@@ -31,7 +31,7 @@ export async function getNextCards(
 				};
 	if (letterCode === '[DP]') {
 		const partnerUserId = await getPartnerUserId(userId);
-		const partnerInteractions = await getLikedByPartner(prisma, partnerUserId || '', sex);
+		const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);
 
 		response = await prisma.names.findMany({

@@ -29,5 +29,9 @@
     "session_deleted": "Session aufgelöst",
     "session_is_deliting": "Session wird aufgelöst...",
     "namecard_thats_it": "Yeah, das waren alle Namen!",
-    "matches_title": "Treffer"
+    "matches_title": "Treffer",
+    "sex_toggle_male": "Jungs",
+    "sex_toggle_girls": "Mädchen",
+    "sex_toggle_all": "Alle",
+    "swipe_name_for": "Namen für"
 }

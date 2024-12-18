@@ -29,5 +29,9 @@
     "session_deleted": "Session deleted",
     "session_is_deliting": "Deleting session...",
     "namecard_thats_it": "Yeah, you swiped all names!",
-    "matches_title": "Matches"
+    "matches_title": "Matches",
+    "sex_toggle_male": "Boys",
+    "sex_toggle_girls": "Girls",
+    "sex_toggle_all": "All",
+    "swipe_name_for": "Names for"
 }

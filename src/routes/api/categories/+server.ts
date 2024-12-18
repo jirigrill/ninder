@@ -1,4 +1,4 @@
-import type { CategoryProgress } from '$lib/types';
+import type { Category, CategoryProgress } from '$lib/types';
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
 import { getCategories } from '$lib/server/CategoryRepository';
@@ -16,14 +16,15 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 	const url = new URL(event.request.url);
-	const sex = url.searchParams.get('sex') || 'male';
+	const sex = url.searchParams.get('sex') || 'all';
 
 	try {
 		const categories = await getCategories();
 		const interactedCards = await getCardInteractions(userId, sex);
 		let categoryProgress: CategoryProgress[] = calculateCountryCategoryProgress(
 			interactedCards,
-			categories
+			categories,
+			sex
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
 		categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
@@ -64,17 +65,41 @@ function calculateCountryCategoryProgress(
 		id: number;
 		letter_code: string | null;
 		total_cards: number | null;
+		total_male_cards: number;
+		total_female_cards: number;
 		visible: boolean | null;
-	}[]
+	}[],
+	sex: string
 ) {
 	const categoryProgress: CategoryProgress[] = categories.map((category) => ({
 		name: category.name,
 		letterCode: category.letter_code ?? '',
-		totalCards: category.total_cards ?? 0,
+		totalCards: getTotalCards(sex, category),
 		swipedCards: calculateCardCountForCategory(interactedCards, category.id),
 		id: category.id
 	}));
 	return categoryProgress;
+}
+
+function getTotalCards(
+	sex: string,
+	category: {
+		name: string;
+		id: number;
+		letter_code: string | null;
+		total_cards: number | null;
+		total_male_cards: number;
+		total_female_cards: number;
+		visible: boolean | null;
+	}
+): number {
+	if (sex === 'male') {
+		return category.total_male_cards;
+	} else if (sex == 'female') {
+		return category.total_female_cards;
+	}
+
+	return category.total_cards ?? 0;
 }
 
 function calculateMixedCategoryProgress(
