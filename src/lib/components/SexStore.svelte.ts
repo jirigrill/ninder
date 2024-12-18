@@ -1,4 +1,4 @@
-let state = $state('male');
+let state = $state('all');
 
 export function getSexState() {
 	return state;

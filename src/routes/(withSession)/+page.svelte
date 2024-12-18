@@ -3,23 +3,12 @@
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
 	import { Progress } from '$lib/components/ui/progress';
 	import type { CategoryProgress } from '$lib/types';
-	import { createQuery, useQueryClient, type CreateQueryResult } from '@tanstack/svelte-query';
+	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import * as m from '$lib/paraglide/messages.js';
-	import ToggleSwitch from './ToggleSwitch.svelte';
-	import { getSexState, setSexState } from './SexStore.svelte';
+	import SexToggle from '$lib/components/SexToggle.svelte';
+	import { getSexState } from '$lib/components/SexStore.svelte';
 
 	let selectedSex = getSexState();
-	const params = new URLSearchParams(window.location.search);
-	const sex = params.get('sex');
-
-	if (sex === 'male' || sex === 'female' || sex === 'all') {
-		selectedSex = sex;
-	} else if (sex === null) {
-		const query = new URLSearchParams(window.location.search);
-		query.set('sex', selectedSex);
-		history.replaceState(null, '', `${window.location.pathname}?${query.toString()}`);
-	}
-
 	const client = useQueryClient();
 	let query = createQuery<CategoryProgress[], Error>({
 		queryKey: ['categories'],
@@ -28,17 +17,13 @@
 
 	async function onSexChange(sex: 'male' | 'female' | 'all') {
 		selectedSex = sex;
-		setSexState(selectedSex);
-		const query = new URLSearchParams(window.location.search);
-		query.set('sex', selectedSex);
-		history.replaceState(null, '', `${window.location.pathname}?${query.toString()}`);
 		await client.refetchQueries({ queryKey: ['categories'] });
 	}
 </script>
 
 <GenericTitleHeader title={m.categories_header()} />
 <div class="scroll-view h-full w-full bg-slate-100 pb-4 pl-4 pr-4">
-	<ToggleSwitch bind:selectedSex {onSexChange} />
+	<SexToggle {onSexChange} />
 	<div class="mb-4"></div>
 	{#if $query.isLoading || $query.isRefetching}
 		{#each Array(10) as index}

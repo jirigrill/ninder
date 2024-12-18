@@ -10,20 +10,20 @@
 	import Match from './Match.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
-	import { getSexState } from '../../SexStore.svelte';
+	import { getSexState } from '$lib/components/SexStore.svelte';
+	import SexToggle from '$lib/components/SexToggle.svelte';
 
 	let swipeableCardStack: SwipeableCardStack;
 	let swipeFeedbackState: 'left' | 'right' | 'none' | 'top' = $state('none');
 	let backgroundColor = $state('bg-slate-100');
 	let take = 50;
 	let country = $page.params.category;
-	const sex = getSexState();
 
 	let matchDialog: Match | null = $state(null);
 
 	const cardsQuery = createQuery<Card[], Error>({
-		queryKey: ['cards', country, take, sex],
-		queryFn: () => getCards(country, take, sex)
+		queryKey: ['cards', country, take],
+		queryFn: () => getCards(country, take, getSexState())
 	});
 
 	let isMutating = $state(false);
@@ -35,20 +35,20 @@
 			swipeAction: 'like' | 'dislike' | 'superlike';
 		}) => {
 			isMutating = true;
-			await client.cancelQueries({ queryKey: ['cards', country, take, sex] });
-			let previousCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
+			await client.cancelQueries({ queryKey: ['cards', country, take] });
+			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
 
 			if (previousCards) {
 				let optimisticCards = previousCards.filter((c) => c.id != swipeAction.card.id);
-				client.setQueryData<Card[]>(['cards', country, take, sex], () => [...optimisticCards]);
+				client.setQueryData<Card[]>(['cards', country, take], () => [...optimisticCards]);
 			}
 
 			return { previousCards };
 		},
 		onSuccess: async () => {
-			let remainingCards = client.getQueryData<Card[]>(['cards', country, take, sex]);
+			let remainingCards = client.getQueryData<Card[]>(['cards', country, take]);
 			if (remainingCards && take - remainingCards.length >= 10) {
-				await client.invalidateQueries({ queryKey: ['cards', country, take, sex] });
+				await client.invalidateQueries({ queryKey: ['cards', country, take] });
 			}
 			isMutating = false;
 		}
@@ -121,30 +121,19 @@
 
 		swipeableCardStack.swipe(direction);
 	}
+
+	async function onSexChange(sex: 'male' | 'female' | 'all') {
+		client.setQueryData<Card[]>(['cards', country, take], () => []);
+		await client.invalidateQueries({ queryKey: ['cards', country, take] });
+	}
 </script>
 
 <GenericTitleHeader title={m.swipe_header()} />
 <div
 	class="flex h-full w-full flex-col items-center pb-4 pl-4 pr-4 {backgroundColor} background-color-transition"
 >
-	<div class="mb-4 flex">
-		<p class=" mr-2 font-semibold">{m.swipe_name_for()}</p>
-		{#if country === '[DP]'}
-			<i class="fa-solid fa-heart mr-2 text-2xl text-red-500"></i>
-		{:else}
-			<span class="fi mb-2 ml-1 mr-1 fi-{country.toLowerCase()}"></span>
-		{/if}
-		{#if sex === 'male'}
-			<i class="fa-solid fa-mars text-2xl text-sky-500"></i>
-		{:else if sex === 'female'}
-			<i class="fa-solid fa-venus text-2xl text-rose-500"></i>
-		{:else if sex === 'all'}
-			<i
-				class="fa-solid fa-venus-mars inline-block bg-gradient-to-r from-rose-500 to-sky-500 bg-clip-text text-2xl text-transparent"
-			></i>
-		{/if}
-	</div>
-
+	<SexToggle {onSexChange} />
+	<div class="mb-4"></div>
 	<SwipeFeedback {swipeFeedbackState} />
 
 	{#if $cardsQuery.isLoading}

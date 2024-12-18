@@ -38,7 +38,7 @@
 			>
 		</Dialog.Header>
 
-		<div class="name-container z-10 mb-4 h-[50vh]">
+		<div class="z-10 mb-4 h-[50vh]">
 			<NameCard {card} shadow={true} />
 		</div>
 
@@ -52,11 +52,3 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
-
-<style>
-	.name-container {
-		width: calc(100vw - 3rem);
-		margin-left: auto;
-		margin-right: auto;
-	}
-</style>
