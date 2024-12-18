@@ -1,7 +1,6 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import type { Session } from '$lib/types';
 import { authenticate } from '$lib/server/authenticate';
-import { PrismaClient } from '@prisma/client';
 import {
 	createSession,
 	deleteSession,
@@ -75,19 +74,14 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
 		let isNewSession = !!newSession.initiatorUserId;
 
-		try {
-			if (isNewSession) {
-				const pairingCode = generatePairingCode();
-				const session = await createSession(newSession.initiatorUserId, pairingCode);
+		if (isNewSession) {
+			const pairingCode = generatePairingCode();
+			const session = await createSession(newSession.initiatorUserId, pairingCode);
 
-				return json(session, { status: 201 });
-			} else {
-				const session = await joinSession(
-					newSession.partnerUserId || '',
-					newSession.pairingCode
-				);
-				return json(session, { status: 200 });
-			}
+			return json(session, { status: 201 });
+		} else {
+			const session = await joinSession(newSession.partnerUserId || '', newSession.pairingCode);
+			return json(session, { status: 200 });
 		}
 	} catch (error) {
 		return json({ error: 'Failed to create session' }, { status: 500 });

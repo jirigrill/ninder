@@ -17,10 +17,9 @@ RUN npm ci
 # Copy the rest of the application code
 COPY . .
 
-# RUN npm run prisma-generate
+RUN npx prisma generate
 RUN npm run build
 RUN npm prune --production
-RUN npx prisma generate
 
 # Use a lightweight Node.js image for the production stage
 FROM node:18-alpine AS production
