@@ -28,7 +28,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 			sex
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		if (set === 'popular') {
+		if (set === 'popular' || set === 'quick') {
 			categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
 		}
 		return json(categoryProgress);
@@ -49,14 +49,13 @@ async function enhanceWithPartnerCategory(
 		partnerInteractions.map((i) => i.cardId)
 	);
 
-	categoryProgress.unshift({
-		name: 'Dein Partner',
-		letterCode: 'xdp',
-		totalCards: partnerInteractions.length,
-		swipedCards: ownInteractions.length,
-		iconClass: 'fa-solid fa-heart self-center text-red-500',
-		id: -1
-	});
+	const index = categoryProgress.findIndex((c) => c.letterCode === 'XDP');
+	if (index === -1) {
+		return categoryProgress;
+	}
+
+	categoryProgress[index].totalCards = partnerInteractions.length;
+	categoryProgress[index].swipedCards = ownInteractions.length;
 
 	return categoryProgress;
 }

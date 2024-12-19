@@ -13,9 +13,15 @@ export async function getCategories(set: string, userId: string): Promise<catego
 	if (set === 'quick') {
 		return getCategoryHistory(userId);
 	} else if (set === 'popular') {
-		return await prisma.categories.findMany({ where: { visible: true }, orderBy: { id: 'asc' } });
+		return await prisma.categories.findMany({
+			where: { visible: true, set: set },
+			orderBy: { id: 'asc' }
+		});
 	} else {
-		return await prisma.categories.findMany({ where: { visible: true }, orderBy: { id: 'asc' } });
+		return await prisma.categories.findMany({
+			where: { visible: true, set: set },
+			orderBy: { id: 'asc' }
+		});
 	}
 }
 
