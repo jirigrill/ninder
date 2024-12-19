@@ -9,6 +9,7 @@ import {
 	joinSession
 } from '$lib/server/SessionRepository';
 import { deleteAllCardInteractions } from '$lib/server/CardInteractionRepository';
+import { deleteHistory } from '$lib/server/CategoryRepository';
 
 function generatePairingCode(): string {
 	return Math.floor(1000 + Math.random() * 9000).toString();
@@ -102,6 +103,7 @@ export const DELETE: RequestHandler = async (event) => {
 		const sessionId = await getSessionId(userId);
 		await deleteAllCardInteractions(sessionId || -1);
 		await deleteSession(sessionId || -1);
+		await deleteHistory(userId);
 
 		return json({ message: 'Session deleted successfully' });
 	} catch (error) {

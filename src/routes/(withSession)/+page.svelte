@@ -1,27 +1,22 @@
 <script lang="ts">
-	import { getCategories } from '$lib/client/CategoryClient';
 	import GenericTitleHeader from '$lib/components/GenericTitleHeader.svelte';
-	import type { CategoryProgress } from '$lib/types';
-	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+	import { useQueryClient } from '@tanstack/svelte-query';
 	import * as m from '$lib/paraglide/messages.js';
 	import SexToggle from '$lib/components/SexToggle.svelte';
 	import { getSexState } from '$lib/components/SexStore.svelte';
-	import QuickCategories from './QuickCategories.svelte';
-	import CountryCategories from './CountryCategories.svelte';
-	import PopularCategories from './PopularCategories.svelte';
 	import { Input } from '$lib/components/ui/input';
+	import CategoryContainer from './CategoryContainer.svelte';
 
 	let search = $state('');
 	let selectedSex = getSexState();
 	const client = useQueryClient();
-	let query = createQuery<CategoryProgress[], Error>({
-		queryKey: ['categories'],
-		queryFn: () => getCategories(selectedSex)
-	});
 
 	async function onSexChange(sex: 'male' | 'female' | 'all') {
 		selectedSex = sex;
-		await client.refetchQueries({ queryKey: ['categories'] });
+		let quickTask = client.refetchQueries({ queryKey: ['categories', 'quick'] });
+		let popularTask = client.refetchQueries({ queryKey: ['categories', 'popular'] });
+		let countriesTask = client.refetchQueries({ queryKey: ['categories', 'countries'] });
+		await Promise.all([quickTask, popularTask, countriesTask]);
 	}
 </script>
 
@@ -37,12 +32,12 @@
 		<Input bind:value={search} placeholder="Suche nach Kategorien..." class="pl-8" />
 	</div>
 
+	<div class="mb-8"></div>
+	<CategoryContainer {search} category="quick" />
 	<div class="mb-4"></div>
-	<QuickCategories {search} />
+	<CategoryContainer {search} category="popular" />
 	<div class="mb-4"></div>
-	<PopularCategories {search} />
-	<div class="mb-4"></div>
-	<CountryCategories {search} />
+	<CategoryContainer {search} category="countries" />
 </div>
 
 <style>

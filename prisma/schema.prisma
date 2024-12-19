@@ -30,6 +30,15 @@ model categories {
   @@unique([name, letter_code])
 }
 
+model category_history {
+  id              Int               @id @default(autoincrement())
+  user_id    String  @db.VarChar(255)
+  first_category_id Int? 
+  second_category_id Int?
+  third_category_id Int? 
+  fourth_category_id Int?
+}
+
 model name_categories {
   name_id     Int
   category_id Int

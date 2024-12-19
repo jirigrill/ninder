@@ -17,9 +17,10 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 	const url = new URL(event.request.url);
 	const sex = url.searchParams.get('sex') || 'all';
+	const set = url.searchParams.get('set') || 'quick';
 
 	try {
-		const categories = await getCategories();
+		const categories = await getCategories(set, userId);
 		const interactedCards = await getCardInteractions(userId, sex);
 		let categoryProgress: CategoryProgress[] = calculateCountryCategoryProgress(
 			interactedCards,
@@ -27,7 +28,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 			sex
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
+		// categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
 
 		return json(categoryProgress);
 	} catch {

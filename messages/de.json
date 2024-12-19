@@ -127,5 +127,8 @@
     "categories_country_jm": "Jamaika",
     "categories_country_ng": "Nigeria",
     "categories_country_cl": "Chile",
-    "categories_your_partner": "Dein Partner"
+    "categories_your_partner": "Dein Partner",
+    "category_set_by_countries": "Nach Ländern",
+    "category_set_by_popular": "Beliebt",
+    "category_set_by_quick": "Schnellzugriff"
 }
