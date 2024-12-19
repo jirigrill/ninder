@@ -2,6 +2,7 @@
 	import type { Card } from '$lib/types';
 	import NameCard from './NameCard.svelte';
 	import { pan, type PanEvent } from '../actions/pan';
+	import CardActionBar from '../../routes/(withSession)/swipe/[category]/CardActionBar.svelte';
 
 	type Props = {
 		onSwipeFeedback: (feedbackType: 'left' | 'right' | 'none' | 'top') => void;
@@ -86,7 +87,7 @@
 	});
 </script>
 
-<div class="relative h-full w-full">
+<div class="relative flex h-full w-full flex-col-reverse">
 	<div class="absolute h-full w-full">
 		<NameCard card={undefined} shadow={true} />
 	</div>
@@ -101,8 +102,17 @@
 				class:transition-all={isTopMostCard(index) && transitionAnimation}
 				style={isTopMostCard(index) ? derivedTransformStyle : ''}
 			>
-				<NameCard {card} shadow={isTopMostCard(index)} />
+				<NameCard {card} shadow={false} />
 			</div>
 		{/key}
 	{/each}
+	<div class="absolute flex w-full items-end pb-5">
+		{#if cards && cards.length > 0}
+			<CardActionBar
+				onDislikeButton={() => swipe('left')}
+				onLikeButton={() => swipe('right')}
+				onSuperLikeButton={() => swipe('top')}
+			/>
+		{/if}
+	</div>
 </div>
