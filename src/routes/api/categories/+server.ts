@@ -28,8 +28,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 			sex
 		);
 		categoryProgress = calculateMixedCategoryProgress(categoryProgress, interactedCards);
-		// categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
-
+		if (set === 'popular') {
+			categoryProgress = await enhanceWithPartnerCategory(userId, categoryProgress, sex);
+		}
 		return json(categoryProgress);
 	} catch {
 		return json({ error: 'Failed to fetch categories' }, { status: 500 });
@@ -50,9 +51,10 @@ async function enhanceWithPartnerCategory(
 
 	categoryProgress.unshift({
 		name: 'Dein Partner',
-		letterCode: '[DP]',
+		letterCode: 'xdp',
 		totalCards: partnerInteractions.length,
 		swipedCards: ownInteractions.length,
+		iconClass: 'fa-solid fa-heart self-center text-red-500',
 		id: -1
 	});
 
@@ -68,6 +70,7 @@ function calculateCountryCategoryProgress(
 		total_cards: number | null;
 		total_male_cards: number;
 		total_female_cards: number;
+		icon_class: string;
 		visible: boolean | null;
 	}[],
 	sex: string
@@ -77,6 +80,7 @@ function calculateCountryCategoryProgress(
 		letterCode: category.letter_code ?? '',
 		totalCards: getTotalCards(sex, category),
 		swipedCards: calculateCardCountForCategory(interactedCards, category.id),
+		iconClass: category.icon_class,
 		id: category.id
 	}));
 	return categoryProgress;

@@ -18,10 +18,7 @@
 	});
 
 	const pushToHistoryMutation = createMutation({
-		mutationFn: pushToHistory,
-		onSuccess: async () => {
-			await client.invalidateQueries({ queryKey: ['categories', 'quick'] });
-		}
+		mutationFn: pushToHistory
 	});
 
 	function filterBySearch(categories: CategoryProgress[], search: string) {
@@ -57,17 +54,9 @@
 					onclick={() => gotoCategory(category)}
 					class="grid grid-cols-[auto_1fr] grid-rows-[auto_auto] gap-x-2 gap-y-1 rounded-xl bg-white p-3 shadow"
 				>
-					{#if category.letterCode === '[DP]'}
-						<i class="fa-solid fa-heart self-center text-red-500"></i>
-					{:else}
-						<i class="fi self-center shadow-sm fi-{category.letterCode.toLowerCase()}"></i>
-					{/if}
+					<i class={category.iconClass}></i>
 					<h1 class="self-center text-start">
-						{#if category.letterCode === '[DP]'}
-							{m.categories_your_partner()}
-						{:else}
-							{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
-						{/if}
+						{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
 					</h1>
 					<p class="col-span-2 self-end text-start text-xs leading-none text-slate-500">
 						{category.swipedCards}/{category.totalCards} Namen

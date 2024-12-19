@@ -24,6 +24,7 @@ model categories {
   total_cards     Int?              @default(0)
   total_male_cards     Int?              @default(0)
   total_female_cards     Int?              @default(0)
+  icon_class      String            @db.VarChar(255) @default("")
   visible         Boolean?          @default(false)
   name_categories name_categories[]
 

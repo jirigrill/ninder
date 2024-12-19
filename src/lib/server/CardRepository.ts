@@ -29,7 +29,7 @@ export async function getNextCards(
 					id: { notIn: interactedCards },
 					sex: { in: ['all', sex] }
 				};
-	if (letterCode === '[DP]') {
+	if (letterCode === 'xdp') {
 		const partnerUserId = await getPartnerUserId(userId);
 		const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);

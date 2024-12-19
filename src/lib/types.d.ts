@@ -11,6 +11,7 @@ export type CategoryProgress = {
 	letterCode: string;
 	totalCards: number;
 	swipedCards: number;
+	iconClass: string;
 	id: number;
 };
 
