@@ -52,7 +52,7 @@
 				Bisher gibt es hier noch keine Kategorien.
 			</p>
 		{:else}
-			{#each filterBySearch($query.data.slice(0, 4), search) as category}
+			{#each filterBySearch($query.data, search) as category}
 				<button
 					onclick={() => gotoCategory(category)}
 					class="grid grid-cols-[auto_1fr] grid-rows-[auto_auto] gap-x-2 gap-y-1 rounded-xl bg-white p-3 shadow"
@@ -62,14 +62,14 @@
 					{:else}
 						<i class="fi self-center shadow-sm fi-{category.letterCode.toLowerCase()}"></i>
 					{/if}
-					<h1 class="self-center">
+					<h1 class="self-center text-start">
 						{#if category.letterCode === '[DP]'}
 							{m.categories_your_partner()}
 						{:else}
 							{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
 						{/if}
 					</h1>
-					<p class="col-span-2 self-end text-xs leading-none text-slate-500">
+					<p class="col-span-2 self-end text-start text-xs leading-none text-slate-500">
 						{category.swipedCards}/{category.totalCards} Namen
 					</p>
 				</button>
