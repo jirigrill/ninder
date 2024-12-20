@@ -56,6 +56,7 @@ model names {
   meaning           String?
   sex               String              @default("male")
   popular           Boolean          @default(false)
+  tags              String            @default("")
   card_interactions card_interactions[]
   name_categories   name_categories[]
 }
