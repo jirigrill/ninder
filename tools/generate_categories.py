@@ -7,7 +7,7 @@ def load_json_file(filepath):
 
 def main():
     # Load JSON files
-    names_data = load_json_file('.\scrapy\post-process.json')
+    names_data = load_json_file('.\scrapy\consolidated.json')
     categories_data = load_json_file('categories.json')
 
     # Step 1: Group names by country
@@ -24,20 +24,25 @@ def main():
         total_male_cards = 0
         total_female_cards = 0
         id = category["id"]
-        if category["name"] == "Gemischt":
-            total_cards = len(names_data)  # All available names for 'Gemischt'
-            total_male_cards = len(list(filter(lambda x: x["sex"] in ["Männlich", "Unisex"], names_data)))
-            total_female_cards = len(list(filter(lambda x: x["sex"] in ["Weiblich", "Unisex"], names_data)))
-            visible = 'TRUE'  # Set 'Gemischt' category to visible
-        else:
+        iconClass = category["iconClass"]
+        set = category["set"]
+        visible = 'TRUE'
+        if not category["virtual"] == "True" and category["letterCode"][0] != "X":
             total_cards = len(list(filter(lambda x: letter_code in x["countries"], names_data)))
-            total_male_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["Männlich", "Unisex"], names_data)))
-            total_female_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["Weiblich", "uniUnisexsex"], names_data)))
+            total_male_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["male", "all"], names_data)))
+            total_female_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["female", "all"], names_data)))
             visible = 'TRUE' if letter_code else 'FALSE'
+        elif category["letterCode"][0] == "X" and category["virtual"] == "False":
+            category_code = category["letterCode"].replace("X", "").lower()
+            total_cards = len(list(filter(lambda x: "categories" in x and category_code in x["categories"], names_data)))
+            total_male_cards = len(list(filter(lambda x:"categories" in x and category_code in x["categories"] and x["sex"] in ["male", "all"], names_data)))
+            total_female_cards = len(list(filter(lambda x: "categories" in x and category_code in x["categories"] and x["sex"] in ["female", "all"], names_data)))
+            visible = 'TRUE' if letter_code else 'FALSE'
+
         country_name = category["name"]
         letter_code_value = 'NULL' if not letter_code else f"'{letter_code}'"
         insert_statements.append(
-            f"INSERT INTO categories (id, name, letter_code, total_cards, total_male_cards, total_female_cards, visible) VALUES ({id}, '{country_name}', {letter_code_value}, {total_cards}, {total_male_cards}, {total_female_cards}, {visible}) ON CONFLICT (name, letter_code) DO NOTHING;"
+            f"INSERT INTO categories (id, name, letter_code, total_cards, total_male_cards, total_female_cards, visible, icon_class, set) VALUES ({id}, '{country_name}', {letter_code_value}, {total_cards}, {total_male_cards}, {total_female_cards}, {visible}, '{iconClass}', '{set}') ON CONFLICT (name, letter_code) DO NOTHING;"
         )
 
     # Output SQL script

@@ -7,7 +7,7 @@ def load_json_file(filepath):
 
 def main():
     # Load JSON files
-    names_data = load_json_file('.\scrapy\post-process.json')
+    names_data = load_json_file('.\scrapy\consolidated.json')
     categories_data = load_json_file('categories.json')
  
     # Step 1: Group names by country
@@ -20,13 +20,16 @@ def main():
     insert_statements = []
 
     # Step 3: Insert names and associate with categories
-    category_id_map = {category["letterCode"]: idx for idx, category in enumerate(categories_data, start=1)}
-    for idx, name_entry in enumerate(names_data, start=1):
+    category_id_map = {}
+    for category in categories_data:
+        category_id_map[category["letterCode"]] = category["id"]
+    for idx, name_entry in enumerate(names_data, start=-1):
         name = name_entry["name"].replace("'", "''")  # Escape single quotes
         sex = name_entry["sex"].replace("'", "''")
         popular = name_entry["popular"]
+        tags = ', '.join(name_entry["tags"])
         insert_statements.append(
-            f"INSERT INTO names (id, name, sex, popular) VALUES ({idx}, '{name}', '{sex}', '{popular}') ON CONFLICT (name) DO NOTHING;"
+            f"INSERT INTO names (id, name, sex, popular, tags) VALUES ({idx}, '{name}', '{sex}', '{popular}', '{tags}') ON CONFLICT (name) DO NOTHING;"
         )
         for country in name_entry["countries"]:
             category_id = category_id_map.get(country)
@@ -34,6 +37,14 @@ def main():
                 insert_statements.append(
                     f"INSERT INTO name_categories (name_id, category_id) VALUES ({idx}, {category_id}) ON CONFLICT (name_id, category_id) DO NOTHING;"
                 )
+        if "categories" in name_entry:
+            for country in name_entry["categories"]:
+                category_code = f"X{country}".upper()
+                category_id = category_id_map.get(category_code)
+                if category_id:
+                    insert_statements.append(
+                        f"INSERT INTO name_categories (name_id, category_id) VALUES ({idx}, {category_id}) ON CONFLICT (name_id, category_id) DO NOTHING;"
+                    )
 
     # Output SQL script
     sql_script = "\n".join(insert_statements)

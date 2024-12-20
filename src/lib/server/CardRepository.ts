@@ -60,7 +60,8 @@ export async function getNextCards(
 		meaning: name.meaning ?? '',
 		countries: name.name_categories
 			.map((nc) => nc.categories.letter_code)
-			.filter((code): code is string => code !== null),
+			.filter((code): code is string => code !== null)
+			.filter((code) => code[0] !== 'X'),
 		partnerInteraction: null
 	}));
 }

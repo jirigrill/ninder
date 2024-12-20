@@ -16,7 +16,7 @@ class CountryCodePipeline:
 
     def process_item(self, item, spider):
         adapter = ItemAdapter(item)
-        languages = adapter.get('countries')
+        languages = adapter.get('languages')
         origin = adapter.get('origin')
         two_letter_codes = set()
 
@@ -46,9 +46,9 @@ class TransformSexPipeline:
     def process_item(self, item, spider):
         adapter = ItemAdapter(item)
         sex = adapter.get('sex', '').lower()
-        if sex == 'Männlich':
+        if sex == 'männlich':
             adapter['sex'] = 'male'
-        elif sex == 'Weiblich':
+        elif sex == 'weiblich':
             adapter['sex'] = 'female'
         else:
             adapter['sex'] = 'all'
