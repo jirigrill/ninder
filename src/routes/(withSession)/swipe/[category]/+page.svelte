@@ -30,6 +30,7 @@
 		onMutate: async (swipeAction: {
 			card: Card;
 			swipeAction: 'like' | 'dislike' | 'superlike';
+			categoryOrigin: string;
 		}) => {
 			await client.cancelQueries({ queryKey: ['cards', country, take] });
 			let previousCards = client.getQueryData<Card[]>(['cards', country, take]);
@@ -50,20 +51,20 @@
 	});
 
 	async function onSuperLike(card: Card) {
-		$swipeMutation.mutate({ card: card, swipeAction: 'superlike' });
+		$swipeMutation.mutate({ card: card, swipeAction: 'superlike', categoryOrigin: country });
 		if (card.partnerInteraction?.swipe == 'superliked') {
 			onMatch(card);
 		}
 	}
 	async function onLike(card: Card) {
-		$swipeMutation.mutate({ card: card, swipeAction: 'like' });
+		$swipeMutation.mutate({ card: card, swipeAction: 'like', categoryOrigin: country });
 		if (card.partnerInteraction?.swipe == 'liked') {
 			onMatch(card);
 		}
 	}
 
 	async function onDislike(card: Card) {
-		$swipeMutation.mutate({ card: card, swipeAction: 'dislike' });
+		$swipeMutation.mutate({ card: card, swipeAction: 'dislike', categoryOrigin: country });
 		if (card.partnerInteraction?.swipe == 'superliked') {
 			onMatch(card);
 		}

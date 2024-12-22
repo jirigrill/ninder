@@ -10,15 +10,7 @@ export async function getNextCards(
 	sex: string
 ): Promise<Card[]> {
 	let response = [];
-	const interactedCards = await prisma.card_interactions
-		.findMany({
-			where:
-				sex === 'all'
-					? { user_id: userId }
-					: { user_id: userId, names: { sex: { in: ['all', sex] } } },
-			select: { name_id: true }
-		})
-		.then((interactions) => interactions.map((interaction) => interaction.name_id || -1));
+	const interactedCards = await getIntercatedCards(userId, letterCode, sex);
 
 	const whereClause =
 		sex === 'all'
@@ -29,7 +21,8 @@ export async function getNextCards(
 					id: { notIn: interactedCards },
 					sex: { in: ['all', sex] }
 				};
-	if (letterCode === 'xdp') {
+
+	if (letterCode.toUpperCase() === 'XDP') {
 		const partnerUserId = await getPartnerUserId(userId);
 		const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);
@@ -90,4 +83,38 @@ export async function getNames(nameIds: number[]): Promise<Match[]> {
 			.filter((code): code is string => code !== null),
 		superMatch: false
 	}));
+}
+
+async function getIntercatedCards(
+	userId: string,
+	category: string,
+	sex: string
+): Promise<number[]> {
+	let cardInteractions: { name_id: number | null }[];
+
+	if (category.toUpperCase() === 'XDP') {
+		cardInteractions = await prisma.card_interactions.findMany({
+			where:
+				sex === 'all'
+					? {
+							user_id: userId,
+							OR: [{ last_change: false }, { action: 'liked' }, { action: 'superliked' }]
+						}
+					: {
+							user_id: userId,
+							names: { sex: { in: ['all', sex] } },
+							OR: [{ last_change: false }, { action: 'liked' }, { action: 'superliked' }]
+						},
+			select: { name_id: true }
+		});
+	} else {
+		cardInteractions = await prisma.card_interactions.findMany({
+			where:
+				sex === 'all'
+					? { user_id: userId }
+					: { user_id: userId, names: { sex: { in: ['all', sex] } } },
+			select: { name_id: true }
+		});
+	}
+	return cardInteractions.map((interaction) => interaction.name_id || -1);
 }

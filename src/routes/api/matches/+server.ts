@@ -24,6 +24,7 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 
 		matches.forEach((match) => {
 			match.superMatch = superMatches.some((superMatch) => superMatch.id === match.cardId);
+			match.countries = match.countries.filter((country) => country[0] !== 'X');
 		});
 
 		return json(matches);

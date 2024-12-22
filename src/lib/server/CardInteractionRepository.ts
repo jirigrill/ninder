@@ -53,7 +53,9 @@ export async function getPartnerCardInteractions(
 		where: { user_id: userId, name_id: { in: cardIds } }
 	});
 	return result.map((interaction) => ({
+		interactionId: interaction.id,
 		userId: userId,
+		lastChance: interaction.last_change === null ? true : interaction.last_change,
 		cardId: interaction.name_id || -1,
 		swipe: interaction.action as 'disliked' | 'liked' | 'superliked'
 	}));
@@ -67,11 +69,27 @@ export async function createInteraction(
 	nameId: number,
 	userId: string,
 	sessionId: number,
-	action: 'disliked' | 'liked' | 'superliked'
+	action: 'disliked' | 'liked' | 'superliked',
+	categoryOrigin: string
 ): Promise<void> {
-	await prisma.card_interactions.create({
-		data: { name_id: nameId, user_id: userId, action: action, session_id: sessionId }
-	});
+	let existingInteractions = await getPartnerCardInteractions(userId, [nameId]);
+	if (existingInteractions.length > 0) {
+		await prisma.card_interactions.updateMany({
+			where: { id: { in: existingInteractions.map((interaction) => interaction.interactionId) } },
+			data: { last_change: false }
+		});
+		return;
+	} else {
+		await prisma.card_interactions.create({
+			data: {
+				name_id: nameId,
+				user_id: userId,
+				action: action,
+				session_id: sessionId,
+				last_change: categoryOrigin === 'XDP' ? false : true
+			}
+		});
+	}
 }
 
 export async function getLikedByPartner(

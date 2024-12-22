@@ -9,6 +9,8 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 	const name_id: number = Number.parseInt(event.params.id || '');
+	const url = new URL(event.request.url);
+	const categoryOrigin = url.searchParams.get('categoryOrigin') || '';
 
 	if (!name_id || !user_id) {
 		return json({ error: 'Missing name_id or user_id' }, { status: 400 });
@@ -19,7 +21,7 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 		if (session_id === null) {
 			return json({ error: `No active session could be found!` }, { status: 400 });
 		}
-		await createInteraction(name_id, user_id, session_id, 'disliked');
+		await createInteraction(name_id, user_id, session_id, 'disliked', categoryOrigin);
 		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.error(error);

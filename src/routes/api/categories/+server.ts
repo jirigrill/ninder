@@ -44,9 +44,12 @@ async function enhanceWithPartnerCategory(
 ) {
 	const partnerUserId = await getPartnerUserId(userId);
 	const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
-	const ownInteractions = await getPartnerCardInteractions(
+	let ownInteractions = await getPartnerCardInteractions(
 		userId,
 		partnerInteractions.map((i) => i.cardId)
+	);
+	ownInteractions = ownInteractions.filter(
+		(i) => i.swipe == 'liked' || i.swipe == 'superliked' || !i.lastChance
 	);
 
 	const index = categoryProgress.findIndex((c) => c.letterCode === 'XDP');

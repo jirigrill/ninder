@@ -13,13 +13,17 @@ export const getCards = async (country: string, take: number, sex: string) => {
 export const swipeCard = async (swipeAction: {
 	card: Card;
 	swipeAction: 'like' | 'dislike' | 'superlike';
+	categoryOrigin: string;
 }): Promise<void> => {
 	const idToken = await getUserStore().user?.getIdToken();
-	await fetch(`/api/cards/${swipeAction.card.id}/${swipeAction.swipeAction}`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${idToken}`
+	await fetch(
+		`/api/cards/${swipeAction.card.id}/${swipeAction.swipeAction}?categoryOrigin=${swipeAction.categoryOrigin}`,
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${idToken}`
+			}
 		}
-	});
+	);
 };

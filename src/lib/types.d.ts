@@ -49,8 +49,10 @@ export type JoinSession = {
 };
 
 export type CardInteraction = {
+	interactionId: number;
 	userId: string;
 	cardId: number;
+	lastChance: boolean;
 	swipe: 'liked' | 'disliked' | 'superliked';
 };
 

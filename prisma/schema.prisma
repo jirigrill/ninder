@@ -13,6 +13,7 @@ model card_interactions {
   name_id    Int?
   user_id    String  @db.VarChar(255)
   action     String? @db.VarChar(10)
+  last_change Boolean? @default(true)
   session_id Int?
   names      names?  @relation(fields: [name_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
