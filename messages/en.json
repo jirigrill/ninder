@@ -133,5 +133,6 @@
     "categories_country_xrare": "Rare Names",
     "category_set_by_countries": "By countries",
     "category_set_by_popular": "Popular",
-    "category_set_by_quick": "Quick selection"
+    "category_set_by_quick": "Quick selection",
+    "categoriessearchplaceholder": "Search for categories..."
 }

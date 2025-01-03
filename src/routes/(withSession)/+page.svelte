@@ -29,7 +29,7 @@
 		<i
 			class="fa-solid fa-magnifying-glass absolute left-2 top-[50%] h-4 w-4 translate-y-[-50%] text-muted-foreground"
 		></i>
-		<Input bind:value={search} placeholder="Suche nach Kategorien..." class="pl-8" />
+		<Input bind:value={search} placeholder={m.categoriessearchplaceholder()} class="pl-8" />
 	</div>
 
 	<div class="mb-8"></div>
