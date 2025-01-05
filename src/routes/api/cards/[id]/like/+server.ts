@@ -1,8 +1,8 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { createInteraction, isMatch } from '$lib/server/CardInteractionRepository';
-import { createAdvice } from '$lib/server/AdviceRepository';
 import { SessionService } from '../../../services/SessionService';
+import { AdviceService } from '../../../services/AdviceService';
+import { MatchService } from '../../../services/MatchService';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
 	const user_id = await authenticate(event);
@@ -19,18 +19,12 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 
 	try {
 		const sessionService = new SessionService();
-		const session = await sessionService.getSessionByUserId(user_id);
-		if (session === undefined) {
-			return json({ error: `No active session could be found!` }, { status: 400 });
-		}
+		const adviceService = new AdviceService();
+		const matchService = new MatchService(sessionService, adviceService);
 
-		await createInteraction(name_id, user_id, session.id, 'liked', categoryOrigin);
-
-		const partnerUserId = sessionService.getPartnerUserId(user_id, session);
-		const isLikedByPartner = await isMatch(partnerUserId || '', name_id);
-		if (isLikedByPartner) {
-			await createAdvice(partnerUserId || '');
-			await createAdvice(user_id || '');
+		const result = await matchService.createInteraction(name_id, user_id, 'liked', categoryOrigin);
+		if (!result) {
+			return json({ error: `Could not create card interaction!` }, { status: 400 });
 		}
 
 		return new Response(null, { status: 204 });

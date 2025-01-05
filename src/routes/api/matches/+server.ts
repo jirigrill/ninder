@@ -1,9 +1,9 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { deleteMatch, getCardIdsOfMatches, getSuperLikeMatches } from '$lib/server/MatchRepository';
-import { getNames } from '$lib/server/CardRepository';
 import type { Match } from '$lib/types';
 import { SessionService } from '../services/SessionService';
+import { AdviceService } from '../services/AdviceService';
+import { MatchService } from '../services/MatchService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -18,15 +18,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 		if (!partnerUserId) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}
-		let matchIds = await getCardIdsOfMatches(userId, partnerUserId);
-		let superMatches = await getSuperLikeMatches(userId, partnerUserId);
-		const cardIds = [...matchIds, ...superMatches];
-		const matches = await getNames(cardIds.map((card) => card.id));
 
-		matches.forEach((match) => {
-			match.superMatch = superMatches.some((superMatch) => superMatch.id === match.cardId);
-			match.countries = match.countries.filter((country) => country[0] !== 'X');
-		});
+		const matchService = new MatchService(sessionService, new AdviceService());
+		const matches = await matchService.getMatches(userId, partnerUserId);
 
 		return json(matches);
 	} catch (error) {
@@ -48,7 +42,9 @@ export const DELETE: RequestHandler = async (event) => {
 		const sessionService = new SessionService();
 		const session = await sessionService.getSessionByUserId(userId);
 		const partnerUserId = sessionService.getPartnerUserId(userId, session);
-		await deleteMatch(userId, partnerUserId || '', match.cardId);
+
+		const matchService = new MatchService(sessionService, new AdviceService());
+		await matchService.deleteMatch(userId, partnerUserId || '', match.cardId);
 
 		return json({ message: 'Match deleted successfully' });
 	} catch (error) {
