@@ -5,6 +5,11 @@ import type { Match, Session } from '$lib/types';
 import { deleteMatch, getCardIdsOfMatches, getSuperLikeMatches } from '$lib/server/MatchRepository';
 import { getNames } from '$lib/server/CardRepository';
 
+export type CardInteractionResponse = {
+	isMatch: boolean;
+	success: boolean;
+};
+
 export class MatchService {
 	private sessionService: SessionService;
 	private adviceService: AdviceService;
@@ -37,26 +42,23 @@ export class MatchService {
 		userId: string,
 		action: 'disliked' | 'liked' | 'superliked',
 		categoryOrigin: string
-	): Promise<boolean> {
+	): Promise<CardInteractionResponse> {
 		const session = await this.sessionService.getSessionByUserId(userId);
 		if (session === undefined) {
-			return false;
+			return { isMatch: false, success: false };
 		}
 
 		await createInteraction(nameId, userId, session.id, action, categoryOrigin);
+		let isLikedByPartner = false;
 
 		if (action === 'liked' || action === 'superliked') {
-			await this.#publishAdvice(session, userId, nameId);
+			const partnerUserId = this.sessionService.getPartnerUserId(userId, session);
+			isLikedByPartner = await isMatch(partnerUserId || '', nameId);
+			if (isLikedByPartner) {
+				await this.adviceService.publishAdvice(session);
+			}
 		}
 
-		return true;
-	}
-
-	async #publishAdvice(session: Session, userId: string, nameId: number) {
-		const partnerUserId = this.sessionService.getPartnerUserId(userId, session);
-		const isLikedByPartner = await isMatch(partnerUserId || '', nameId);
-		if (isLikedByPartner) {
-			await this.adviceService.publishAdvice(session);
-		}
+		return { isMatch: isLikedByPartner, success: true };
 	}
 }

@@ -19,6 +19,23 @@
 
 	let matchDialog: Match | null = $state(null);
 
+	const swipeCardClient = async (swipeAction: {
+		card: Card;
+		swipeAction: 'like' | 'dislike' | 'superlike';
+		categoryOrigin: string;
+	}): Promise<void> => {
+		const response = await swipeCard(swipeAction);
+		if (!response) {
+			return;
+		}
+
+		if (swipeAction.card.partnerInteraction) {
+			return;
+		}
+
+		onMatch(swipeAction.card);
+	};
+
 	const cardsQuery = createQuery<Card[], Error>({
 		queryKey: ['cards', country, take],
 		queryFn: () => getCards(country, take, getSexState())
@@ -26,7 +43,7 @@
 
 	const client = useQueryClient();
 	const swipeMutation = createMutation({
-		mutationFn: swipeCard,
+		mutationFn: swipeCardClient,
 		onMutate: async (swipeAction: {
 			card: Card;
 			swipeAction: 'like' | 'dislike' | 'superlike';
@@ -52,12 +69,16 @@
 
 	async function onSuperLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'superlike', categoryOrigin: country });
-		if (card.partnerInteraction?.swipe == 'superliked') {
+		if (
+			card.partnerInteraction?.swipe == 'superliked' ||
+			card.partnerInteraction?.swipe == 'liked'
+		) {
 			onMatch(card);
 		}
 	}
 	async function onLike(card: Card) {
 		$swipeMutation.mutate({ card: card, swipeAction: 'like', categoryOrigin: country });
+		console.log(card);
 		if (card.partnerInteraction?.swipe == 'liked') {
 			onMatch(card);
 		}

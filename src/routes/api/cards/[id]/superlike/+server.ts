@@ -28,11 +28,11 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 			'superliked',
 			categoryOrigin
 		);
-		if (!result) {
+		if (!result.success) {
 			return json({ error: `Could not create card interaction!` }, { status: 400 });
 		}
 
-		return new Response(null, { status: 204 });
+		return json(result.isMatch);
 	} catch (error) {
 		console.error(error);
 		return json({ error: 'Internal server error' }, { status: 500 });

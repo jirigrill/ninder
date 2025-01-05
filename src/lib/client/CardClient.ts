@@ -14,9 +14,9 @@ export const swipeCard = async (swipeAction: {
 	card: Card;
 	swipeAction: 'like' | 'dislike' | 'superlike';
 	categoryOrigin: string;
-}): Promise<void> => {
+}): Promise<boolean> => {
 	const idToken = await getUserStore().user?.getIdToken();
-	await fetch(
+	const response = await fetch(
 		`/api/cards/${swipeAction.card.id}/${swipeAction.swipeAction}?categoryOrigin=${swipeAction.categoryOrigin}`,
 		{
 			method: 'POST',
@@ -26,4 +26,7 @@ export const swipeCard = async (swipeAction: {
 			}
 		}
 	);
+
+	const json = await response.json();
+	return json as boolean;
 };
