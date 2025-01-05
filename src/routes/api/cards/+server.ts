@@ -1,8 +1,8 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
 import { getNextCards } from '$lib/server/CardRepository';
-import { getPartnerUserId } from '$lib/server/SessionRepository';
 import { getPartnerCardInteractions } from '$lib/server/CardInteractionRepository';
+import { SessionService } from '../services/SessionService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -17,7 +17,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 
 	try {
 		const nextCards = await getNextCards(userId, country, take, sex);
-		const partnerUserId = await getPartnerUserId(userId);
+		const sessionService = new SessionService();
+		const session = await sessionService.getSessionByUserId(userId);
+		const partnerUserId = sessionService.getPartnerUserId(userId, session);
 		if (partnerUserId === null) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}

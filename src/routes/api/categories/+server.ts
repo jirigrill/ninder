@@ -8,7 +8,7 @@ import {
 	getPartnerCardInteractions,
 	type InteractedCards
 } from '$lib/server/CardInteractionRepository';
-import { getPartnerUserId } from '$lib/server/SessionRepository';
+import { SessionService } from '../services/SessionService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -42,7 +42,9 @@ async function enhanceWithPartnerCategory(
 	categoryProgress: CategoryProgress[],
 	sex: string
 ) {
-	const partnerUserId = await getPartnerUserId(userId);
+	const sessionService = new SessionService();
+	const session = await sessionService.getSessionByUserId(userId);
+	const partnerUserId = sessionService.getPartnerUserId(userId, session);
 	const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 	let ownInteractions = await getPartnerCardInteractions(
 		userId,

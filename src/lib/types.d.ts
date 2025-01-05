@@ -29,6 +29,7 @@ export type PartnerSession = {
 };
 
 export type Session = {
+	id: number;
 	pairingCode: string;
 	initiatorUserId: string;
 	partnerUserId: string | null;

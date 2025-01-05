@@ -1,30 +1,5 @@
 import type { Session } from '$lib/types';
-import type { PrismaClient } from '@prisma/client';
 import prisma from './PrismaContext';
-
-export async function getPartnerUserId(userId: string): Promise<string | null> {
-	const sessions = await prisma.sessions.findMany({
-		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
-	});
-
-	if (sessions.length === 0) {
-		return null;
-	}
-
-	let preferredSession = sessions.find((session) => session.partneruserid === userId);
-
-	if (!preferredSession) {
-		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
-	}
-
-	if (!preferredSession) {
-		return null;
-	}
-
-	return preferredSession.partneruserid === userId
-		? preferredSession.initiatoruserid
-		: preferredSession.partneruserid;
-}
 
 export async function getSessions(userId: string): Promise<Session[]> {
 	const sessions = await prisma.sessions.findMany({
@@ -48,6 +23,7 @@ export async function createSession(userId: string, pairingCode: string): Promis
 	});
 
 	return {
+		id: session.id,
 		pairingCode: session.pairingcode,
 		initiatorUserId: session.initiatoruserid,
 		partnerUserId: session.partneruserid
@@ -63,7 +39,6 @@ export async function joinSession(
 		data: { partneruserid: partnerUserId }
 	});
 
-	//if greater than 1, something really bad happens #yolo
 	if (sessions.count != 1) {
 		return null;
 	}
@@ -76,33 +51,12 @@ export async function joinSession(
 
 	return updatedSession
 		? {
+				id: updatedSession.id,
 				pairingCode: updatedSession.pairingcode,
 				initiatorUserId: updatedSession.initiatoruserid,
 				partnerUserId: updatedSession.partneruserid
 			}
 		: null;
-}
-
-export async function getSessionId(userId: string): Promise<number | null> {
-	const sessions = await prisma.sessions.findMany({
-		where: { OR: [{ partneruserid: userId }, { initiatoruserid: userId }] }
-	});
-
-	if (sessions.length === 0) {
-		return null;
-	}
-
-	let preferredSession = sessions.find((session) => session.partneruserid === userId);
-
-	if (!preferredSession) {
-		preferredSession = sessions.find((session) => session.initiatoruserid === userId);
-	}
-
-	if (!preferredSession) {
-		return null;
-	}
-
-	return preferredSession.id;
 }
 
 export async function deleteSession(id: number): Promise<void> {

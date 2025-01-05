@@ -1,10 +1,9 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { PrismaClient } from '@prisma/client';
-import { getPartnerUserId, getSessionId, getSessions } from '$lib/server/SessionRepository';
 import { deleteMatch, getCardIdsOfMatches, getSuperLikeMatches } from '$lib/server/MatchRepository';
 import { getNames } from '$lib/server/CardRepository';
 import type { Match } from '$lib/types';
+import { SessionService } from '../services/SessionService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -13,7 +12,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	}
 
 	try {
-		const partnerUserId = await getPartnerUserId(userId);
+		const sessionService = new SessionService();
+		const session = await sessionService.getSessionByUserId(userId);
+		const partnerUserId = sessionService.getPartnerUserId(userId, session);
 		if (!partnerUserId) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}
@@ -43,9 +44,10 @@ export const DELETE: RequestHandler = async (event) => {
 	if (!match?.cardId) {
 		return json({ error: "Match couldn't be found!" }, { status: 404 });
 	}
-
 	try {
-		const partnerUserId = await getPartnerUserId(userId);
+		const sessionService = new SessionService();
+		const session = await sessionService.getSessionByUserId(userId);
+		const partnerUserId = sessionService.getPartnerUserId(userId, session);
 		await deleteMatch(userId, partnerUserId || '', match.cardId);
 
 		return json({ message: 'Match deleted successfully' });

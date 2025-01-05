@@ -1,7 +1,7 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { getSessionId } from '$lib/server/SessionRepository';
 import { createInteraction } from '$lib/server/CardInteractionRepository';
+import { SessionService } from '../../../services/SessionService';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
 	const user_id = await authenticate(event);
@@ -17,11 +17,13 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 	}
 
 	try {
-		const session_id = await getSessionId(user_id);
-		if (session_id === null) {
+		const sessionService = new SessionService();
+		const session = await sessionService.getSessionByUserId(user_id);
+		if (session === undefined) {
 			return json({ error: `No active session could be found!` }, { status: 400 });
 		}
-		await createInteraction(name_id, user_id, session_id, 'disliked', categoryOrigin);
+
+		await createInteraction(name_id, user_id, session.id, 'disliked', categoryOrigin);
 		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.error(error);

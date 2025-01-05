@@ -1,8 +1,8 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { getPartnerUserId, getSessionId } from '$lib/server/SessionRepository';
-import { createInteraction } from '$lib/server/CardInteractionRepository';
+import { createInteraction, isMatch } from '$lib/server/CardInteractionRepository';
 import { createAdvice } from '$lib/server/AdviceRepository';
+import { SessionService } from '../../../services/SessionService';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
 	const user_id = await authenticate(event);
@@ -18,13 +18,21 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 	}
 
 	try {
-		const session_id = await getSessionId(user_id);
-		if (session_id === null) {
+		const sessionService = new SessionService();
+		const session = await sessionService.getSessionByUserId(user_id);
+		if (session === undefined) {
 			return json({ error: `No active session could be found!` }, { status: 400 });
 		}
-		await createInteraction(name_id, user_id, session_id, 'superliked', categoryOrigin);
-		const partnerUserId = await getPartnerUserId(user_id);
-		await createAdvice(partnerUserId || '');
+
+		await createInteraction(name_id, user_id, session.id, 'superliked', categoryOrigin);
+
+		const partnerUserId = sessionService.getPartnerUserId(user_id, session);
+		const isLikedByPartner = await isMatch(partnerUserId || '', name_id);
+		if (isLikedByPartner) {
+			await createAdvice(partnerUserId || '');
+			await createAdvice(user_id || '');
+		}
+
 		return new Response(null, { status: 204 });
 	} catch (error) {
 		console.error(error);
