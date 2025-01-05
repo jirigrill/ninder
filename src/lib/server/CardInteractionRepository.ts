@@ -76,7 +76,7 @@ export async function createInteraction(
 	if (existingInteractions.length > 0) {
 		await prisma.card_interactions.updateMany({
 			where: { id: { in: existingInteractions.map((interaction) => interaction.interactionId) } },
-			data: { last_change: false }
+			data: { last_change: false, action: action }
 		});
 		return;
 	} else {

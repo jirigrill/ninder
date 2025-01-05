@@ -5,8 +5,8 @@ from scrapy_baybenames.items import ScrapyBaybenamesItem
 
 class BabyvornamendeChartsSpider(scrapy.Spider):
     name = "babyvornamendecharts"
-    allowed_domains = ["baby-vornamen.de"]
-    start_urls = ["https://www.baby-vornamen.de/Namensthemen/Charts/"]
+    allowed_domains = ["xxx"]
+    start_urls = ["xxx"]
 
     def parse(self, response): 
         articles = response.css('article.teaser a.teaser__link::attr(href)')
@@ -17,7 +17,7 @@ class BabyvornamendeChartsSpider(scrapy.Spider):
         chart_name = f"charts-{response.url.split('/')[-1].split('-')[-2].lower()}"
 
         for name in name_links:
-            yield response.follow(f'https://www.baby-vornamen.de{name}', self.parse_name, meta={'chart_name': chart_name})
+            yield response.follow(f'xxx', self.parse_name, meta={'chart_name': chart_name})
 
     def parse_name(self, response):
         chart_name = response.meta['chart_name']
@@ -38,8 +38,8 @@ class BabyvornamendeChartsSpider(scrapy.Spider):
 
 class BabyvornamendeCountrySpider(scrapy.Spider):
     name = "babyvornamendecountry"
-    allowed_domains = ["baby-vornamen.de"]
-    start_urls = ["https://www.baby-vornamen.de/Sprache_und_Herkunft/"]
+    allowed_domains = ["xxx"]
+    start_urls = ["xxx"]
 
     def parse(self, response): 
         articles = response.css('ul.imglist--flags li')
@@ -91,10 +91,10 @@ class BabyvornamendeCountrySpider(scrapy.Spider):
     
 class BabyvornamendeRareSpider(scrapy.Spider):
     name = "babyvornamenderare"
-    allowed_domains = ["baby-vornamen.de"]
+    allowed_domains = ["xxx"]
     start_urls = [
-        "https://www.baby-vornamen.de/Namensthemen/Listen/Seltene-Jungennamen-286.php",
-        "https://www.baby-vornamen.de/Namensthemen/Listen/Seltene-Maedchennamen-287.php"
+        "xxx",
+        "xxx"
     ]
 
     def parse(self, response): 
@@ -125,22 +125,22 @@ class BabyvornamendeRareSpider(scrapy.Spider):
 
 class BabyvornamendeTop1000(scrapy.Spider):
     name = "babyvornamendetop1000"
-    allowed_domains = ["baby-vornamen.de"]
-    start_urls = ["https://www.baby-vornamen.de/Vornamen/"]
+    allowed_domains = ["xxx"]
+    start_urls = ["xxx"]
 
     def parse(self, response): 
         names = response.css('td.tab__data--name a::attr(href)')
         yield from response.follow_all(names, self.parse_name)
 
         if response.request.method == 'GET':
-            url = 'https://www.baby-vornamen.de/Vornamen/'
+            url = 'xxx'
             data = {
                 'sta': '1',
                 'wei': '1',
             }
             headers = {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Referer': 'https://www.baby-vornamen.de/Vornamen/',
+                'Referer': 'xxx',
             }
 
             yield scrapy.FormRequest(
