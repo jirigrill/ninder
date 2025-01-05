@@ -3,6 +3,8 @@ import type { Session } from '$lib/types';
 import { authenticate } from '$lib/server/authenticate';
 import { deleteHistory } from '$lib/server/CategoryRepository';
 import { SessionService } from '../services/SessionService';
+import { CardService } from '../services/CardService';
+import { MatchService } from '../services/MatchService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -74,9 +76,12 @@ export const DELETE: RequestHandler = async (event) => {
 	}
 
 	try {
-		await new SessionService().deleteSessionByUserId(userId);
-		// await deleteAllCardInteractions(sessionId || -1);
+		const sessionService = new SessionService();
+
+		await new CardService(sessionService).deleteAllCardInteractions(userId);
 		await deleteHistory(userId);
+
+		await sessionService.deleteSessionByUserId(userId);
 
 		return json({ message: 'Session deleted successfully' });
 	} catch (error) {

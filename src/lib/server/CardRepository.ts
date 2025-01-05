@@ -1,10 +1,10 @@
 import type { Card, Match } from '$lib/types';
-import { getPartnerUserId } from './SessionRepository';
 import { getLikedByPartner } from './CardInteractionRepository';
 import prisma from './PrismaContext';
 
 export async function getNextCards(
 	userId: string,
+	partnerUserId: string,
 	letterCode: string,
 	take: number,
 	sex: string
@@ -23,7 +23,6 @@ export async function getNextCards(
 				};
 
 	if (letterCode.toUpperCase() === 'XDP') {
-		const partnerUserId = await getPartnerUserId(userId);
 		const partnerInteractions = await getLikedByPartner(partnerUserId || '', sex);
 		const partnerInteractedCards = partnerInteractions.map((interaction) => interaction.cardId);
 

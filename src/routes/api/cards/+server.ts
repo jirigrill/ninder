@@ -1,8 +1,7 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import { authenticate } from '$lib/server/authenticate';
-import { getNextCards } from '$lib/server/CardRepository';
-import { getPartnerCardInteractions } from '$lib/server/CardInteractionRepository';
 import { SessionService } from '../services/SessionService';
+import { CardService } from '../services/CardService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
 	const userId = await authenticate(event);
@@ -16,25 +15,9 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 	const sex = url.searchParams.get('sex') || 'all';
 
 	try {
-		const nextCards = await getNextCards(userId, country, take, sex);
 		const sessionService = new SessionService();
-		const session = await sessionService.getSessionByUserId(userId);
-		const partnerUserId = sessionService.getPartnerUserId(userId, session);
-		if (partnerUserId === null) {
-			return json({ error: 'No partner found' }, { status: 404 });
-		}
-
-		const partnerInteractions = await getPartnerCardInteractions(
-			partnerUserId,
-			nextCards.map((card) => card.id)
-		);
-
-		nextCards.forEach((card) => {
-			const interaction = partnerInteractions.find((interaction) => interaction.cardId === card.id);
-			if (interaction) {
-				card.partnerInteraction = interaction;
-			}
-		});
+		const cardService = new CardService(sessionService);
+		const nextCards = await cardService.getNextCards(userId, country, take, sex);
 
 		return json(nextCards);
 	} catch {
