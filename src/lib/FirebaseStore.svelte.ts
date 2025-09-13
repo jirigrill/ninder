@@ -1,49 +1,36 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, type User, type UserCredential } from 'firebase/auth';
-import { Firestore, getFirestore } from 'firebase/firestore';
-import type { PartnerSession } from './types';
-
-const firebaseConfig = {
-	apiKey: 'AIzaSyAaxvmtb8eFtmkSbQyHIvveWbHnl6STi1Q',
-	authDomain: 'ninder-74387.firebaseapp.com',
-	projectId: 'ninder-74387',
-	storageBucket: 'ninder-74387.firebasestorage.app',
-	messagingSenderId: '682243847210',
-	appId: '1:682243847210:web:828e80cfcbc3cc85de7f53'
-};
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
-export const auth = getAuth();
-
-let user: User | null = $state(null);
-let session: PartnerSession | null = $state(null);
+// Temporary stub to prevent build errors during Firebase removal
+// TODO: Remove this file once all components are updated to use simpleAuth
 
 export function getUserStore() {
-	return {
-		get user(): User | null {
-			return user;
-		},
-		set user(value: User) {
-			user = value;
-		}
-	};
+  return {
+    get user() {
+      return null;
+    },
+    set user(value) {
+      // No-op
+    }
+  };
 }
 
 export function getSessionStore() {
-	return {
-		get session(): PartnerSession | null {
-			return session;
-		},
-		set session(value: PartnerSession) {
-			session = value;
-		}
-	};
+  return {
+    get session() {
+      return null;
+    },
+    set session(value) {
+      // No-op
+    }
+  };
 }
 
-export async function login(): Promise<UserCredential> {
-	return signInAnonymously(auth);
+export async function login() {
+  // No-op - returns empty promise
+  return Promise.resolve(null);
 }
 
-export function getStore(): Firestore {
-	return firestore;
+export function getStore() {
+  // Return empty object
+  return {};
 }
+
+export const auth = null;

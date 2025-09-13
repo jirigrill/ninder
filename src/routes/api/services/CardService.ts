@@ -16,14 +16,13 @@ export class CardService {
 	async getNextCards(userId: string, country: string, take: number, sex: string): Promise<Card[]> {
 		const session = await this.sessionService.getSessionByUserId(userId);
 		const partnerUserId = this.sessionService.getPartnerUserId(userId, session);
-		if (partnerUserId === null) {
-			return [];
-		}
+		// TODO: For now, allow single-user mode for testing
+		const effectivePartnerUserId = partnerUserId || userId;
 
-		const nextCards = await getNextCards(userId, partnerUserId, country, take, sex);
+		const nextCards = await getNextCards(userId, effectivePartnerUserId, country, take, sex);
 
 		const partnerInteractions = await getPartnerCardInteractions(
-			partnerUserId,
+			effectivePartnerUserId,
 			nextCards.map((card) => card.id)
 		);
 

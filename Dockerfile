@@ -4,18 +4,21 @@ FROM node:18-alpine AS build
 RUN set -ex; \
     apk update; \
     apk add --no-cache \
-    openssl
+    openssl \
+    python3 \
+    make \
+    g++
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
-
 # Copy the rest of the application code
 COPY . .
+
+# Clean install dependencies to ensure native modules are built for Alpine
+RUN rm -rf node_modules && npm ci
 
 RUN npx prisma generate
 RUN npm run build

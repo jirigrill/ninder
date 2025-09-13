@@ -1,13 +1,12 @@
-import { getUserStore } from '$lib/FirebaseStore.svelte';
+import { secureAuth } from '$lib/auth-secure';
 import type { CreateSession, JoinSession, Session } from '$lib/types';
 
-export const deleteSession = async (userId: string) => {
-	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/session`, {
+export const deleteSession = async (username: string) => {
+	const response = await fetch(`/api/session?username=${username}`, {
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${idToken}`
+			...secureAuth.getAuthHeader()
 		}
 	});
 
@@ -23,9 +22,10 @@ export const deleteSession = async (userId: string) => {
 	return data;
 };
 
-export const getSession = async (userId: string) => {
-	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/session`, { headers: { Authorization: `Bearer ${idToken}` } });
+export const getSession = async (username: string) => {
+	const response = await fetch(`/api/session?username=${username}`, {
+		headers: secureAuth.getAuthHeader()
+	});
 	const data = await response.json();
 	if (response.status === 404) {
 		return null;
@@ -34,16 +34,15 @@ export const getSession = async (userId: string) => {
 	return data as Session;
 };
 
-export const createSession = async (userId: string) => {
-	const idToken = await getUserStore().user?.getIdToken();
+export const createSession = async (username: string) => {
 	const session: CreateSession = {
-		initiatorUserId: userId
+		initiatorUserId: username
 	};
 	const response = await fetch(`/api/session`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${idToken}`
+			...secureAuth.getAuthHeader()
 		},
 		body: JSON.stringify(session)
 	});
@@ -51,17 +50,16 @@ export const createSession = async (userId: string) => {
 	return data as Session;
 };
 
-export const joinSession = async (userId: string, pairingCode: string) => {
-	const idToken = await getUserStore().user?.getIdToken();
+export const joinSession = async (username: string, pairingCode: string) => {
 	const session: JoinSession = {
-		partnerUserId: userId,
+		partnerUserId: username,
 		pairingCode: pairingCode
 	};
 	const response = await fetch(`/api/session`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${idToken}`
+			...secureAuth.getAuthHeader()
 		},
 		body: JSON.stringify(session)
 	});

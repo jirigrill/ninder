@@ -21,15 +21,15 @@ This is a learning project to get started with Svelte.
 
 # Techstack
 
-- Frontend: Svelte (kit), Shadcn, Bits UI, Tailwind, Firebase
-- Backend: Sveltekit, Prisma, Firebase
-- Database: Postgres
-- Other: Scrapy, Docker Swarm
+- Frontend: Svelte (kit), Shadcn, Bits UI, Tailwind
+- Backend: Sveltekit, Prisma
+- Database: PostgreSQL
+- Other: Scrapy, Docker Compose
 
 # Operations
 
-Unlike many others these days, I’ve chosen not to use a PaaS solution.
-Ninder is hosted on a V-Server from Hetzner within a Docker Swarm single-node cluster.
+Unlike many others these days, I've chosen not to use a PaaS solution.
+Ninder is hosted on a V-Server from Hetzner using Docker Compose.
 
 The main reason for this decision is cost efficiency, as I run several other useful services in the background, such as **Uptime Karma** for monitoring and **Umami** for user tracking and site analytics.
 
@@ -37,9 +37,9 @@ Once changes are committed to the master branch, a Docker image is automatically
 
 # Authentication
 
-Authentication is implemented using Firebase.
-For now, I rely entirely on anonymous logins to allow users to try the app without the need to register first.
-In the future, additional authentication providers can be added, and all anonymous user accounts can be migrated to full accounts seamlessly.
+Authentication is implemented using a lightweight username-only system.
+Users simply choose a username to identify themselves across devices.
+No passwords or email addresses are required, making it easy to get started while still maintaining progress across sessions.
 
 # Swiping
 

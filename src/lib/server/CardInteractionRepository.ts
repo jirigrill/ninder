@@ -113,7 +113,14 @@ export async function getLikedByPartner(
 
 export async function isMatch(partnerUserId: string, cardId: number): Promise<boolean> {
 	const result = await prisma.card_interactions.findFirst({
-		where: { user_id: partnerUserId, name_id: cardId, action: 'liked' }
+		where: { 
+			user_id: partnerUserId, 
+			name_id: cardId, 
+			OR: [
+				{ action: 'liked' },
+				{ action: 'superliked' }
+			]
+		}
 	});
 	return result !== null;
 }

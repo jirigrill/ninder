@@ -3,6 +3,8 @@ export type Card = {
 	name: string;
 	countries: string[];
 	meaning: string;
+	description: string;
+	origin: string;
 	partnerInteraction: CardInteraction | null;
 };
 
@@ -61,6 +63,8 @@ export type Match = {
 	cardId: number;
 	name: string;
 	meaning: string;
+	description: string;
+	origin: string;
 	countries: string[];
 	superMatch: boolean;
 };

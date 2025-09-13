@@ -50,6 +50,8 @@ export async function getNextCards(
 		id: name.id,
 		name: name.name,
 		meaning: name.meaning ?? '',
+		description: name.description ?? '',
+		origin: name.origin ?? '',
 		countries: name.name_categories
 			.map((nc) => nc.categories.letter_code)
 			.filter((code): code is string => code !== null)
@@ -76,7 +78,9 @@ export async function getNames(nameIds: number[]): Promise<Match[]> {
 	return names.map((name) => ({
 		cardId: name.id,
 		name: name.name,
-		meaning: '',
+		meaning: name.meaning ?? '',
+		description: name.description ?? '',
+		origin: name.origin ?? '',
 		countries: name.name_categories
 			.map((nc) => nc.categories.letter_code)
 			.filter((code): code is string => code !== null),

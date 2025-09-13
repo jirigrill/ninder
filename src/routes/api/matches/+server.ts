@@ -1,26 +1,27 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
-import { authenticate } from '$lib/server/authenticate';
 import type { Match } from '$lib/types';
 import { SessionService } from '../services/SessionService';
 import { AdviceService } from '../services/AdviceService';
 import { MatchService } from '../services/MatchService';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-	const userId = await authenticate(event);
-	if (!userId) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+	const url = new URL(event.request.url);
+	const username = url.searchParams.get('username');
+	
+	if (!username) {
+		return json({ error: 'username is required' }, { status: 400 });
 	}
 
 	try {
 		const sessionService = new SessionService();
-		const session = await sessionService.getSessionByUserId(userId);
-		const partnerUserId = sessionService.getPartnerUserId(userId, session);
+		const session = await sessionService.getSessionByUserId(username);
+		const partnerUserId = sessionService.getPartnerUserId(username, session);
 		if (!partnerUserId) {
 			return json({ error: 'No partner found' }, { status: 404 });
 		}
 
 		const matchService = new MatchService(sessionService, new AdviceService());
-		const matches = await matchService.getMatches(userId, partnerUserId);
+		const matches = await matchService.getMatches(username, partnerUserId);
 
 		return json(matches);
 	} catch (error) {
@@ -29,9 +30,11 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 };
 
 export const DELETE: RequestHandler = async (event) => {
-	const userId = await authenticate(event);
-	if (!userId) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+	const url = new URL(event.request.url);
+	const username = url.searchParams.get('username');
+	
+	if (!username) {
+		return json({ error: 'username is required' }, { status: 400 });
 	}
 
 	const match: Match = await event.request.json();
@@ -40,11 +43,11 @@ export const DELETE: RequestHandler = async (event) => {
 	}
 	try {
 		const sessionService = new SessionService();
-		const session = await sessionService.getSessionByUserId(userId);
-		const partnerUserId = sessionService.getPartnerUserId(userId, session);
+		const session = await sessionService.getSessionByUserId(username);
+		const partnerUserId = sessionService.getPartnerUserId(username, session);
 
 		const matchService = new MatchService(sessionService, new AdviceService());
-		await matchService.deleteMatch(userId, partnerUserId || '', match.cardId);
+		await matchService.deleteMatch(username, partnerUserId || '', match.cardId);
 
 		return json({ message: 'Match deleted successfully' });
 	} catch (error) {

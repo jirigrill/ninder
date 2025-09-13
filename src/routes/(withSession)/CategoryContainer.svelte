@@ -59,7 +59,7 @@
 						{m[`categories_country_${category.letterCode.toLowerCase()}`]?.()}
 					</h1>
 					<p class="col-span-2 self-end text-start text-xs leading-none text-slate-500">
-						{category.swipedCards}/{category.totalCards} Namen
+						{category.swipedCards}/{category.totalCards} {m.category_names_counter()}
 					</p>
 				</button>
 			{/each}

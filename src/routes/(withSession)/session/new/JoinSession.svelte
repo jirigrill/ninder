@@ -2,7 +2,8 @@
 	import PinInput from '$lib/components/PinInput.svelte';
 	import StatusButton from '$lib/components/StatusButton.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import { secureAuth } from '$lib/auth-secure';
+	import { goto } from '$app/navigation';
 	import * as m from '$lib/paraglide/messages.js';
 
 	type Props = { onjoined: () => void };
@@ -13,7 +14,10 @@
 	let sessionJoinState: 'none' | 'loading' | 'failed' | 'succeeded' = $state('none');
 	let pinState = '';
 	let pinValue: string[] = $state([]);
-	const userStore = getUserStore();
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		goto('/auth');
+	}
 
 	function onPinInput(pin: string) {
 		pinState = pin;
@@ -22,11 +26,11 @@
 
 	async function onJoinSession() {
 		sessionJoinState = 'loading';
-		const result = await joinSession(userStore.user?.uid, pinState);
+		const result = await joinSession(user.username, pinState);
 		sessionJoinState = result ? 'succeeded' : 'failed';
 
 		if (result) {
-			umami.identify({ user_id: userStore.user?.uid, pairing_code: pinState });
+			umami.identify({ user_id: user.username, pairing_code: pinState });
 			setTimeout(() => onjoined(), 1000);
 		}
 	}

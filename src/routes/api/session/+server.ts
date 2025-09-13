@@ -1,23 +1,34 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
 import type { Session } from '$lib/types';
-import { authenticate } from '$lib/server/authenticate';
 import { deleteHistory } from '$lib/server/CategoryRepository';
 import { SessionService } from '../services/SessionService';
 import { CardService } from '../services/CardService';
 import { MatchService } from '../services/MatchService';
+import { requireAuth } from '$lib/server/auth-middleware';
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
-	const userId = await authenticate(event);
-	if (!userId) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+	// Authenticate user
+	let authenticatedUser;
+	try {
+		authenticatedUser = requireAuth(event);
+	} catch {
+		return json({ error: 'Authentication required' }, { status: 401 });
 	}
 
-	if (!userId) {
-		return json({ error: 'user_id is required' }, { status: 400 });
+	const url = new URL(event.request.url);
+	const username = url.searchParams.get('username');
+
+	// Verify the username matches the authenticated user
+	if (username !== authenticatedUser.username) {
+		return json({ error: 'Username mismatch' }, { status: 403 });
+	}
+
+	if (!username) {
+		return json({ error: 'username is required' }, { status: 400 });
 	}
 
 	try {
-		const session = await new SessionService().getSessionByUserId(userId);
+		const session = await new SessionService().getSessionByUserId(username);
 
 		if (!session) {
 			return json({ error: 'No session found' }, { status: 404 });
@@ -30,10 +41,6 @@ export const GET: RequestHandler = async (event: RequestEvent) => {
 };
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
-	const userId = await authenticate(event);
-	if (!userId) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
 	try {
 		const newSession: Session = await event.request.json();
 		if (!newSession.initiatorUserId && !newSession.partnerUserId) {
@@ -66,22 +73,20 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
 };
 
 export const DELETE: RequestHandler = async (event) => {
-	const userId = await authenticate(event);
-	if (!userId) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	const url = new URL(event.request.url);
+	const username = url.searchParams.get('username');
 
-	if (!userId) {
-		return json({ error: 'user_id is required' }, { status: 400 });
+	if (!username) {
+		return json({ error: 'username is required' }, { status: 400 });
 	}
 
 	try {
 		const sessionService = new SessionService();
 
-		await new CardService(sessionService).deleteAllCardInteractions(userId);
-		await deleteHistory(userId);
+		await new CardService(sessionService).deleteAllCardInteractions(username);
+		await deleteHistory(username);
 
-		await sessionService.deleteSessionByUserId(userId);
+		await sessionService.deleteSessionByUserId(username);
 
 		return json({ message: 'Session deleted successfully' });
 	} catch (error) {

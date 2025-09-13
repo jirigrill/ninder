@@ -1,21 +1,24 @@
 import { browser } from '$app/environment';
-import { auth, login } from '$lib/FirebaseStore.svelte';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { secureAuth } from '$lib/auth-secure';
+import { redirect } from '@sveltejs/kit';
+import type { PageLoad } from './$types';
 
-export const load: PageLoad = async () => {
+export const load: PageLoad = async ({ url }) => {
 	if (browser) {
-		await login();
+		// Check if user is authenticated
+		const user = secureAuth.getCurrentUser();
+		
+		// If not authenticated, redirect to auth page
+		if (!user) {
+			throw redirect(302, '/auth');
+		}
+		
+		return {
+			user: user
+		};
 	}
-
-	function getAuthUser(): Promise<User | null> {
-		return new Promise((resolve) => {
-			onAuthStateChanged(auth, (user) => {
-				resolve(user);
-			});
-		});
-	}
-
+	
 	return {
-		getAuthUser: getAuthUser
+		user: null
 	};
 };

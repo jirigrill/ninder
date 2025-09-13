@@ -7,38 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model advices {
+  id      Int    @id @default(autoincrement())
+  user_id String @db.VarChar(255)
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model card_interactions {
-  id         Int     @id @default(autoincrement())
-  name_id    Int?
-  user_id    String  @db.VarChar(255)
-  action     String? @db.VarChar(10)
+  id          Int      @id @default(autoincrement())
+  name_id     Int?
+  user_id     String   @db.VarChar(255)
+  action      String?  @db.VarChar(10)
+  session_id  Int?
   last_change Boolean? @default(true)
-  session_id Int?
-  names      names?  @relation(fields: [name_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  names       names?   @relation(fields: [name_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model categories {
-  id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(255)
-  letter_code     String?           @db.VarChar(10)
-  total_cards     Int?              @default(0)
-  total_male_cards     Int?              @default(0)
-  total_female_cards     Int?              @default(0)
-  icon_class      String            @db.VarChar(255) @default("")
-  visible         Boolean?          @default(false)
-  set String @db.VarChar(255) @default("countries")
-  name_categories name_categories[]
+  id                 Int               @id @default(autoincrement())
+  name               String            @db.VarChar(255)
+  letter_code        String?           @db.VarChar(10)
+  total_cards        Int?              @default(0)
+  visible            Boolean?          @default(false)
+  total_female_cards Int?              @default(0)
+  total_male_cards   Int?              @default(0)
+  icon_class         String            @default("") @db.VarChar(255)
+  set                String            @default("countries") @db.VarChar(255)
+  name_categories    name_categories[]
 
   @@unique([name, letter_code])
 }
 
 model category_history {
-  id              Int               @id @default(autoincrement())
-  user_id    String  @db.VarChar(255)
-  first_category_id Int? 
+  id                 Int    @id @default(autoincrement())
+  user_id            String @db.VarChar(255)
+  first_category_id  Int?
   second_category_id Int?
-  third_category_id Int? 
+  third_category_id  Int?
   fourth_category_id Int?
 }
 
@@ -55,9 +60,12 @@ model names {
   id                Int                 @id @default(autoincrement())
   name              String              @unique @db.VarChar(255)
   meaning           String?
+  description       String?             @db.Text
+  origin            String?             @db.Text
   sex               String              @default("male")
-  popular           Boolean          @default(false)
-  tags              String            @default("")
+  popular           Boolean             @default(false)
+  tags              String              @default("")
+  scraped_at        DateTime?
   card_interactions card_interactions[]
   name_categories   name_categories[]
 }
@@ -69,7 +77,10 @@ model sessions {
   partneruserid   String? @db.VarChar(255)
 }
 
-model advices {
-  id        Int     @id @default(autoincrement())
-  user_id   String  @db.VarChar(255)
+model users {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique @db.VarChar(50)
+  password_hash String   @db.VarChar(255)
+  created_at    DateTime @default(now())
+  last_seen     DateTime @default(now())
 }

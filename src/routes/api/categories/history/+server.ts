@@ -1,12 +1,9 @@
 import { json, type RequestEvent, type RequestHandler } from '@sveltejs/kit';
-import { authenticate } from '$lib/server/authenticate';
 import { pushToCategoryHistory } from '$lib/server/CategoryRepository';
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
-	const user_id = await authenticate(event);
-	if (!user_id) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	// TODO: Replace with proper authentication
+	const user_id = 'default-user';
 	const url = new URL(event.request.url);
 	const category_id = Number.parseInt(url.searchParams.get('category') || '') || null;
 

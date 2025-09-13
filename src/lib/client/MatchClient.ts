@@ -1,22 +1,35 @@
-import { getUserStore } from '$lib/FirebaseStore.svelte';
+import { secureAuth } from '$lib/auth-secure';
 import type { Match } from '$lib/types';
 
 export const getMatches = async () => {
-	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/matches`, {
-		headers: { Authorization: `Bearer ${idToken}` }
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		throw new Error('User not authenticated');
+	}
+	
+	const response = await fetch(`/api/matches?username=${user.username}`, {
+		headers: secureAuth.getAuthHeader()
 	});
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error || 'Failed to fetch matches');
+	}
+	
 	const data = await response.json();
 	return (data as Match[]).reverse();
 };
 
 export const deleteMatch = async (match: Match) => {
-	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/matches`, {
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		throw new Error('User not authenticated');
+	}
+	
+	const response = await fetch(`/api/matches?username=${user.username}`, {
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${idToken}`
+			...secureAuth.getAuthHeader()
 		},
 		body: JSON.stringify(match)
 	});

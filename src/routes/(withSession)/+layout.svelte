@@ -2,7 +2,7 @@
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 	import '/node_modules/flag-icons/css/flag-icons.min.css';
 	import '../../app.css';
-	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import { secureAuth } from '$lib/auth-secure';
 	import { browser } from '$app/environment';
 	import { getSession } from '$lib/client/SessionClient';
 	import { afterNavigate, goto } from '$app/navigation';
@@ -17,7 +17,7 @@
 	let loading = $state(true);
 	let hideAppBar = $state(false);
 	let pathSegment = $state('categories');
-	const userStore = getUserStore();
+	let currentUser = $state(null);
 
 	const query = createQuery<Boolean, Error>({
 		queryKey: ['advices'],
@@ -34,26 +34,21 @@
 		handleUserAuthentication();
 	});
 
-	function updateUserStore(user) {
-		userStore.user = user;
+	function handleUserAuthentication() {
+		const user = secureAuth.getCurrentUser();
+		if (!user) {
+			goto('/auth');
+			return;
+		}
+
+		currentUser = user;
+		// TODO: Check session status with new username system
+		loading = false;
 	}
 
-	function handleUserAuthentication() {
-		data.getAuthUser().then(async (user) => {
-			if (!user) {
-				return;
-			}
-
-			updateUserStore(user);
-			let session = await getSession(user.uid);
-
-			if (!session || !session.partnerUserId) {
-				goto('/session/new');
-			}
-
-			umami.identify({ user_id: user.uid, pairing_code: session?.pairingCode || '' });
-			loading = false;
-		});
+	function handleLogout() {
+		secureAuth.logout();
+		goto('/auth');
 	}
 
 	onMount(() => {

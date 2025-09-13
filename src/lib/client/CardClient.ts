@@ -1,11 +1,21 @@
-import { getUserStore } from '$lib/FirebaseStore.svelte';
+import { secureAuth } from '$lib/auth-secure';
 import type { Card } from '$lib/types';
 
 export const getCards = async (country: string, take: number, sex: string) => {
-	const idToken = await getUserStore().user?.getIdToken();
-	const response = await fetch(`/api/cards?country=${country}&take=${take}&sex=${sex}`, {
-		headers: { Authorization: `Bearer ${idToken}` }
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		throw new Error('User not authenticated');
+	}
+	
+	const response = await fetch(`/api/cards?username=${user.username}&country=${country}&take=${take}&sex=${sex}`, {
+		headers: secureAuth.getAuthHeader()
 	});
+	
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error || 'Failed to fetch cards');
+	}
+	
 	const data = await response.json();
 	return (data as Card[]).reverse();
 };
@@ -15,17 +25,26 @@ export const swipeCard = async (swipeAction: {
 	swipeAction: 'like' | 'dislike' | 'superlike';
 	categoryOrigin: string;
 }): Promise<boolean> => {
-	const idToken = await getUserStore().user?.getIdToken();
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		throw new Error('User not authenticated');
+	}
+	
 	const response = await fetch(
-		`/api/cards/${swipeAction.card.id}/${swipeAction.swipeAction}?categoryOrigin=${swipeAction.categoryOrigin}`,
+		`/api/cards/${swipeAction.card.id}/${swipeAction.swipeAction}?username=${user.username}&categoryOrigin=${swipeAction.categoryOrigin}`,
 		{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${idToken}`
+				...secureAuth.getAuthHeader()
 			}
 		}
 	);
+
+	if (!response.ok) {
+		const error = await response.json();
+		throw new Error(error.error || 'Failed to swipe card');
+	}
 
 	const json = await response.json();
 	return json as boolean;

@@ -3,7 +3,8 @@
 	import PinInput from '$lib/components/PinInput.svelte';
 	import QrCode from '$lib/components/QrCode.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { getUserStore } from '$lib/FirebaseStore.svelte';
+	import { secureAuth } from '$lib/auth-secure';
+	import { goto } from '$app/navigation';
 	import type { Session } from '$lib/types';
 	import CreateSessionSkeleton from './CreateSessionSkeleton.svelte';
 	import * as m from '$lib/paraglide/messages.js';
@@ -12,7 +13,11 @@
 	import { poll } from '$lib/client/FetchPolling';
 	import { onDestroy } from 'svelte';
 	const { onjoined }: Props = $props();
-	const userId = getUserStore().user.uid;
+	const user = secureAuth.getCurrentUser();
+	if (!user) {
+		goto('/auth');
+	}
+	const userId = user.username;
 	let session: Session | null = $state(null);
 
 	const { stop } = poll<Session | null>(
