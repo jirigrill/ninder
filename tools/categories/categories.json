@@ -11,7 +11,7 @@
         "id": "-2",
         "name": "Top 1000",
         "letterCode": "XTOP1000",
-        "iconClass": "fa-solid fa-start self-center text-yellow-500",
+        "iconClass": "fa-solid fa-star self-center text-yellow-500",
         "set": "popular",
         "virtual": "False"
     },
@@ -772,7 +772,7 @@
         "name": "Grills",
         "letterCode": "grills",
         "iconClass": "grill-icon self-center",
-        "set": "countries",
+        "set": "popular",
         "virtual": "False"
     }
 ]

@@ -11,7 +11,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check .",
-		"start:migrate:prod": "prisma migrate deploy && npm run start:prod"
+		"start:migrate:prod": "prisma migrate deploy && npm run load-data:prod && npm run start:prod",
+		"load-data:prod": "node -e \"const { spawn } = require('child_process'); const cmd = spawn('sh', ['-c', 'npx prisma db execute --file tools/categories/generate_categories.sql || true && npx prisma db execute --file tools/names/consolidated_names.sql || true'], { stdio: 'inherit' }); cmd.on('close', () => process.exit(0));\" || true"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "1.11.3",

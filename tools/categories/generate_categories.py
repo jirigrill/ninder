@@ -7,8 +7,9 @@ def load_json_file(filepath):
 
 def main():
     # Load JSON files
-    names_data = load_json_file('.\scrapy\consolidated.json')
+    names_data = load_json_file('../scrapy/consolidated.json')
     categories_data = load_json_file('categories.json')
+    custom_names_data = load_json_file('../names/custom_names.json')
 
     # Step 1: Group names by country
     country_name_count = defaultdict(int)
@@ -27,7 +28,14 @@ def main():
         iconClass = category["iconClass"]
         set = category["set"]
         visible = 'TRUE'
-        if not category["virtual"] == "True" and category["letterCode"][0] != "X":
+
+        # Special handling for Grills category (ID 94)
+        if id == "94" or id == 94:
+            total_cards = len(custom_names_data)
+            total_male_cards = len(list(filter(lambda x: x["sex"] == "male", custom_names_data)))
+            total_female_cards = len(list(filter(lambda x: x["sex"] == "female", custom_names_data)))
+            visible = 'TRUE'
+        elif not category["virtual"] == "True" and category["letterCode"][0] != "X":
             total_cards = len(list(filter(lambda x: letter_code in x["countries"], names_data)))
             total_male_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["male", "all"], names_data)))
             total_female_cards = len(list(filter(lambda x: letter_code in x["countries"] and x["sex"] in ["female", "all"], names_data)))

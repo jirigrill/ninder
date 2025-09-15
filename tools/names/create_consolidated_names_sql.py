@@ -163,18 +163,26 @@ class ConsolidatedNamesSQLGenerator:
         """Generate SQL file with all names and category relationships"""
         try:
             all_names = {}
-            
-            # Add original names
+
+            # Add original names first
             for name_key, name_entry in self.original_names.items():
                 all_names[name_key] = name_entry
-            
-            # Add custom names (don't overwrite existing)
+
+            # Add custom names with highest priority - merge with existing or add new
             for name_entry in self.custom_names:
                 name_key = name_entry.name.lower()
                 if name_key not in all_names:
+                    # New custom name - add it
                     all_names[name_key] = name_entry
+                    logger.info(f"Added new custom name: {name_entry.name}")
                 else:
-                    logger.warning(f"Skipping duplicate name: {name_entry.name}")
+                    # Existing name - merge categories (add Grills category)
+                    existing_entry = all_names[name_key]
+                    existing_entry.category_ids.update(name_entry.category_ids)
+                    # Update tags to include grills if not already there
+                    if 'grills' not in existing_entry.tags:
+                        existing_entry.tags = f"{existing_entry.tags}, grills" if existing_entry.tags else "grills"
+                    logger.info(f"Updated existing name with Grills category: {name_entry.name}")
             
             logger.info(f"Generating SQL for {len(all_names)} total names")
             

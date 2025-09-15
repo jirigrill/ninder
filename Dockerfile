@@ -42,6 +42,7 @@ COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/tools ./tools
 
 # Expose the default port (adjust if necessary)
 EXPOSE 3000
